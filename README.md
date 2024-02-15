@@ -1,7 +1,11 @@
 # Infuse Media Integrator
 
 ## Überblick
-Der `kurmann/infuse-media-integrator` ist ein Microservice innerhalb der `kurmann/media-library`, der speziell dafür entwickelt wurde, Videodateien nahtlos in eine Infuse-kompatible Mediathek zu integrieren. Dieser Service optimiert die Strukturierung der Medieninhalte, sodass sie direkt mit dem Infuse Player auf Apple TV und anderen Geräten gestreamt werden können.
+Der `kurmann/infuse-media-integrator` ist ein Microservice innerhalb der `kurmann/media-library`, der speziell dafür entwickelt wurde, Videodateien nahtlos in eine Infuse-kompatible Mediathek zu integrieren. 
+
+### Hauptzweck
+
+Dieser Service optimiert die Strukturierung der Medieninhalte, sodass sie direkt mit dem Infuse Player auf Apple TV und anderen Geräten gestreamt werden können.
 
 ## Funktionen
 - **Automatische Integration**: Verschiebt Videodateien mit bearbeiteten Metadaten in die Infuse-Mediathek, indem er eine spezifische Verzeichnis- und Dateistruktur verwendet, die von Infuse erkannt wird.
