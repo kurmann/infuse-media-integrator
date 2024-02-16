@@ -11,3 +11,7 @@ Entspricht dem Eingabeverzeichnis
 ### /output
 
 Entspricht dem simuliertem Stammverzeichnis der Infuse-Mediathek
+
+## Videodateien
+
+- [2024-02-11 Zwillinge Testvideo](tests/input/family-kurmann-glueck-category-with-embedded-artwork/2024-02-11 Zwillinge Testvideo.m4v)
