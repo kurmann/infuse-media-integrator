@@ -13,7 +13,7 @@ public class Mpeg4VideoFileWithEmbeddedMetadata
 
     private Mpeg4VideoFileWithEmbeddedMetadata(FileInfo fileInfo) => FileInfo = fileInfo;
 
-    public static Result<FileInfo> Create(string path)
+    public static Result<Mpeg4VideoFileWithEmbeddedMetadata> Create(string path)
     {
         try
         {
@@ -22,18 +22,18 @@ public class Mpeg4VideoFileWithEmbeddedMetadata
 
             // Prüfe, ob die Datei existiert
             if (!fileInfo.Exists)
-                return Result.Failure<FileInfo>("File not found.");
+                return Result.Failure<Mpeg4VideoFileWithEmbeddedMetadata>("File not found.");
 
             // Prüfe, ob die Datei eine MPEG4-Datei ist
             if (!mpeg4FileExtensions.Contains(fileInfo.Extension))
-                return Result.Failure<FileInfo>("File is not a MPEG4 file.");
+                return Result.Failure<Mpeg4VideoFileWithEmbeddedMetadata>("File is not a MPEG4 file.");
 
             // Rückgabe des FileInfo-Objekts
-            return Result.Success(fileInfo);
+            return new Mpeg4VideoFileWithEmbeddedMetadata(fileInfo);
         }
         catch (Exception e)
         {
-            return Result.Failure<FileInfo>($"Error on reading file info: {e.Message}");
+            return Result.Failure<Mpeg4VideoFileWithEmbeddedMetadata>($"Error on reading file info: {e.Message}");
         }
     }
 }
