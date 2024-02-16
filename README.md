@@ -17,3 +17,7 @@ Der Service ist so konzipiert, dass er als Teil der `kurmann/media-library`-Arch
 
 ## Ziel
 Ziel des `kurmann/infuse-media-integrator` ist es, die Verwaltung und das Teilen von Videomedien zu vereinfachen, indem er eine Brücke zwischen der `kurmann/media-library` und der Infuse-App schafft.
+
+## Testdaten
+
+Für Unittesting mit Videodateien stehen Testdaten bereit: [Testdateien](tests/Tests.md)
