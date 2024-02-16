@@ -2,6 +2,9 @@ using CSharpFunctionalExtensions;
 
 namespace Kurmann.InfuseMediaIntegrator.Entities;
 
+/// <summary>
+/// Repräsentiert eine MPEG4-Video-Datei mit eingebetteten Metadaten.
+/// </summary>
 public class Mpeg4VideoFileWithEmbeddedMetadata
 {
     private static readonly string[] mpeg4FileExtensions = [".mp4", ".m4v"];
