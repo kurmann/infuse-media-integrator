@@ -5,11 +5,9 @@ namespace Kurmann.InfuseMediaIntegrator.Entities;
 /// <summary>
 /// Repräsentiert eine Sammlung von MPEG4-Video-Dateien mit eingebetteten Metadaten.
 /// </summary>
-public class Mpeg4VideoInputFiles
+public class Mpeg4VideoInputFiles(IEnumerable<Mpeg4VideoFileWithEmbeddedMetadata> mpeg4VideoFiles)
 {
-    private readonly List<Mpeg4VideoFileWithEmbeddedMetadata> _mpeg4VideoFiles;
-
-    private Mpeg4VideoInputFiles(List<Mpeg4VideoFileWithEmbeddedMetadata> mpeg4VideoFiles) => _mpeg4VideoFiles = mpeg4VideoFiles;
+    public IReadOnlyList<Mpeg4VideoFileWithEmbeddedMetadata> Mpeg4VideoFiles { get; } = mpeg4VideoFiles.ToList();
 
     public static Result<Mpeg4VideoInputFiles> Create(string directoryPath)
     {
