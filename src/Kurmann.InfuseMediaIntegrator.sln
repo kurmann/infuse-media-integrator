@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kurmann.InfuseMediaIntegrator", "Kurmann.InfuseMediaIntegrator\Kurmann.InfuseMediaIntegrator.csproj", "{C8C6F9B9-A586-48B0-B62B-BDA139FD36D7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kurmann.InfuseMediaIntegrator.Tests", "Kurmann.InfuseMediaIntegrator.Tests\Kurmann.InfuseMediaIntegrator.Tests.csproj", "{684C8540-35F9-4B1E-98D1-218154871383}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{C8C6F9B9-A586-48B0-B62B-BDA139FD36D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C8C6F9B9-A586-48B0-B62B-BDA139FD36D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C8C6F9B9-A586-48B0-B62B-BDA139FD36D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{684C8540-35F9-4B1E-98D1-218154871383}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{684C8540-35F9-4B1E-98D1-218154871383}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{684C8540-35F9-4B1E-98D1-218154871383}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{684C8540-35F9-4B1E-98D1-218154871383}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
