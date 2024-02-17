@@ -1,14 +1,12 @@
-using Xunit;
 using Kurmann.InfuseMediaIntegrator.Entities;
 
 namespace Kurmann.InfuseMediaIntegrator.Tests.Entities;
 
-
-public class Mpeg4VideoInputFilesTests : TestBase
+[TestClass]
+public class Mpeg4VideoInputFilesTests
 {
-    private string InputDirectoryPath => GetInputDirectoryPath("family-kurmann-glueck-category-with-embedded-artwork");
 
-    [Fact]
+    [TestMethod]
     public void Create_ShouldReturnSuccess_WhenDirectoryExists()
     {
         // Arrange
@@ -22,7 +20,7 @@ public class Mpeg4VideoInputFilesTests : TestBase
         Assert.NotNull(result.Value);
     }
     
-    [Fact]
+    [TestMethod]
     public void Create_ShouldReturnFailure_WhenDirectoryNotFound()
     {
         // Arrange
