@@ -11,7 +11,7 @@ public class Mpeg4VideoInputFilesTests
     public void Create_ShouldReturnSuccess_WhenDirectoryExists()
     {
         // Arrange
-        var directoryPath = Path.Combine(InputDirectoryPath, "Zwillinge Testvideo.m4v");
+        var directoryPath = InputDirectoryPath;
         
         // Act
         var result = Mpeg4VideoInputFiles.Create(directoryPath);
@@ -24,7 +24,7 @@ public class Mpeg4VideoInputFilesTests
     public void Create_ShouldReturnFailure_WhenDirectoryNotFound()
     {
         // Arrange
-        var directoryPath = Path.Combine("../not/existing", "Zwillinge Testvideo.m4v");
+        var directoryPath = "../not/existing";
         
         // Act
         var result = Mpeg4VideoInputFiles.Create(directoryPath);
