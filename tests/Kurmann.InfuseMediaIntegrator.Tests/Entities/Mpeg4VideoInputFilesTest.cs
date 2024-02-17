@@ -1,4 +1,5 @@
 using Xunit;
+using Kurmann.InfuseMediaIntegrator.Entities;
 
 namespace Kurmann.InfuseMediaIntegrator.Tests.Entities;
 
