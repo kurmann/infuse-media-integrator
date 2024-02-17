@@ -18,7 +18,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
 
-    <ProjectReference Include="..\..\src\Kurmann.InfuseMediaIntegrator\Kurmann.InfuseMediaIntegrator.csproj" />
+    <ProjectReference Include="..\Kurmann.InfuseMediaIntegrator\Kurmann.InfuseMediaIntegrator.csproj" />
   </ItemGroup>
 
 </Project>
