@@ -5,9 +5,10 @@ namespace Kurmann.InfuseMediaIntegrator.Entities;
 /// <summary>
 /// Repräsentiert eine Sammlung von MPEG4-Video-Dateien mit eingebetteten Metadaten.
 /// </summary>
-public class VideoIntegrationDirectory(IEnumerable<Mpeg4Video> mpeg4VideoFiles)
+public class VideoIntegrationDirectory(IEnumerable<Mpeg4Video> mpeg4VideoFiles, IEnumerable<QuickTimeVideo> quickTimeVideoFiles)
 {
     public IReadOnlyList<Mpeg4Video> Mpeg4VideoFiles { get; } = mpeg4VideoFiles.ToList();
+    public IReadOnlyList<QuickTimeVideo> QuickTimeVideoFiles { get; } = quickTimeVideoFiles.ToList();
 
     public static Result<VideoIntegrationDirectory> Create(string directoryPath)
     {
@@ -28,6 +29,7 @@ public class VideoIntegrationDirectory(IEnumerable<Mpeg4Video> mpeg4VideoFiles)
 
             // Filtere die MPEG4-Dateien
             var mpeg4VideoFiles = new List<Mpeg4Video>();
+            var quickTimeVideoFiles = new List<QuickTimeVideo>();
             foreach (var file in files)
             {
                 // Erstelle ein Mpeg4VideoFileWithEmbeddedMetadata-Objekt
@@ -39,10 +41,20 @@ public class VideoIntegrationDirectory(IEnumerable<Mpeg4Video> mpeg4VideoFiles)
 
                 // Füge das Objekt der Liste hinzu
                 mpeg4VideoFiles.Add(mpeg4VideoFile.Value);
+
+                // Erstelle ein QuickTimeVideoFileWithEmbeddedMetadata-Objekt
+                var quickTimeVideoFile = QuickTimeVideo.Create(file.FullName);
+
+                // Prüfe, ob das Objekt erstellt werden konnte, falls nicht, ignoriere die Datei
+                if (quickTimeVideoFile.IsFailure)
+                    continue;
+
+                // Füge das Objekt der Liste hinzu
+                quickTimeVideoFiles.Add(quickTimeVideoFile.Value);
             }
 
-            // Rückgabe des Mpeg4VideoInputFiles-Objekts
-            return Result.Success(new VideoIntegrationDirectory(mpeg4VideoFiles));
+            // Rückgabe des VideoIntegrationDirectory-Objekts
+            return Result.Success(new VideoIntegrationDirectory(mpeg4VideoFiles, quickTimeVideoFiles));
         }
         catch (Exception e)
         {

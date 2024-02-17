@@ -23,6 +23,7 @@ public class VideoIntegrationDirectoryTests
         // Assert
         Assert.IsTrue(result.IsSuccess);
         Assert.AreEqual(1, result.Value.Mpeg4VideoFiles.Count); // Hier sollte nur die MPEG4-Datei enthalten sein
+        Assert.AreEqual(1, result.Value.QuickTimeVideoFiles.Count); // Hier sollte nur die QuickTime-Datei enthalten sein
     }
     
     [TestMethod]
