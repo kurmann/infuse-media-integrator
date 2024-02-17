@@ -5,11 +5,11 @@ namespace Kurmann.InfuseMediaIntegrator.Entities;
 /// <summary>
 /// Repräsentiert eine Sammlung von MPEG4-Video-Dateien mit eingebetteten Metadaten.
 /// </summary>
-public class Mpeg4VideoInputFiles(IEnumerable<Mpeg4Video> mpeg4VideoFiles)
+public class VideoIntegrationDirectory(IEnumerable<Mpeg4Video> mpeg4VideoFiles)
 {
     public IReadOnlyList<Mpeg4Video> Mpeg4VideoFiles { get; } = mpeg4VideoFiles.ToList();
 
-    public static Result<Mpeg4VideoInputFiles> Create(string directoryPath)
+    public static Result<VideoIntegrationDirectory> Create(string directoryPath)
     {
         try
         {
@@ -18,7 +18,10 @@ public class Mpeg4VideoInputFiles(IEnumerable<Mpeg4Video> mpeg4VideoFiles)
 
             // Prüfe, ob das Verzeichnis existiert
             if (!directoryInfo.Exists)
-                return Result.Failure<Mpeg4VideoInputFiles>("Directory not found.");
+            {
+                // Gib das nicht gefundene Verzeichnis zurück
+                return Result.Failure<VideoIntegrationDirectory>($"Directory {directoryInfo.FullName} not found.");
+            }
 
             // Lese alle Dateien im Verzeichnis
             var files = directoryInfo.GetFiles();
@@ -39,11 +42,11 @@ public class Mpeg4VideoInputFiles(IEnumerable<Mpeg4Video> mpeg4VideoFiles)
             }
 
             // Rückgabe des Mpeg4VideoInputFiles-Objekts
-            return Result.Success(new Mpeg4VideoInputFiles(mpeg4VideoFiles));
+            return Result.Success(new VideoIntegrationDirectory(mpeg4VideoFiles));
         }
         catch (Exception e)
         {
-            return Result.Failure<Mpeg4VideoInputFiles>($"Error on reading directory info: {e.Message}");
+            return Result.Failure<VideoIntegrationDirectory>($"Error on reading directory info: {e.Message}");
         }
     }
 }

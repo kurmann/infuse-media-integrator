@@ -3,12 +3,12 @@ using Kurmann.InfuseMediaIntegrator.Entities;
 namespace Kurmann.InfuseMediaIntegrator.Tests.Entities;
 
 [TestClass]
-public class Mpeg4VideoInputFilesTests
+public class VideoIntegrationDirectoryTests
 {
-    private const string InputDirectoryPath = "/Data/Input";
+    private const string InputDirectoryPath = "../../Data/Input";
 
     /// <summary>
-    /// Testet die Methode <see cref="Mpeg4VideoInputFiles.Create(string)"/>.
+    /// Testet die Methode <see cref="VideoIntegrationDirectory.Create(string)"/>.
     /// Ausganssituation ist ein Verzeichnis mit einer MPEG4-Datei und einer QuickTime-Datei.
     /// </summary>
     [TestMethod]
@@ -18,7 +18,7 @@ public class Mpeg4VideoInputFilesTests
         var directoryPath = InputDirectoryPath;
         
         // Act
-        var result = Mpeg4VideoInputFiles.Create(directoryPath);
+        var result = VideoIntegrationDirectory.Create(directoryPath);
         
         // Assert
         Assert.IsTrue(result.IsSuccess);
@@ -32,7 +32,7 @@ public class Mpeg4VideoInputFilesTests
         var directoryPath = "../not/existing";
         
         // Act
-        var result = Mpeg4VideoInputFiles.Create(directoryPath);
+        var result = VideoIntegrationDirectory.Create(directoryPath);
         
         // Assert
         Assert.AreEqual("Directory not found.", result.Error);
