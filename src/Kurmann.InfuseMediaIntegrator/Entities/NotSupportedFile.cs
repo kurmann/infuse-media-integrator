@@ -4,11 +4,23 @@ namespace Kurmann.InfuseMediaIntegrator.Entities;
 
 public class NotSupportedFile
 {
+    /// <summary>
+    /// Repräsentiert eine nicht unterstützte Datei.
+    /// </summary>
     public FileInfo FileInfo { get; }
 
-    private NotSupportedFile(FileInfo fileInfo) => FileInfo = fileInfo;
+    /// <summary>
+    /// Der Grund, warum die Datei nicht unterstützt wird.
+    /// </summary>
+    public string Reason { get; }
 
-    public static Result<NotSupportedFile> Create(string path)
+    private NotSupportedFile(FileInfo fileInfo, string reason)
+    {
+        FileInfo = fileInfo;
+        Reason = reason;
+    }
+
+    public static Result<NotSupportedFile> Create(string path, string reason)
     {
         try
         {
@@ -20,7 +32,7 @@ public class NotSupportedFile
                 return Result.Failure<NotSupportedFile>("File not found.");
 
             // Rückgabe des FileInfo-Objekts
-            return new NotSupportedFile(fileInfo);
+            return new NotSupportedFile(fileInfo, reason);
         }
         catch (Exception e)
         {
