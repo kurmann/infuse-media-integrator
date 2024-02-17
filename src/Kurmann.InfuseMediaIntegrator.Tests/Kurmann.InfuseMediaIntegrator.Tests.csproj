@@ -19,5 +19,13 @@
   <ItemGroup>
     <ProjectReference Include="..\Kurmann.InfuseMediaIntegrator\Kurmann.InfuseMediaIntegrator.csproj" />
   </ItemGroup>
+  
+  <!-- Kopiert die Test-Dateien ins Ausgabeverzeichnis damit diese beim Testen zuverlässig gefunden werden -->
+  <ItemGroup>
+    <Content Include="Data\Input\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 
 </Project>
