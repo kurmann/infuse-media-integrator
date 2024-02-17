@@ -5,7 +5,7 @@ namespace Kurmann.InfuseMediaIntegrator.Tests.Entities;
 [TestClass]
 public class Mpeg4VideoInputFilesTests
 {
-    private const string InputDirectoryPath = "../../../../../tests/Data/Input";
+    private const string InputDirectoryPath = "Data/Input";
 
     [TestMethod]
     public void Create_ShouldReturnSuccess_WhenDirectoryExists()
