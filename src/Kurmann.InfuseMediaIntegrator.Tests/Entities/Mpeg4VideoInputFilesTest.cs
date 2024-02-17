@@ -5,7 +5,7 @@ namespace Kurmann.InfuseMediaIntegrator.Tests.Entities;
 [TestClass]
 public class Mpeg4VideoInputFilesTests
 {
-    private const string InputDirectoryPath = "Data/Input";
+    private const string InputDirectoryPath = "/Data/Input";
 
     [TestMethod]
     public void Create_ShouldReturnSuccess_WhenDirectoryExists()
@@ -18,6 +18,7 @@ public class Mpeg4VideoInputFilesTests
         
         // Assert
         Assert.IsTrue(result.IsSuccess);
+        Assert.AreEqual(1, result.Value.Mpeg4VideoFiles.Count);
     }
     
     [TestMethod]
