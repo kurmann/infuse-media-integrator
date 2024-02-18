@@ -11,4 +11,6 @@
     <PackageReference Include="CSharpFunctionalExtensions" Version="2.40.3" />
   </ItemGroup>
 
+  <RootNamespace>Kurmann.InfuseMediaIntegrator</RootNamespace>
+
 </Project>
