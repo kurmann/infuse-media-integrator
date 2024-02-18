@@ -4,6 +4,7 @@ namespace Kurmann.InfuseMediaIntegrator;
 
 /// <summary>
 /// Nimmt eine Datei entgegen und prüft, ob es sich um eine unterstützte Video-Datei handelt und bestimmt den Video-Datentyp.
+/// Prüft nicht, ob die Datei existiert, wertet als nur die Dateiendung aus.
 /// </summary>
 public class SupportedVideoFileType
 {
@@ -20,10 +21,6 @@ public class SupportedVideoFileType
         {
             // Erstelle ein FileInfo-Objekt
             var fileInfo = new FileInfo(path);
-
-            // Prüfe, ob die Datei existiert
-            if (!fileInfo.Exists)
-                return Result.Failure<SupportedVideoFileType>("File not found.");
 
             // Bestimme den Dateityp anhand der Dateiendung und berücksichtige dabei die Groß-/Kleinschreibung nicht
             if (quickTimeFileExtensions.Contains(fileInfo.Extension, StringComparer.OrdinalIgnoreCase))
