@@ -36,36 +36,32 @@ public class VideoIntegrationDirectory(IEnumerable<Mpeg4Video> mpeg4VideoFiles,
             var notSupportedFiles = new List<NotSupportedFile>();
             foreach (var file in files)
             {
-                // Erstelle ein Mpeg4VideoFileWithEmbeddedMetadata-Objekt
-                var mpeg4VideoFile = Mpeg4Video.Create(file.FullName);
-
-                // Prüfe, ob das Objekt erstellt werden konnte, und füge es der Liste hinzu
-                if (mpeg4VideoFile.IsSuccess)
+                // Prüfe, ob die Datei existiert
+                if (!file.Exists)
                 {
-                    mpeg4VideoFiles.Add(mpeg4VideoFile.Value);
-                    continue; // Fahre mit der nächsten Datei fort
+                    return Result.Failure<VideoIntegrationDirectory>($"File not found: {file.FullName}");
                 }
 
-                // Erstelle ein QuickTimeVideo-Objekt und füge es der Liste hinzu wenn es erstellt werden konnte
-                var quickTimeVideoFile = QuickTimeVideo.Create(file.FullName);
-                if (quickTimeVideoFile.IsSuccess)
+                // Ermittle den unterstützten Video-Dateityp
+                var fileType = SupportedVideoFileType.Create(file.FullName);
+                if (fileType.IsFailure)
                 {
-                    quickTimeVideoFiles.Add(quickTimeVideoFile.Value);
-                    continue; // Fahre mit der nächsten Datei fort
+                    return Result.Failure<VideoIntegrationDirectory>($"Error on reading file info: {fileType.Error}");
                 }
 
-                // Erstelle ein NotSupportedFile-Objekt und füge es der Liste hinzu wenn es erstellt werden konnte
-                var notSupportedFile = NotSupportedFile.Create(file.FullName, $"File '{file.Name}' is not supported.");
-                if (notSupportedFile.IsSuccess)
+                // Füge das Video-Objekt der entsprechenden Liste hinzu anhand des Dateityps
+                switch (fileType.Value.Type)
                 {
-                    notSupportedFiles.Add(notSupportedFile.Value);
-                    continue; // Fahre mit der nächsten Datei fort
-                }
-
-                // Gib eine Fehlermeldung zurück, wenn das Erstellen des NotSupportedFile-Objekts fehlgeschlagen ist
-                if (notSupportedFile.IsFailure)
-                {
-                    return Result.Failure<VideoIntegrationDirectory>($"Error on reading file info: {notSupportedFile.Error}");
+                    case VideoFileType.Mpeg4:
+                        Mpeg4Video.Create(file.FullName).Tap(mpeg4VideoFiles.Add);
+                        break;
+                    case VideoFileType.QuickTime:
+                        QuickTimeVideo.Create(file.FullName).Tap(quickTimeVideoFiles.Add);
+                        break;
+                    case VideoFileType.NotSupported:
+                        // Retourniere eine NotSupportedFile-Instanz mit der Datei und dem Grund, dass die Dateiendung nicht unterstützt wird
+                        NotSupportedFile.Create(file.FullName, $"File extension not supported.").Tap(notSupportedFiles.Add);
+                        break;
                 }
 
             }

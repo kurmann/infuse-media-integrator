@@ -27,7 +27,7 @@ public class SupportedVideoFileType
                 return new SupportedVideoFileType(VideoFileType.QuickTime);
             if (mpeg4FileExtensions.Contains(fileInfo.Extension, StringComparer.OrdinalIgnoreCase))
                 return new SupportedVideoFileType(VideoFileType.Mpeg4);
-            return new SupportedVideoFileType(VideoFileType.NotSupportedFile);
+            return new SupportedVideoFileType(VideoFileType.NotSupported);
         }
         catch (Exception e)
         {
@@ -38,7 +38,7 @@ public class SupportedVideoFileType
 
 public enum VideoFileType
 {
-    NotSupportedFile,
+    NotSupported,
     QuickTime,
     Mpeg4
 }
