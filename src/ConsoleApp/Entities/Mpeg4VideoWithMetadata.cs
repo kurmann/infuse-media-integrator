@@ -25,7 +25,7 @@ namespace Kurmann.InfuseMediaIntegrator.Entities
             Album = album;
         }
 
-        public static Result<Mpeg4VideoWithMetadata> Create(string file)
+        public static Result<Mpeg4VideoWithMetadata> Create(string? file)
         {
             var mpeg4Video = Mpeg4Video.Create(file);
             if (mpeg4Video.IsFailure)
