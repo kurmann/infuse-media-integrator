@@ -14,13 +14,18 @@ public class CreateFanartInfuseImageCommandTests
     {
         // Arrange
         var videoPath = new FileInfo(Path.Combine(InputDirectoryPath, "Zwillinge Testvideo.m4v"));
-        var outputDirectory = new DirectoryInfo(Path.Combine(InputDirectoryPath, "Data/Output"));
+        var outputDirectory = "Data/Processing";
 
         // Act
-        var createFanartInfuseImageCommand = new CreateFanartInfuseImageCommand(videoPath.FullName, outputDirectory.FullName);
+        var createFanartInfuseImageCommand = new CreateFanartInfuseImageCommand(videoPath.FullName, outputDirectory);
         var result = createFanartInfuseImageCommand.Execute();
 
         // Assert
         Assert.IsTrue(result.IsSuccess);
+        Assert.IsTrue(File.Exists(Path.Combine(outputDirectory, "Zwillinge Testvideo-fanart.jpg")));
+        Assert.IsTrue(new FileInfo(Path.Combine(outputDirectory, "Zwillinge Testvideo-fanart.jpg")).Length > 0);
+
+        // Clean up
+        File.Delete(Path.Combine(outputDirectory, "Zwillinge Testvideo-fanart.jpg"));
     }
 }

@@ -13,7 +13,7 @@ public class MimeTypeToExtensionMapping
         Extension = extension;
     }
 
-    public static Result<MimeTypeToExtensionMapping> Create(string mimeType)
+    public static Result<MimeTypeToExtensionMapping> Create(string? mimeType)
     {
         if (string.IsNullOrWhiteSpace(mimeType))
             return Result.Failure<MimeTypeToExtensionMapping>("MIME-Typ ist nicht definiert.");

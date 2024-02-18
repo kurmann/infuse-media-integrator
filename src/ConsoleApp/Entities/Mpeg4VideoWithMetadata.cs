@@ -15,9 +15,18 @@ namespace Kurmann.InfuseMediaIntegrator.Entities
         public string Album { get; }
         public byte[]? Artwork { get; }
         public string? ArtworkMimeType { get; }
+        public string? ArtworkExtension { get; }
         public Mpeg4Video Mpeg4Video { get; }
 
-        private Mpeg4VideoWithMetadata(Mpeg4Video mpeg4Video, string title, string titleSort, string description, uint? year, string album, byte[]? artwork, string? artworkMimeType)
+        private Mpeg4VideoWithMetadata(Mpeg4Video mpeg4Video,
+                                       string title,
+                                       string titleSort,
+                                       string description,
+                                       uint? year,
+                                       string album,
+                                       byte[]? artwork,
+                                       string? artworkMimeType,
+                                       string? artworkExtension)
         {
             Mpeg4Video = mpeg4Video;
             Title = title;
@@ -27,6 +36,7 @@ namespace Kurmann.InfuseMediaIntegrator.Entities
             Album = album;
             Artwork = artwork;
             ArtworkMimeType = artworkMimeType;
+            ArtworkExtension = artworkExtension;
         }
 
         public static Result<Mpeg4VideoWithMetadata> Create(string? file)
@@ -49,6 +59,7 @@ namespace Kurmann.InfuseMediaIntegrator.Entities
                 var tagLibPicture = tagLibFile.Tag.Pictures.ElementAtOrDefault(0);
                 byte[]? artwork = tagLibPicture?.Data.Data;
                 string? artworkMimeType = tagLibPicture?.MimeType;
+                string? artworkExtension = MimeTypeToExtensionMapping.Create(artworkMimeType).GetValueOrDefault()?.Extension;
 
                 // Lies die restlichen Metadaten aus und erstelle ein Mpeg4VideoWithMetadata-Objekt
                 return new Mpeg4VideoWithMetadata(mpeg4Video: mpeg4Video,
@@ -58,7 +69,8 @@ namespace Kurmann.InfuseMediaIntegrator.Entities
                                                   year: tagLibFile.Tag.Year,
                                                   album: tagLibFile.Tag.Album,
                                                   artwork: artwork,
-                                                  artworkMimeType: artworkMimeType);
+                                                  artworkMimeType: artworkMimeType,
+                                                  artworkExtension: artworkExtension);
             }
             catch (Exception ex)
             {
