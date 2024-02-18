@@ -10,9 +10,9 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/src/Kurmann.InfuseMediaIntegrator/bin/Debug/net8.0/Kurmann.InfuseMediaIntegrator.dll",
+            "program": "${workspaceFolder}/src/ConsoleApp/bin/Debug/net8.0/ConsoleApp.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/src/Kurmann.InfuseMediaIntegrator",
+            "cwd": "${workspaceFolder}/src/ConsoleApp",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
             "console": "internalConsole",
             "stopAtEntry": false
