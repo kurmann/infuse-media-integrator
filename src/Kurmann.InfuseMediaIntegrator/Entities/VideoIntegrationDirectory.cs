@@ -47,6 +47,7 @@ public class VideoIntegrationDirectory(IEnumerable<Mpeg4Video> mpeg4VideoFiles,
 
                         mpeg4VideoFiles.Add(mpeg4VideoFile.Value);     
                     }
+                }
                 
                 // Erstelle ein QuickTimeVideo-Objekt
                 var quickTimeVideoFile = QuickTimeVideo.Create(file.FullName);
