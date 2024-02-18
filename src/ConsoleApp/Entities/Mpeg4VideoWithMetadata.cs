@@ -13,9 +13,11 @@ namespace Kurmann.InfuseMediaIntegrator.Entities
         public string Description { get; }
         public uint? Year { get; }
         public string Album { get; }
+        public byte[]? Artwork { get; }
+        public string? ArtWorkFileExtension { get; }
         public Mpeg4Video Mpeg4Video { get; }
 
-        private Mpeg4VideoWithMetadata(Mpeg4Video mpeg4Video, string title, string titleSort, string description, uint? year, string album)
+        private Mpeg4VideoWithMetadata(Mpeg4Video mpeg4Video, string title, string titleSort, string description, uint? year, string album, byte[]? artwork, string? artWorkFileExtension)
         {
             Mpeg4Video = mpeg4Video;
             Title = title;
@@ -23,6 +25,8 @@ namespace Kurmann.InfuseMediaIntegrator.Entities
             Description = description;
             Year = year;
             Album = album;
+            Artwork = artwork;
+            ArtWorkFileExtension = artWorkFileExtension;
         }
 
         public static Result<Mpeg4VideoWithMetadata> Create(string? file)
@@ -39,13 +43,20 @@ namespace Kurmann.InfuseMediaIntegrator.Entities
             // Erstelle ein TagLib-Objekt
             var tagLibFile = TagLib.File.Create(mpeg4Video.FileInfo.FullName);
 
-            // Lies die Metadaten aus und erstelle ein Mpeg4VideoWithMetadata-Objekt
+            // Lies das Titelbild (Artwork) aus den Metadaten
+            var tagLibPicture = tagLibFile.Tag.Pictures.ElementAtOrDefault(0);
+            byte[]? artwork = tagLibPicture?.Data.Data;
+            string? artWorkFileExtension = tagLibPicture?.Filename?.Split('.').LastOrDefault();
+
+            // Lies die restlichen Metadaten aus und erstelle ein Mpeg4VideoWithMetadata-Objekt
             return new Mpeg4VideoWithMetadata(mpeg4Video: mpeg4Video,
                                               title: tagLibFile.Tag.Title,
                                               titleSort: tagLibFile.Tag.TitleSort,
                                               description: tagLibFile.Tag.Description,
                                               year: tagLibFile.Tag.Year,
-                                              album: tagLibFile.Tag.Album);
+                                              album: tagLibFile.Tag.Album,
+                                              artwork: artwork,
+                                              artWorkFileExtension: artWorkFileExtension);
         }
     }
 }
