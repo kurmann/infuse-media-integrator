@@ -1,14 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-
-
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
+    <RootNamespace>Kurmann.InfuseMediaIntegrator.Tests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Kurmann.InfuseMediaIntegrator\Kurmann.InfuseMediaIntegrator.csproj" />
+    <ProjectReference Include="..\ConsoleApp\ConsoleApp.csproj" />
   </ItemGroup>
   
   <!-- Kopiert die Test-Dateien ins Ausgabeverzeichnis damit diese beim Testen zuverlässig gefunden werden -->
@@ -28,7 +26,5 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-
-  <RootNamespace>Kurmann.InfuseMediaIntegrator.Tests</RootNamespace>
 
 </Project>
