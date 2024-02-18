@@ -24,7 +24,7 @@ public class VideoIntegrationDirectory(IEnumerable<Mpeg4Video> mpeg4VideoFiles,
             if (!directoryInfo.Exists)
             {
                 // Gib das nicht gefundene Verzeichnis zurück
-                return Result.Failure<VideoIntegrationDirectory>($"Directory {directoryInfo.FullName} not found.");
+                return Result.Failure<VideoIntegrationDirectory>($"Directory not found: {directoryInfo.FullName}");
             }
 
             // Lese alle Dateien im Verzeichnis
@@ -40,38 +40,33 @@ public class VideoIntegrationDirectory(IEnumerable<Mpeg4Video> mpeg4VideoFiles,
                 var mpeg4VideoFile = Mpeg4Video.Create(file.FullName);
 
                 // Prüfe, ob das Objekt erstellt werden konnte, und füge es der Liste hinzu
-                if (mpeg4VideoFile.IsFailure)
+                if (mpeg4VideoFile.IsSuccess)
                 {
-                    if (mpeg4VideoFile.IsSuccess)
-                    {
-
-                        mpeg4VideoFiles.Add(mpeg4VideoFile.Value);     
-                    }
+                    mpeg4VideoFiles.Add(mpeg4VideoFile.Value);
+                    continue; // Fahre mit der nächsten Datei fort
                 }
-                
-                // Erstelle ein QuickTimeVideo-Objekt
+
+                // Erstelle ein QuickTimeVideo-Objekt und füge es der Liste hinzu wenn es erstellt werden konnte
                 var quickTimeVideoFile = QuickTimeVideo.Create(file.FullName);
-
-                // Prüfe, ob das Objekt erstellt werden konnte, und füge es der Liste hinzu
-                if (quickTimeVideoFile.IsFailure)
+                if (quickTimeVideoFile.IsSuccess)
                 {
-                    if (quickTimeVideoFile.IsSuccess)
-                        quickTimeVideoFiles.Add(quickTimeVideoFile.Value);
+                    quickTimeVideoFiles.Add(quickTimeVideoFile.Value);
+                    continue; // Fahre mit der nächsten Datei fort
                 }
 
-                // Erstelle ein NotSupportedFile-Objekt
+                // Erstelle ein NotSupportedFile-Objekt und füge es der Liste hinzu wenn es erstellt werden konnte
                 var notSupportedFile = NotSupportedFile.Create(file.FullName, $"File '{file.Name}' is not supported.");
+                if (notSupportedFile.IsSuccess)
+                {
+                    notSupportedFiles.Add(notSupportedFile.Value);
+                    continue; // Fahre mit der nächsten Datei fort
+                }
 
-                // Prüfe, ob das Objekt erstellt werden konnte, und füge es der Liste hinzu
+                // Gib eine Fehlermeldung zurück, wenn das Erstellen des NotSupportedFile-Objekts fehlgeschlagen ist
                 if (notSupportedFile.IsFailure)
                 {
-                    if (notSupportedFile.IsSuccess)
-                        notSupportedFiles.Add(notSupportedFile.Value);
-                }
-                
-                // Wenn das NotSupportedFile-Objekt nicht erstellt werden konnte, gib eine Fehlermeldung aus
-                if (notSupportedFile.IsFailure)
                     return Result.Failure<VideoIntegrationDirectory>($"Error on reading file info: {notSupportedFile.Error}");
+                }
 
             }
 
