@@ -53,7 +53,7 @@ public class VideoIntegrationDirectoryTests
         var result = VideoIntegrationDirectory.Create(directoryPath);
         
         // Assert
-        Assert.AreEqual("Directory not found.", result.Error);
+        StringAssert.Contains(result.Error, "Directory not found: ");
         Assert.IsTrue(result.IsFailure);
     }
 }

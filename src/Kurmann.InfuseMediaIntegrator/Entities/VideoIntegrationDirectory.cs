@@ -24,7 +24,7 @@ public class VideoIntegrationDirectory(IEnumerable<Mpeg4Video> mpeg4VideoFiles,
             if (!directoryInfo.Exists)
             {
                 // Gib das nicht gefundene Verzeichnis zurück
-                return Result.Failure<VideoIntegrationDirectory>($"Directory {directoryInfo.FullName} not found.");
+                return Result.Failure<VideoIntegrationDirectory>($"Directory not found: {directoryInfo.FullName}");
             }
 
             // Lese alle Dateien im Verzeichnis
