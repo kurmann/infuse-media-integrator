@@ -7,8 +7,6 @@ namespace Kurmann.InfuseMediaIntegrator.Entities;
 /// </summary>
 public class Mpeg4Video
 {
-    private static readonly string[] mpeg4FileExtensions = [".mp4", ".m4v"];
-
     public FileInfo FileInfo { get; }
 
     private Mpeg4Video(FileInfo fileInfo) => FileInfo = fileInfo;
@@ -25,8 +23,12 @@ public class Mpeg4Video
                 return Result.Failure<Mpeg4Video>("File not found.");
 
             // Prüfe, ob die Datei eine MPEG4-Datei ist
-            if (!mpeg4FileExtensions.Contains(fileInfo.Extension))
-                return Result.Failure<Mpeg4Video>("File is not a MPEG4 file.");
+            var videoFileType = SupportedVideoFileType.Create(fileInfo.FullName);
+            if (videoFileType.IsFailure)
+                return Result.Failure<Mpeg4Video>($"Error on reading file info: {videoFileType.Error}");
+            
+            if (videoFileType.Value.Type != VideoFileType.Mpeg4)
+                return Result.Failure<Mpeg4Video>("File is not a MPEG4 video.");
 
             // Rückgabe des FileInfo-Objekts
             return new Mpeg4Video(fileInfo);

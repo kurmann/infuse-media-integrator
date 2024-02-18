@@ -7,8 +7,6 @@ namespace Kurmann.InfuseMediaIntegrator.Entities;
 /// </summary>
 public class QuickTimeVideo
 {
-    private static readonly string[] quickTimeFileExtensions = [".mov", ".qt"];
-
     public FileInfo FileInfo { get; }
 
     private QuickTimeVideo(FileInfo fileInfo) => FileInfo = fileInfo;
@@ -25,8 +23,12 @@ public class QuickTimeVideo
                 return Result.Failure<QuickTimeVideo>("File not found.");
 
             // Prüfe, ob die Datei eine QuickTime-Datei ist
-            if (!quickTimeFileExtensions.Contains(fileInfo.Extension))
-                return Result.Failure<QuickTimeVideo>("File is not a QuickTime file.");
+            var videoFileType = SupportedVideoFileType.Create(fileInfo.FullName);
+            if (videoFileType.IsFailure)
+                return Result.Failure<QuickTimeVideo>($"Error on reading file info: {videoFileType.Error}");
+
+            if (videoFileType.Value.Type != VideoFileType.QuickTime)
+                return Result.Failure<QuickTimeVideo>("File is not a QuickTime video.");
 
             // Rückgabe des FileInfo-Objekts
             return new QuickTimeVideo(fileInfo);
