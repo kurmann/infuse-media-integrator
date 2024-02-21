@@ -96,7 +96,7 @@ public class FileMappingInfoTests
     {
         // Arrange
         var category = "Familie";
-        var fileName = "2024-21 Ausflug nach Willisau.m4v";
+        var fileName = "2024-12 Ausflug nach Willisau.m4v";
         
         // Act
         var result = FileMappingInfo.Create(category, fileName);
@@ -122,5 +122,41 @@ public class FileMappingInfoTests
         Assert.AreEqual(2024, result.Value.Year);
         Assert.AreEqual(fileName, result.Value.SourcePath);
         Assert.AreEqual("Familie/2024/2024-21-03 Ausflug nach Willisau.m4v", result.Value.TargetPath);
+    }
+
+    [TestMethod]
+    public void Create_ShouldReturnSuccess_WhenFileNameHasIsoDateAndTitleWithUmlaut()
+    {
+        // Arrange
+        var category = "Familie";
+        var fileName = "2024-21-03 Ausflug nach Willisäu.m4v";
+        
+        // Act
+        var result = FileMappingInfo.Create(category, fileName);
+        
+        // Assert
+        Assert.IsTrue(result.IsSuccess);
+        Assert.AreEqual(category, result.Value.Category);
+        Assert.AreEqual(2024, result.Value.Year);
+        Assert.AreEqual(fileName, result.Value.SourcePath);
+        Assert.AreEqual("Familie/2024/2024-21-03 Ausflug nach Willisäu.m4v", result.Value.TargetPath);
+    }
+
+    [TestMethod]
+    public void Create_ShouldReturnSuccess_WhenFileNameHasIsoDateAndTitleWithSpecialCharacters()
+    {
+        // Arrange
+        var category = "Familie";
+        var fileName = "2024-21-03 Ausflug nach Willisäu!?.m4v";
+        
+        // Act
+        var result = FileMappingInfo.Create(category, fileName);
+        
+        // Assert
+        Assert.IsTrue(result.IsSuccess);
+        Assert.AreEqual(category, result.Value.Category);
+        Assert.AreEqual(2024, result.Value.Year);
+        Assert.AreEqual(fileName, result.Value.SourcePath);
+        Assert.AreEqual("Familie/2024/2024-21-03 Ausflug nach Willisäu!?.m4v", result.Value.TargetPath);
     }
 }
