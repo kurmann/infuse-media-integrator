@@ -52,21 +52,25 @@ public partial class FileMappingInfo
     /// <param name="year">Das extrahierte Jahr.</param>
     /// <param name="sortingTitle">Der extrahierte sortierte Titel.</param>
     /// <returns>True, wenn die Extraktion erfolgreich war; andernfalls False.</returns>
-    private static bool TryParseFileName(string fileName, out int year, out string sortingTitle)
+    private static bool TryParseFileName(string fileName, out int year, out string? sortingTitle)
     {
         year = 0;
-        sortingTitle = string.Empty;
-        
-        // Beispiel: 2024-21-03 Ausflug nach Willisau.m4v
-        var match = IsoDateWithFileName().Match(fileName);
-        if (!match.Success) return false;
+        sortingTitle = null;
 
-        var isoDate = match.Groups[1].Value; // Beispiel: 2024-21-03
-        sortingTitle = match.Groups[2].Value; // Beispiel: Ausflug nach Willisau
+        var match = YearMonthAndDateWithFilenameRegex().Match(fileName);
+        if (!match.Success)
+        {
+            return false;
+        }
 
-        if (!DateTime.TryParse(isoDate, out var date)) return false;
+        year = int.Parse(match.Groups["year"].Value);
+        if (year < 1900)
+        {
+            return false;
+        }
 
-        year = date.Year;
+        sortingTitle = match.Groups["title"].Value;
+
         return true;
     }
 
@@ -80,10 +84,10 @@ public partial class FileMappingInfo
     /// <returns>Der generierte Zielpfad.</returns>
     private static string GenerateTargetPath(string category, int year, string sortingTitle, string fileName)
     {
-        // Beispiel: root\Family Videos\2024\2024-21-03 Ausflug nach Willisau\2024-21-03 Ausflug nach Willisau.m4v
-        return $"root\\{category}\\{year}\\{sortingTitle}\\{fileName}";
+        var extension = Path.GetExtension(fileName);
+        return Path.Combine(category, year.ToString(), $"{sortingTitle}{extension}");
     }
 
-    [GeneratedRegex(@"^(\d{4}-\d{2}-\d{2})\s(.*?)\.\w+$")]
-    private static partial Regex IsoDateWithFileName();
+    [GeneratedRegex(@"^(?<year>\d{4})(-(?<month>\d{2})(-(?<day>\d{2}))?)? (?<title>.+)\.\w+$")]
+    private static partial Regex YearMonthAndDateWithFilenameRegex();
 }
