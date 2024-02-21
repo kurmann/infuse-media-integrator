@@ -21,3 +21,6 @@ Ziel des `kurmann/infuse-media-integrator` ist es, die Verwaltung und das Teilen
 ## Testdaten
 
 Für Unittesting mit Videodateien stehen Testdaten bereit: [Testdateien](docs/Tests.md)
+
+## Dokumentation
+- [Dateistruktur Infuse](/docs/Dateistruktur.md)
