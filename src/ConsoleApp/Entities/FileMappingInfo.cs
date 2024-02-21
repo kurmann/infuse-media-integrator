@@ -29,6 +29,11 @@ public partial class FileMappingInfo
     /// </summary>
     public int Year { get; }
 
+    /// <summary>
+    /// Der Typ der Datei im Sinn von Infuse.
+    /// </summary>
+    public InfuseMediaType MediaType { get; }
+
     private FileMappingInfo(string category, int year, string sourcePath, string targetPath)
     {
         Category = category;
@@ -50,7 +55,7 @@ public partial class FileMappingInfo
             return Result.Failure<FileMappingInfo>("Category cannot be null or whitespace.");
         }
 
-        if (string.IsNullOrWhiteSpace(filePath) || !TryParseFileName(filePath, out var year))
+        if (string.IsNullOrWhiteSpace(filePath) || !TryParseYear(filePath, out var year))
         {
             return Result.Failure<FileMappingInfo>("File name does not match the expected format '{{ISO-Datum}} {{Titel}}.{{Extension}}'.");
         }
@@ -66,7 +71,7 @@ public partial class FileMappingInfo
     /// <param name="fileName">Der Dateiname.</param>
     /// <param name="year">Das extrahierte Jahr.</param>
     /// <returns>True, wenn die Extraktion erfolgreich war; andernfalls False.</returns>
-    private static bool TryParseFileName(string fileName, out int year)
+    private static bool TryParseYear(string fileName, out int year)
     {
         year = 0;
 
