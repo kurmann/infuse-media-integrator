@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
 
 namespace Kurmann.InfuseMediaIntegrator.Entities;
@@ -6,7 +7,7 @@ namespace Kurmann.InfuseMediaIntegrator.Entities;
 /// Definiert ein Mapping von einer Quelldatei zu einem Zielpfad basierend auf den Metadaten der Datei.
 /// Die Metadaten werden aus dem Dateinamen extrahiert, der ein spezifisches Format haben muss.
 /// </summary>
-public class FileMappingInfo
+public partial class FileMappingInfo
 {
     public string Category { get; }
     public int Year { get; }
@@ -56,7 +57,7 @@ public class FileMappingInfo
         year = 0;
         sortingTitle = string.Empty;
         
-        var match = System.Text.RegularExpressions.Regex.Match(fileName, @"^(\d{4}-\d{2}-\d{2})\s(.*?)\.\w+$");
+        var match = IsoDateWithFileName().Match(fileName);
         if (!match.Success) return false;
 
         var isoDate = match.Groups[1].Value;
@@ -80,4 +81,7 @@ public class FileMappingInfo
     {
         return $"root\\{category}\\{year}\\{sortingTitle}\\{fileName}";
     }
+
+    [GeneratedRegex(@"^(\d{4}-\d{2}-\d{2})\s(.*?)\.\w+$")]
+    private static partial Regex IsoDateWithFileName();
 }
