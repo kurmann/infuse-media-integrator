@@ -1,3 +1,5 @@
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
+
 namespace Kurmann.InfuseMediaIntegrator.Commands;
 
 [TestClass]
@@ -26,5 +28,20 @@ public class CreateFanartInfuseImageCommandTests
 
         // Clean up
         File.Delete(Path.Combine(InputDirectoryPath, "Zwillinge Testvideo-fanart.jpg")); // Lösche das Fanart-Infuse-Image damit der Test wiederholt werden kann
+    }
+
+    [TestMethod] // Teste ob leerer Pfad zu einem Fehler führt
+    public void Execute_ShouldReturnFailure_WhenMpeg4VideoPathIsEmpty()
+    {
+        // Arrange
+        var videoPath = string.Empty;
+
+        // Act
+        var createFanartInfuseImageCommand = new CreateFanartInfuseImageCommand(videoPath);
+        var result = createFanartInfuseImageCommand.Execute();
+
+        // Assert
+        StringAssert.Contains(result.Error, "The MP4 video does not exist.");
+        Assert.IsTrue(result.IsFailure);
     }
 }
