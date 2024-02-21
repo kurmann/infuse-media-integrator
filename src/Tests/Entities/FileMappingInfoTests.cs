@@ -159,4 +159,19 @@ public class FileMappingInfoTests
         Assert.AreEqual(fileName, result.Value.SourcePath);
         Assert.AreEqual("Familie/2024/2024-21-03 Ausflug nach Willisäu!?.m4v", result.Value.TargetPath);
     }
+
+    [TestMethod]
+    public void Create_ShouldRecognizeJpgFileAsFanart()
+    {
+        // Arrange
+        var category = "Familie";
+        var fileName = "2024-21-03 Ausflug nach Willisau.jpg";
+        
+        // Act
+        var result = FileMappingInfo.Create(category, fileName);
+        
+        // Assert
+        Assert.IsTrue(result.IsSuccess);
+        Assert.AreEqual(InfuseMediaType.FanartImage, result.Value.MediaType);
+    }
 }
