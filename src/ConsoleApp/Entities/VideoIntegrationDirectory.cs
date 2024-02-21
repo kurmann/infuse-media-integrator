@@ -7,11 +7,13 @@ namespace Kurmann.InfuseMediaIntegrator.Entities;
 /// </summary>
 public class VideoIntegrationDirectory(IEnumerable<Mpeg4Video> mpeg4VideoFiles,
                                        IEnumerable<QuickTimeVideo> quickTimeVideoFiles,
-                                       IEnumerable<NotSupportedFile> notSupportedFiles)
+                                       IEnumerable<NotSupportedFile> notSupportedFiles,
+                                       IEnumerable<FileInfo> jpegFiles)
 {
     public IReadOnlyList<Mpeg4Video> Mpeg4VideoFiles { get; } = mpeg4VideoFiles.ToList();
     public IReadOnlyList<QuickTimeVideo> QuickTimeVideoFiles { get; } = quickTimeVideoFiles.ToList();
     public IReadOnlyList<NotSupportedFile> NotSupportedFiles { get; } = notSupportedFiles.ToList();
+    public IReadOnlyList<FileInfo> JpegFiles { get; } = jpegFiles.ToList();
 
     public static Result<VideoIntegrationDirectory> Create(string directoryPath)
     {
@@ -34,6 +36,7 @@ public class VideoIntegrationDirectory(IEnumerable<Mpeg4Video> mpeg4VideoFiles,
             var mpeg4VideoFiles = new List<Mpeg4Video>();
             var quickTimeVideoFiles = new List<QuickTimeVideo>();
             var notSupportedFiles = new List<NotSupportedFile>();
+            var jpegFiles = new List<FileInfo>();
             foreach (var file in files)
             {
                 // Prüfe, ob die Datei existiert
@@ -58,16 +61,18 @@ public class VideoIntegrationDirectory(IEnumerable<Mpeg4Video> mpeg4VideoFiles,
                     case VideoFileType.QuickTime:
                         QuickTimeVideo.Create(file.FullName).Tap(quickTimeVideoFiles.Add);
                         break;
+                    case VideoFileType.Jpeg:
+                        jpegFiles.Add(file);
+                        break;
                     case VideoFileType.NotSupported:
                         // Retourniere eine NotSupportedFile-Instanz mit der Datei und dem Grund, dass die Dateiendung nicht unterstützt wird
                         NotSupportedFile.Create(file.FullName, $"File extension not supported.").Tap(notSupportedFiles.Add);
                         break;
                 }
-
             }
 
             // Rückgabe des VideoIntegrationDirectory-Objekts
-            return Result.Success(new VideoIntegrationDirectory(mpeg4VideoFiles, quickTimeVideoFiles, notSupportedFiles));
+            return Result.Success(new VideoIntegrationDirectory(mpeg4VideoFiles, quickTimeVideoFiles, notSupportedFiles, jpegFiles));
         }
         catch (Exception e)
         {

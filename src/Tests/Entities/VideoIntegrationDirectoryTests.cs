@@ -5,7 +5,8 @@ namespace Kurmann.InfuseMediaIntegrator.Tests.Entities;
 [TestClass]
 public class VideoIntegrationDirectoryTests
 {
-    private const string InputDirectoryPath = "Data/Input/Testcase 1";
+    private const string InputPathTestCase1 = "Data/Input/Testcase 1";
+    private const string InputPathTestCase2 = "Data/Input/Testcase 2";
 
     /// <summary>
     /// Testet die Methode <see cref="VideoIntegrationDirectory.Create(string)"/>.
@@ -15,7 +16,7 @@ public class VideoIntegrationDirectoryTests
     public void Create_ShouldReturnSuccess_WhenDirectoryExists()
     {
         // Arrange
-        var directoryPath = InputDirectoryPath;
+        var directoryPath = InputPathTestCase1;
         
         // Act
         var result = VideoIntegrationDirectory.Create(directoryPath);
@@ -33,7 +34,7 @@ public class VideoIntegrationDirectoryTests
     public void Create_ShouldReturnSuccess_WhenDirectoryContainsNotSupportedFile()
     {
         // Arrange
-        var directoryPath = InputDirectoryPath;
+        var directoryPath = InputPathTestCase1;
         
         // Act
         var result = VideoIntegrationDirectory.Create(directoryPath);
@@ -55,5 +56,22 @@ public class VideoIntegrationDirectoryTests
         // Assert
         StringAssert.Contains(result.Error, "Directory not found: ");
         Assert.IsTrue(result.IsFailure);
+    }
+
+    [TestMethod] // Prüfe ob beim Verzeichnis "Testcase 2" je eine Mpeg4- und JPEG gefunden wird und keine QuickTime-Datei und keine nicht unterstützte Datei
+    public void Create_ShouldReturnSuccess_WhenDirectoryContainsMpeg4VideoAndJpegFile()
+    {
+        // Arrange
+        var directoryPath = InputPathTestCase2;
+        
+        // Act
+        var result = VideoIntegrationDirectory.Create(directoryPath);
+        
+        // Assert
+        Assert.IsTrue(result.IsSuccess);
+        Assert.AreEqual(1, result.Value.Mpeg4VideoFiles.Count); // Hier sollte nur die MPEG4-Datei enthalten sein
+        Assert.AreEqual(1, result.Value.JpegFiles.Count); // Hier sollte nur die JPEG-Datei enthalten sein
+        Assert.AreEqual(0, result.Value.QuickTimeVideoFiles.Count); // Hier sollte keine QuickTime-Datei enthalten sein
+        Assert.AreEqual(0, result.Value.NotSupportedFiles.Count); // Hier sollte keine nicht unterstützte Datei enthalten sein
     }
 }

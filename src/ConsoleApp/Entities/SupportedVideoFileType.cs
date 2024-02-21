@@ -10,6 +10,7 @@ public class SupportedVideoFileType
 {
     private static readonly string[] quickTimeFileExtensions = [".mov", ".qt"];
     private static readonly string[] mpeg4FileExtensions = [".mp4", ".m4v"];
+    private static readonly string[] jpegFileExtensions = [".jpg", ".jpeg"];
 
     public VideoFileType Type { get;}
 
@@ -27,6 +28,8 @@ public class SupportedVideoFileType
                 return new SupportedVideoFileType(VideoFileType.QuickTime);
             if (mpeg4FileExtensions.Contains(fileInfo.Extension, StringComparer.OrdinalIgnoreCase))
                 return new SupportedVideoFileType(VideoFileType.Mpeg4);
+            if (jpegFileExtensions.Contains(fileInfo.Extension, StringComparer.OrdinalIgnoreCase))
+                return new SupportedVideoFileType(VideoFileType.Jpeg);
             return new SupportedVideoFileType(VideoFileType.NotSupported);
         }
         catch (Exception e)
@@ -40,5 +43,6 @@ public enum VideoFileType
 {
     NotSupported,
     QuickTime,
-    Mpeg4
+    Mpeg4,
+    Jpeg
 }
