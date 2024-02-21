@@ -42,8 +42,8 @@ public class CreateFanartInfuseImageCommandTests
         var result = createFanartInfuseImageCommand.Execute();
 
         // Assert
-        StringAssert.Contains(result.Error, "The MP4 video does not exist.");
         Assert.IsTrue(result.IsFailure);
+        StringAssert.Contains(result.Error, "The MP4 video does not exist.");
     }
 
     [TestMethod] // Test ob bei der Datei "Zwillinge Testvideo (ohne Artwork).m4v" ein Fehler zurückgegeben wird, weil kein Artwork vorhanden ist
@@ -57,7 +57,7 @@ public class CreateFanartInfuseImageCommandTests
         var result = createFanartInfuseImageCommand.Execute();
 
         // Assert
-        StringAssert.Contains(result.Error, "The MP4 video does not contain a title image (artwork).");
         Assert.IsTrue(result.IsFailure);
+        StringAssert.Contains(result.Error, "The MP4 video does not contain a title image (artwork).");
     }
 }

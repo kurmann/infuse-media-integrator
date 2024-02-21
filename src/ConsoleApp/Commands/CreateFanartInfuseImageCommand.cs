@@ -39,7 +39,8 @@ public class CreateFanartInfuseImageCommand(string? mpeg4VideoPath) : ICommand
         string? artworkExtension = mpeg4VideoWithMetadata.Value.ArtworkExtension;
 
         // Prüfe ob ein Titelbild (Artwork) vorhanden ist
-        if (artwork == null)
+        // Prüfe auch ob {byte[0]} zurückgegeben wird, da dies ein Zeichen für ein fehlendes Titelbild ist
+        if (artwork == null || artwork.Length == 0 || artworkExtension == null)
         {
             return Result.Failure("The MP4 video does not contain a title image (artwork).");
         }
