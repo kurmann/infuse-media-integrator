@@ -173,5 +173,25 @@ public class FileMappingInfoTests
         // Assert
         Assert.IsTrue(result.IsSuccess);
         Assert.AreEqual(InfuseMediaType.FanartImage, result.Value.MediaType);
+        Assert.AreEqual(category, result.Value.Category);
+        Assert.AreEqual(fileName, result.Value.SourcePath);
+    }
+
+    [TestMethod]
+    // prüft, ob InfuseMediaType.MovieFile zurückgegeben wird, wenn die Dateiendung nicht .jpg oder .jpeg ist
+    public void Create_ShouldRecognizeNonJpgFileAsMovieFile()
+    {
+        // Arrange
+        var category = "Familie";
+        var fileName = "2024-21-03 Ausflug nach Willisau.m4v";
+        
+        // Act
+        var result = FileMappingInfo.Create(category, fileName);
+        
+        // Assert
+        Assert.IsTrue(result.IsSuccess);
+        Assert.AreEqual(InfuseMediaType.MovieFile, result.Value.MediaType);
+        Assert.AreEqual(category, result.Value.Category);
+        Assert.AreEqual(fileName, result.Value.SourcePath);
     }
 }

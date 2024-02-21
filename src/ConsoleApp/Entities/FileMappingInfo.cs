@@ -34,12 +34,13 @@ public partial class FileMappingInfo
     /// </summary>
     public InfuseMediaType MediaType { get; }
 
-    private FileMappingInfo(string category, int year, string sourcePath, string targetPath)
+    private FileMappingInfo(string category, int year, string sourcePath, string targetPath, InfuseMediaType mediaType)
     {
         Category = category;
         Year = year;
         SourcePath = sourcePath;
         TargetPath = targetPath;
+        MediaType = mediaType;
     }
 
     /// <summary>
@@ -55,14 +56,14 @@ public partial class FileMappingInfo
             return Result.Failure<FileMappingInfo>("Category cannot be null or whitespace.");
         }
 
-        if (string.IsNullOrWhiteSpace(filePath) || !TryParseYear(filePath, out var year))
+        if (string.IsNullOrWhiteSpace(filePath) || !TryParseYear(filePath, out var year, out var mediaType))
         {
             return Result.Failure<FileMappingInfo>("File name does not match the expected format '{{ISO-Datum}} {{Titel}}.{{Extension}}'.");
         }
 
         var targetPath = GenerateTargetPath(category, year, filePath);
 
-        return new FileMappingInfo(category, year, filePath, targetPath);
+        return new FileMappingInfo(category, year, filePath, targetPath, mediaType);
     }
 
     /// <summary>
@@ -70,17 +71,30 @@ public partial class FileMappingInfo
     /// </summary>
     /// <param name="fileName">Der Dateiname.</param>
     /// <param name="year">Das extrahierte Jahr.</param>
+    /// <param name="mediaType">Der Typ der Datei im Sinn von Infuse.</param>
     /// <returns>True, wenn die Extraktion erfolgreich war; andernfalls False.</returns>
-    private static bool TryParseYear(string fileName, out int year)
+    /// Hinweis: Auch bei JPG-Bildern wird versucht, das Jahr zu extrahieren, weil die JPG-Datei den gleichen Namen wie das Video hat.
+    private static bool TryParseYear(string fileName, out int year, out InfuseMediaType mediaType)
     {
         year = 0;
+        // Standardwert für den Medientyp ist MovieFile
+        mediaType = InfuseMediaType.MovieFile;
 
+        // Prüfen, ob der Dateiname dem erwarteten Format entspricht
         var match = YearMonthAndDateWithFilenameRegex().Match(fileName);
         if (!match.Success)
         {
             return false;
         }
 
+        // Prüft, ob es sich um ein JPG-Bild handelt (berücksichtigte Dateiendungen: jpg, jpeg mit Gross- und Kleinschreibung)
+        // Aktuell werden Bilder als FanartImage behandelt, da Infuse das Cover-Bild aus den Metadaten der Videodatei extrahiert.
+        if (Path.GetExtension(fileName) == ".jpg" || Path.GetExtension(fileName) == ".jpeg")
+        {
+            mediaType = InfuseMediaType.FanartImage;
+        }
+
+        // Liest das Jahr aus und prüft, ob es gültig ist
         year = int.Parse(match.Groups["year"].Value);
         if (year < 1900)
         {
@@ -100,8 +114,6 @@ public partial class FileMappingInfo
     /// <returns>Der generierte Zielpfad.</returns>
     private static string GenerateTargetPath(string category, int year, string fileName)
     {
-        var extension = Path.GetExtension(fileName);
-
         // Beispoldateipfad: Familie\2024\2024-21-03 Ausflug nach Willisau.m4v
         return Path.Combine(category, year.ToString(), fileName);
     }
