@@ -6,31 +6,25 @@ using Kurmann.InfuseMediaIntegrator.Entities;
 /// <summary>
 /// Erstellt ein Fanart-Infuse-Image aus einem MP4-Video.
 /// Diese haben den gleichen Dateinamen wie das MP4-Video, jedoch mit der Endung "-fanart.jpg".
+/// Das Fanart-Infuse-Image wird im gleichen Verzeichnis wie das MP4-Video gespeichert. Ein vorhandenes Fanart-Infuse-Image wird überschrieben.
 /// </summary>
-public class CreateFanartInfuseImageCommand(string? mpeg4VideoPath, string? outputDirectory) : ICommand
+public class CreateFanartInfuseImageCommand(string? mpeg4VideoPath) : ICommand
 {
     public string? Mpeg4VideoPath { get; } = mpeg4VideoPath;
-    public string? OutputDirectory { get; } = outputDirectory;
 
     public Result Execute()
     {
-        // Prüfe ob das Ausgabeverzeichniss leer ist
-        if (string.IsNullOrWhiteSpace(OutputDirectory))
+        // Prüfe ob das MP4-Video existiert
+        if (string.IsNullOrWhiteSpace(Mpeg4VideoPath) || !File.Exists(Mpeg4VideoPath))
         {
-            return Result.Failure("Das Ausgabeverzeichnis ist nicht definiert.");
+            return Result.Failure("Das MP4-Video existiert nicht.");
         }
 
-        // Prüfe ob das Ausgabeverzeichniss existiert und erstelle es falls nicht
-        if (!Directory.Exists(OutputDirectory))
+        // Prüfe ob das Verzeichnis des MP4-Videos ausgelesen werden kann
+        var outputDirectory = Path.GetDirectoryName(Mpeg4VideoPath);
+        if (outputDirectory == null)
         {
-            try
-            {
-                Directory.CreateDirectory(OutputDirectory);
-            }
-            catch (Exception ex)
-            {
-                return Result.Failure($"Fehler beim Erstellen des Ausgabeverzeichnisses '{OutputDirectory}': {ex.Message}");
-            }
+            return Result.Failure("Das Verzeichnis des MP4-Videos konnte nicht ausgelesen werden.");
         }
 
         // Erstelle ein Mpeg4VideoWithMetadata-Objekt
@@ -52,7 +46,7 @@ public class CreateFanartInfuseImageCommand(string? mpeg4VideoPath, string? outp
 
         // Ermittle den Zielpfad des Fanart-Infuse-Image im Zielverzeichnis mit dem gleichen Dateinamen wie das MP4 und der Endung "-fanart.xxx" 
         // Die Dateiendung wird aus dem MIME-Typ des Titelbilds (Artwork) abgeleitet
-        var fanartInfuseImagePath = Path.Combine(OutputDirectory, $"{Path.GetFileNameWithoutExtension(Mpeg4VideoPath)}-fanart.{artworkExtension}");
+        var fanartInfuseImagePath = Path.Combine(outputDirectory, $"{Path.GetFileNameWithoutExtension(Mpeg4VideoPath)}-fanart.{artworkExtension}");
 
         // Schreibe das Titelbild (Artwork) in das Zielverzeichnis
         File.WriteAllBytes(fanartInfuseImagePath, artwork);

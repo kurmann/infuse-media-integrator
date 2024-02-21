@@ -14,18 +14,17 @@ public class CreateFanartInfuseImageCommandTests
     {
         // Arrange
         var videoPath = new FileInfo(Path.Combine(InputDirectoryPath, "Zwillinge Testvideo.m4v"));
-        var outputDirectory = "Data/Processing";
 
         // Act
-        var createFanartInfuseImageCommand = new CreateFanartInfuseImageCommand(videoPath.FullName, outputDirectory);
+        var createFanartInfuseImageCommand = new CreateFanartInfuseImageCommand(videoPath.FullName);
         var result = createFanartInfuseImageCommand.Execute();
 
         // Assert
         Assert.IsTrue(result.IsSuccess);
-        Assert.IsTrue(File.Exists(Path.Combine(outputDirectory, "Zwillinge Testvideo-fanart.jpg")));
-        Assert.IsTrue(new FileInfo(Path.Combine(outputDirectory, "Zwillinge Testvideo-fanart.jpg")).Length > 0);
+        Assert.IsTrue(File.Exists(Path.Combine(InputDirectoryPath, "Zwillinge Testvideo-fanart.jpg"))); // Das Fanart-Infuse-Image sollte erstellt worden sein
+        Assert.IsTrue(new FileInfo(Path.Combine(InputDirectoryPath, "Zwillinge Testvideo-fanart.jpg")).Length > 0); // Das Fanart-Infuse-Image sollte nicht leer sein
 
         // Clean up
-        File.Delete(Path.Combine(outputDirectory, "Zwillinge Testvideo-fanart.jpg"));
+        File.Delete(Path.Combine(InputDirectoryPath, "Zwillinge Testvideo-fanart.jpg")); // Lösche das Fanart-Infuse-Image damit der Test wiederholt werden kann
     }
 }
