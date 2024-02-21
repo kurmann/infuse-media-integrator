@@ -5,7 +5,7 @@ namespace Kurmann.InfuseMediaIntegrator.Tests.Entities;
 [TestClass]
 public class Mpeg4VideoWithMetadataTests
 {
-    private const string InputDirectoryPath = "Data/Input";
+    private const string InputDirectoryPath = "Data/Input/Testcase 1";
 
     /// <summary>
     /// Testet die Methode <see cref="Mpeg4VideoWithMetadata.Create(Mpeg4Video)"/>.
