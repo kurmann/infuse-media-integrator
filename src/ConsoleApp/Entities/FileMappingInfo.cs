@@ -67,8 +67,12 @@ public partial class FileMappingInfo
         }
 
         var targetPath = GenerateTargetPath(category, year, filePath, mediaType);
+        if (targetPath.IsFailure)
+        {
+            return Result.Failure<FileMappingInfo>(targetPath.Error);
+        }
 
-        return new FileMappingInfo(category, year, filePath, targetPath, mediaType);
+        return new FileMappingInfo(category, year, filePath, targetPath.Value, mediaType);
     }
 
     /// <summary>
@@ -92,9 +96,9 @@ public partial class FileMappingInfo
             return false;
         }
 
-        // Prüft, ob es sich um ein JPG-Bild handelt (berücksichtigte Dateiendungen: jpg, jpeg mit Gross- und Kleinschreibung)
+        // Prüft, ob es sich um ein JPG-Bild handelt (berücksichtigte Dateiendungen: jpg, jpeg und berücksichtigt Gross- und Kleinschreibung)
         // Aktuell werden Bilder als FanartImage behandelt, da Infuse das Cover-Bild aus den Metadaten der Videodatei extrahiert.
-        if (Path.GetExtension(fileName) == ".jpg" || Path.GetExtension(fileName) == ".jpeg")
+        if (fileName.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) || fileName.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase))
         {
             mediaType = InfuseMediaType.FanartImage;
         }
@@ -117,16 +121,27 @@ public partial class FileMappingInfo
     /// <param name="sortingTitle">Der sortierte Titel der Datei.</param>
     /// <param name="fileName">Der Name der Quelldatei.</param>
     /// <returns>Der generierte Zielpfad.</returns>
-    private static string GenerateTargetPath(string category, int year, string fileName, InfuseMediaType mediaType = InfuseMediaType.MovieFile)
+    /// Hinweis: Bei Fanart-Bildern wird das Suffix "-fanart" vor der Dateiendung hinzugefügt.
+    /// Hinweis: Beispielpfad: Familie\2024\2024-21-03 Ausflug nach Willisau.m4v
+    /// Hinweis: Beispielpfad: Familie\2024\2024-21-03 Ausflug nach Willisau-fanart.jpg
+    /// Wenn die JPG-Datei bereits das Suffix "-fanart" enthält, wird es nicht nochmals hinzugefügt.
+    private static Result<string> GenerateTargetPath(string category, int year, string fileName, InfuseMediaType mediaType = InfuseMediaType.MovieFile)
     {
-        // Bei Fanart-Bildern wird das Suffix "-fanart" vor der Dateiendung hinzugefügt
-        if (mediaType == InfuseMediaType.FanartImage)
+        try
         {
-            fileName = fileName.Insert(fileName.LastIndexOf('.'), FanartImagePostfix);
-        }
+            // Bei Fanart-Bildern wird das Suffix "-fanart" vor der Dateiendung hinzugefügt, ausser wenn es bereits am Ende des Dateinamens steht (ohne Erweiterung)
+            if (mediaType == InfuseMediaType.FanartImage && !Path.GetFileNameWithoutExtension(fileName).EndsWith(FanartImagePostfix, StringComparison.OrdinalIgnoreCase))
+            {
+                fileName = Path.GetFileNameWithoutExtension(fileName) + FanartImagePostfix + Path.GetExtension(fileName);
+            }
 
-        // Beispoldateipfad: Familie\2024\2024-21-03 Ausflug nach Willisau.m4v
-        return Path.Combine(category, year.ToString(), fileName);
+            // Beispoldateipfad: Familie\2024\2024-21-03 Ausflug nach Willisau.m4v
+            return Result.Success(Path.Combine(category, year.ToString(), fileName));
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure<string>($"Fehler beim Generieren des Zielpfads: {ex.Message}");
+        }
     }
 
     [GeneratedRegex(@"^(?<year>\d{4})(-(?<month>\d{2})(-(?<day>\d{2}))?)? (?<title>.+)\.\w+$")]

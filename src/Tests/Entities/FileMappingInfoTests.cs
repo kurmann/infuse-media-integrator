@@ -177,7 +177,7 @@ public class FileMappingInfoTests
         Assert.AreEqual(fileName, result.Value.SourcePath);
     }
 
-    [TestMethod] /// prüft, ob InfuseMediaType.MovieFile zurückgegeben wird, wenn die Dateiendung nicht .jpg oder .jpeg ist
+    [TestMethod] // prüft, ob InfuseMediaType.MovieFile zurückgegeben wird, wenn die Dateiendung nicht .jpg oder .jpeg ist
     public void Create_ShouldRecognizeNonJpgFileAsMovieFile()
     {
         // Arrange
@@ -194,7 +194,7 @@ public class FileMappingInfoTests
         Assert.AreEqual(fileName, result.Value.SourcePath);
     }
 
-    [TestMethod] /// Prüft, ob Dateien vom InfuseMediaType.Fanart das Präfix "-fanart" erhalten vor der Dateiendung
+    [TestMethod] // Prüft, ob Dateien vom InfuseMediaType.Fanart das Präfix "-fanart" erhalten vor der Dateiendung
     public void Create_ShouldReturnFanartImage_WhenMediaTypeIsFanartImage()
     {
         // Arrange
@@ -212,4 +212,39 @@ public class FileMappingInfoTests
         Assert.AreEqual("Familie/2024/2024-21-03 Ausflug nach Willisau-fanart.jpg", result.Value.TargetPath);
     }
 
+    [TestMethod] // Prüft, ob JPG-Dateien, die bereits das Präfix "-fanart" enthalten, nicht nochmals das Präfix erhalten
+    public void Create_ShouldReturnFanartImage_WhenMediaTypeIsFanartImageAndFileNameAlreadyContainsFanartPostfix()
+    {
+        // Arrange
+        var category = "Familie";
+        var fileName = "2024-21-03 Ausflug nach Willisau-fanart.jpg";
+        
+        // Act
+        var result = FileMappingInfo.Create(category, fileName);
+        
+        // Assert
+        Assert.IsTrue(result.IsSuccess);
+        Assert.AreEqual(InfuseMediaType.FanartImage, result.Value.MediaType);
+        Assert.AreEqual(category, result.Value.Category);
+        Assert.AreEqual(fileName, result.Value.SourcePath);
+        Assert.AreEqual("Familie/2024/2024-21-03 Ausflug nach Willisau-fanart.jpg", result.Value.TargetPath);
+    }
+
+    [TestMethod] // Prüft, ob JPG-Dateien mit Großbuchstaben als Dateiendung als FanartImage erkannt werden
+    public void Create_ShouldReturnFanartImage_WhenMediaTypeIsFanartImageAndFileNameHasUppercaseJpgExtension()
+    {
+        // Arrange
+        var category = "Familie";
+        var fileName = "2024-21-03 Ausflug nach Willisau.JPG";
+        
+        // Act
+        var result = FileMappingInfo.Create(category, fileName);
+        
+        // Assert
+        Assert.IsTrue(result.IsSuccess);
+        Assert.AreEqual(InfuseMediaType.FanartImage, result.Value.MediaType);
+        Assert.AreEqual(category, result.Value.Category);
+        Assert.AreEqual(fileName, result.Value.SourcePath);
+        Assert.AreEqual("Familie/2024/2024-21-03 Ausflug nach Willisau-fanart.JPG", result.Value.TargetPath);
+    }
 }
