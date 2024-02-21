@@ -57,11 +57,12 @@ public partial class FileMappingInfo
         year = 0;
         sortingTitle = string.Empty;
         
+        // Beispiel: 2024-21-03 Ausflug nach Willisau.m4v
         var match = IsoDateWithFileName().Match(fileName);
         if (!match.Success) return false;
 
-        var isoDate = match.Groups[1].Value;
-        sortingTitle = match.Groups[2].Value;
+        var isoDate = match.Groups[1].Value; // Beispiel: 2024-21-03
+        sortingTitle = match.Groups[2].Value; // Beispiel: Ausflug nach Willisau
 
         if (!DateTime.TryParse(isoDate, out var date)) return false;
 
@@ -79,6 +80,7 @@ public partial class FileMappingInfo
     /// <returns>Der generierte Zielpfad.</returns>
     private static string GenerateTargetPath(string category, int year, string sortingTitle, string fileName)
     {
+        // Beispiel: root\Family Videos\2024\2024-21-03 Ausflug nach Willisau\2024-21-03 Ausflug nach Willisau.m4v
         return $"root\\{category}\\{year}\\{sortingTitle}\\{fileName}";
     }
 
