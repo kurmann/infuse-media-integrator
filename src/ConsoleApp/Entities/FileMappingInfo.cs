@@ -30,6 +30,11 @@ public partial class FileMappingInfo
     public int Year { get; }
 
     /// <summary>
+    /// Das Suffix, das an den Dateinamen angehängt wird, um das Bild als Fanart zu kennzeichnen.
+    /// </summary>
+    private const string FanartImagePostfix = "-fanart";  // Infuse erkennt Bilder als Fanart, wenn der Dateiname das Suffix "-fanart" enthält
+
+    /// <summary>
     /// Der Typ der Datei im Sinn von Infuse.
     /// </summary>
     public InfuseMediaType MediaType { get; }
@@ -61,7 +66,7 @@ public partial class FileMappingInfo
             return Result.Failure<FileMappingInfo>("File name does not match the expected format '{{ISO-Datum}} {{Titel}}.{{Extension}}'.");
         }
 
-        var targetPath = GenerateTargetPath(category, year, filePath);
+        var targetPath = GenerateTargetPath(category, year, filePath, mediaType);
 
         return new FileMappingInfo(category, year, filePath, targetPath, mediaType);
     }
@@ -112,8 +117,14 @@ public partial class FileMappingInfo
     /// <param name="sortingTitle">Der sortierte Titel der Datei.</param>
     /// <param name="fileName">Der Name der Quelldatei.</param>
     /// <returns>Der generierte Zielpfad.</returns>
-    private static string GenerateTargetPath(string category, int year, string fileName)
+    private static string GenerateTargetPath(string category, int year, string fileName, InfuseMediaType mediaType = InfuseMediaType.MovieFile)
     {
+        // Bei Fanart-Bildern wird das Suffix "-fanart" vor der Dateiendung hinzugefügt
+        if (mediaType == InfuseMediaType.FanartImage)
+        {
+            fileName = fileName.Insert(fileName.LastIndexOf('.'), FanartImagePostfix);
+        }
+
         // Beispoldateipfad: Familie\2024\2024-21-03 Ausflug nach Willisau.m4v
         return Path.Combine(category, year.ToString(), fileName);
     }
