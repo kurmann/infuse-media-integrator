@@ -50,7 +50,7 @@ public partial class FileMappingInfo
             return Result.Failure<FileMappingInfo>("Category cannot be null or whitespace.");
         }
 
-        if (string.IsNullOrWhiteSpace(filePath) || !TryParseFileName(filePath, out var year, out var sortingTitle))
+        if (string.IsNullOrWhiteSpace(filePath) || !TryParseFileName(filePath, out var year))
         {
             return Result.Failure<FileMappingInfo>("File name does not match the expected format '{{ISO-Datum}} {{Titel}}.{{Extension}}'.");
         }
@@ -65,12 +65,10 @@ public partial class FileMappingInfo
     /// </summary>
     /// <param name="fileName">Der Dateiname.</param>
     /// <param name="year">Das extrahierte Jahr.</param>
-    /// <param name="sortingTitle">Der extrahierte sortierte Titel.</param>
     /// <returns>True, wenn die Extraktion erfolgreich war; andernfalls False.</returns>
-    private static bool TryParseFileName(string fileName, out int year, out string? sortingTitle)
+    private static bool TryParseFileName(string fileName, out int year)
     {
         year = 0;
-        sortingTitle = null;
 
         var match = YearMonthAndDateWithFilenameRegex().Match(fileName);
         if (!match.Success)
@@ -83,8 +81,6 @@ public partial class FileMappingInfo
         {
             return false;
         }
-
-        sortingTitle = match.Groups["title"].Value;
 
         return true;
     }
@@ -107,4 +103,22 @@ public partial class FileMappingInfo
 
     [GeneratedRegex(@"^(?<year>\d{4})(-(?<month>\d{2})(-(?<day>\d{2}))?)? (?<title>.+)\.\w+$")]
     private static partial Regex YearMonthAndDateWithFilenameRegex();
+}
+
+public enum InfuseMediaType
+{
+    /// <summary>
+    /// Die Datei ist ein Film.
+    /// </summary>
+    MovieFile,
+
+    /// <summary>
+    /// Die Datei ist ein Titelbild, das als Cover für einen Film verwendet wird und von Infuse als solches erkannt wird.
+    /// </summary>
+    CoverImage,
+
+    /// <summary>
+    /// Die Datei ist ein Hintergrundbild, das von Infuse als solches erkannt wird.
+    /// </summary>
+    FanartImage,
 }
