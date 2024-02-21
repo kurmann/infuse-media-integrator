@@ -17,14 +17,14 @@ public class CreateFanartInfuseImageCommand(string? mpeg4VideoPath) : ICommand
         // Prüfe ob das MP4-Video existiert
         if (string.IsNullOrWhiteSpace(Mpeg4VideoPath) || !File.Exists(Mpeg4VideoPath))
         {
-            return Result.Failure("Das MP4-Video existiert nicht.");
+            return Result.Failure("The MP4 video does not exist.");
         }
 
         // Prüfe ob das Verzeichnis des MP4-Videos ausgelesen werden kann
         var outputDirectory = Path.GetDirectoryName(Mpeg4VideoPath);
         if (outputDirectory == null)
         {
-            return Result.Failure("Das Verzeichnis des MP4-Videos konnte nicht ausgelesen werden.");
+            return Result.Failure("The output directory of the MP4 video cannot be read.");
         }
 
         // Erstelle ein Mpeg4VideoWithMetadata-Objekt
@@ -41,7 +41,7 @@ public class CreateFanartInfuseImageCommand(string? mpeg4VideoPath) : ICommand
         // Prüfe ob ein Titelbild (Artwork) vorhanden ist
         if (artwork == null)
         {
-            return Result.Failure("Das Titelbild (Artwork) ist nicht vorhanden.");
+            return Result.Failure("The MP4 video does not contain a title image (artwork).");
         }
 
         // Ermittle den Zielpfad des Fanart-Infuse-Image im Zielverzeichnis mit dem gleichen Dateinamen wie das MP4 und der Endung "-fanart.xxx" 
