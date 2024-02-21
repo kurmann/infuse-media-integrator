@@ -9,16 +9,31 @@ namespace Kurmann.InfuseMediaIntegrator.Entities;
 /// </summary>
 public partial class FileMappingInfo
 {
-    public string Category { get; }
-    public int Year { get; }
-    public string SortingTitle { get; }
+    /// <summary>
+    /// Der Pfad der Quelldatei.
+    /// </summary>
+    public string SourcePath { get; }
+
+    /// <summary>
+    /// Der Pfad des Ziels, zu dem die Quelldatei verschoben werden soll.
+    /// </summary>
     public string TargetPath { get; }
 
-    private FileMappingInfo(string category, int year, string sortingTitle, string targetPath)
+    /// <summary>
+    /// Die Kategorie der Datei.
+    /// </summary>
+    public string Category { get; }
+
+    /// <summary>
+    /// Das Jahr der Datei.
+    /// </summary>
+    public int Year { get; }
+
+    private FileMappingInfo(string category, int year, string sourcePath, string targetPath)
     {
         Category = category;
         Year = year;
-        SortingTitle = sortingTitle;
+        SourcePath = sourcePath;
         TargetPath = targetPath;
     }
 
@@ -26,23 +41,23 @@ public partial class FileMappingInfo
     /// Erstellt eine Instanz von FileMappingInfo basierend auf der Kategorie und dem Dateinamen.
     /// </summary>
     /// <param name="category">Die Kategorie der Datei.</param>
-    /// <param name="fileName">Der Name der Quelldatei, der dem Format '{{ISO-Datum}} {{Titel}}.{{Extension}}' entsprechen muss.</param>
+    /// <param name="filePath">Der Pfad der Quelldatei</param>
     /// <returns>Ein Result-Objekt, das bei Erfolg eine Instanz von FileMappingInfo enthält.</returns>
-    public static Result<FileMappingInfo> Create(string category, string fileName)
+    public static Result<FileMappingInfo> Create(string category, string filePath)
     {
         if (string.IsNullOrWhiteSpace(category))
         {
             return Result.Failure<FileMappingInfo>("Category cannot be null or whitespace.");
         }
 
-        if (string.IsNullOrWhiteSpace(fileName) || !TryParseFileName(fileName, out var year, out var sortingTitle))
+        if (string.IsNullOrWhiteSpace(filePath) || !TryParseFileName(filePath, out var year, out var sortingTitle))
         {
             return Result.Failure<FileMappingInfo>("File name does not match the expected format '{{ISO-Datum}} {{Titel}}.{{Extension}}'.");
         }
 
-        var targetPath = GenerateTargetPath(category, year, sortingTitle, fileName);
+        var targetPath = GenerateTargetPath(category, year, filePath);
 
-        return new FileMappingInfo(category, year, sortingTitle, targetPath);
+        return new FileMappingInfo(category, year, filePath, targetPath);
     }
 
     /// <summary>
@@ -82,10 +97,12 @@ public partial class FileMappingInfo
     /// <param name="sortingTitle">Der sortierte Titel der Datei.</param>
     /// <param name="fileName">Der Name der Quelldatei.</param>
     /// <returns>Der generierte Zielpfad.</returns>
-    private static string GenerateTargetPath(string category, int year, string sortingTitle, string fileName)
+    private static string GenerateTargetPath(string category, int year, string fileName)
     {
         var extension = Path.GetExtension(fileName);
-        return Path.Combine(category, year.ToString(), $"{sortingTitle}{extension}");
+
+        // Beispoldateipfad: Familie\2024\2024-21-03 Ausflug nach Willisau.m4v
+        return Path.Combine(category, year.ToString(), fileName);
     }
 
     [GeneratedRegex(@"^(?<year>\d{4})(-(?<month>\d{2})(-(?<day>\d{2}))?)? (?<title>.+)\.\w+$")]

@@ -120,7 +120,7 @@ public class FileMappingInfoTests
         Assert.IsTrue(result.IsSuccess);
         Assert.AreEqual(category, result.Value.Category);
         Assert.AreEqual(2024, result.Value.Year);
-        Assert.AreEqual("Ausflug nach Willisau", result.Value.SortingTitle);
-        Assert.AreEqual("Familie/2024/Ausflug nach Willisau.m4v", result.Value.TargetPath);
+        Assert.AreEqual(fileName, result.Value.SourcePath);
+        Assert.AreEqual("Familie/2024/2024-21-03 Ausflug nach Willisau.m4v", result.Value.TargetPath);
     }
 }
