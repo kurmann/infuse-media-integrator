@@ -19,7 +19,13 @@ public class CategoryInfo
     /// </summary>
     public List<string> Categories { get; }
 
-    public static Result<CategoryInfo> Create(string? rootPath, string? directoryPath)
+    /// <summary>
+    /// Erstellt eine neue Instanz der Klasse <see cref="CategoryInfo"/> aus einem Wurzelverzeichnis und einem Verzeichnis.
+    /// </summary>
+    /// <param name="rootPath"></param>
+    /// <param name="directoryPath"></param>
+    /// <returns></returns>
+    public static Result<CategoryInfo> CreateFromDirectoryStructure(string? rootPath, string? directoryPath)
     {
         if (string.IsNullOrWhiteSpace(rootPath))
             return Result.Failure<CategoryInfo>("RootPath is null or empty");
@@ -41,5 +47,15 @@ public class CategoryInfo
         categories.AddRange(directory.GetDirectories().Select(d => d.Name));
 
         return Result.Success(new CategoryInfo(categories));
+    }
+
+    // Erstellt eine neue Instanz der Klasse <see cref="CategoryInfo"/> aus einer Liste von Komma-separierten Kategorien.
+    public static Result<CategoryInfo> CreateFromCommaSeparatedList(string? categories)
+    {
+        if (string.IsNullOrWhiteSpace(categories))
+            return Result.Failure<CategoryInfo>("Categories is null or empty");
+
+        var categoriesList = categories.Split(',').Select(c => c.Trim()).ToList();
+        return Result.Success(new CategoryInfo(categoriesList));
     }
 }

@@ -14,7 +14,7 @@ namespace Kurmann.InfuseMediaIntegrator.Tests.Entities
             // Arrange
 
             // Act
-            var result = CategoryInfo.Create(RootPath, DirectoryPath);
+            var result = CategoryInfo.CreateFromDirectoryStructure(RootPath, DirectoryPath);
 
             // Assert
             Assert.IsTrue(result.IsSuccess);
@@ -29,7 +29,7 @@ namespace Kurmann.InfuseMediaIntegrator.Tests.Entities
             // Arrange
 
             // Act
-            var result = CategoryInfo.Create(null, DirectoryPath);
+            var result = CategoryInfo.CreateFromDirectoryStructure(null, DirectoryPath);
 
             // Assert
             Assert.IsFalse(result.IsSuccess);
@@ -42,7 +42,7 @@ namespace Kurmann.InfuseMediaIntegrator.Tests.Entities
             // Arrange
 
             // Act
-            var result = CategoryInfo.Create(RootPath, null);
+            var result = CategoryInfo.CreateFromDirectoryStructure(RootPath, null);
 
             // Assert
             Assert.IsFalse(result.IsSuccess);
@@ -55,7 +55,7 @@ namespace Kurmann.InfuseMediaIntegrator.Tests.Entities
             // Arrange
 
             // Act
-            var result = CategoryInfo.Create("NonExistingRootPath", DirectoryPath);
+            var result = CategoryInfo.CreateFromDirectoryStructure("NonExistingRootPath", DirectoryPath);
 
             // Assert
             Assert.IsFalse(result.IsSuccess);
@@ -68,11 +68,41 @@ namespace Kurmann.InfuseMediaIntegrator.Tests.Entities
             // Arrange
 
             // Act
-            var result = CategoryInfo.Create(RootPath, "NonExistingDirectoryPath");
+            var result = CategoryInfo.CreateFromDirectoryStructure(RootPath, "NonExistingDirectoryPath");
 
             // Assert
             Assert.IsFalse(result.IsSuccess);
             Assert.AreEqual("DirectoryPath 'NonExistingDirectoryPath' does not exist", result.Error);
+        }
+
+        [TestMethod] // Teste die Komma-separierten Kategorien
+        public void Create_ShouldReturnSuccess_WhenCategoriesAreValid()
+        {
+            // Arrange
+            const string categories = "Root,Category1,Category2";
+
+            // Act
+            var result = CategoryInfo.CreateFromCommaSeparatedList(categories);
+
+            // Assert
+            Assert.IsTrue(result.IsSuccess);
+            Assert.IsNotNull(result.Value);
+            CollectionAssert.Contains(result.Value.Categories, "Root");
+            CollectionAssert.Contains(result.Value.Categories, "Category1");
+            CollectionAssert.Contains(result.Value.Categories, "Category2");
+        }
+
+        [TestMethod]
+        public void Create_ShouldReturnFailure_WhenCategoriesAreNull()
+        {
+            // Arrange
+
+            // Act
+            var result = CategoryInfo.CreateFromCommaSeparatedList(null);
+
+            // Assert
+            Assert.IsFalse(result.IsSuccess);
+            Assert.AreEqual("Categories is null or empty", result.Error);
         }
     }
 }
