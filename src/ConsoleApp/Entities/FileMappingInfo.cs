@@ -5,7 +5,7 @@ namespace Kurmann.InfuseMediaIntegrator.Entities;
 
 /// <summary>
 /// Definiert ein Mapping von einer Quelldatei zu einem Zielpfad basierend auf den Metadaten der Datei.
-/// Die Metadaten werden aus dem Dateinamen extrahiert, der ein spezifisches Format haben muss.
+/// Die Zuteilung erfolgt anhand gegebenen Informationen.
 /// </summary>
 public partial class FileMappingInfo
 {
@@ -73,6 +73,28 @@ public partial class FileMappingInfo
         }
 
         return new FileMappingInfo(category, year, filePath, targetPath.Value, mediaType);
+    }
+
+    /// <summary>
+    /// Erstellt eine Instanz von FileMappingInfo basierend auf dem Dateipfad und den Metadaten der Datei.
+    /// </summary>
+    /// <param name="filePath">Der Pfad der Quelldatei.</param>
+    /// <param name="metadata">Das FileMetadata-Objekt mit den Metadaten der Datei.</param>
+    /// <returns>Ein Result-Objekt, das bei Erfolg eine Instanz von FileMappingInfo enthält.</returns>
+    public static Result<FileMappingInfo> Create(string filePath, FileMetadata metadata)
+    {
+        if (string.IsNullOrWhiteSpace(filePath) || !TryParseYear(filePath, out var year, out var mediaType))
+        {
+            return Result.Failure<FileMappingInfo>("File name does not match the expected format '{{ISO-Datum}} {{Titel}}.{{Extension}}'.");
+        }
+
+        var targetPath = GenerateTargetPath(metadata.Category, year, filePath, mediaType);
+        if (targetPath.IsFailure)
+        {
+            return Result.Failure<FileMappingInfo>(targetPath.Error);
+        }
+
+        return new FileMappingInfo(metadata.Category, year, filePath, targetPath.Value, mediaType);
     }
 
     /// <summary>
@@ -165,3 +187,11 @@ public enum InfuseMediaType
     /// </summary>
     FanartImage,
 }
+
+/// <summary>
+/// Umfasst Metadaten einer Datei, die einen Einfluss auf das Mapping der Datei haben.
+/// </summary>
+/// <param name="RecordingDate">Das Aufnahmedatum</param>
+/// <param name="Category">Die Kategorie</param>
+/// <param name="Title">Der Titel</param>
+public record FileMetadata(DateOnly RecordingDate, string Category, string Title);
