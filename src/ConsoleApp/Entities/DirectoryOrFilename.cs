@@ -1,3 +1,5 @@
+using CSharpFunctionalExtensions;
+
 namespace Kurmann.InfuseMediaIntegrator.Entities;
 
 /// <summary>
