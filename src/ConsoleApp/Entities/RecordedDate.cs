@@ -194,7 +194,7 @@ public class RecordedDate
         {
             var fromCulture = new CultureInfo("de-CH");
             if (DateOnly.TryParseExact(germanMatch.Value,
-                                       new[] { fromCulture.DateTimeFormat.ShortDatePattern, "dd.MM.yy", "d.M.yy", "dd.M.yy", "d.MM.yy" },
+                                       [fromCulture.DateTimeFormat.ShortDatePattern, "dd.MM.yy", "d.M.yy", "dd.M.yy", "d.MM.yy"],
                                        fromCulture,
                                        DateTimeStyles.None,
                                        out var germanDate))
@@ -235,12 +235,12 @@ public class RecordedDate
     /// <returns></returns>
     private static (Maybe<DateOnly>, Maybe<string>) TryParseMonth(string text)
     {
-        string[] patterns = new string[]
-        {
+        string[] patterns =
+        [
             @"\b\d{4}-\d{2}\b",  // ISO-Monat: 2021-06
             @"\b(January|February|March|April|May|June|July|August|September|October|November|December)\b \d{4}",  // Englischer Monatsname: June 2021
             @"\b(Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember)\b \d{4}",  // Deutscher Monatsname: Juni 2021
-        };
+        ];
 
         foreach (string pattern in patterns)
         {
@@ -267,11 +267,11 @@ public class RecordedDate
     /// <returns></returns>
     private static (Maybe<DateOnly>, Maybe<string>) TryParseSeason(string text)
     {
-        string[] patterns = new string[]
-        {
+        string[] patterns =
+        [
             @"\b(Spring|Summer|Fall|Autumn|Winter)\b \d{4}",  // Englische Jahreszeit: Summer 2021
             @"\b(Frühling|Sommer|Herbst|Winter)\b \d{4}",  // Deutsche Jahreszeit: Sommer 2021
-        };
+        ];
 
         foreach (string pattern in patterns)
         {

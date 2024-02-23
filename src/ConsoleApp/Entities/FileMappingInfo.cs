@@ -28,7 +28,7 @@ public partial class FileMappingInfo
     /// <summary>
     /// Die Kategorien der Datei (oft nur eine)
     /// </summary>
-    public List<string> Categories { get; } = new List<string>();
+    public List<string> Categories { get; } = [];
 
     /// <summary>
     /// Der Titel der Datei.

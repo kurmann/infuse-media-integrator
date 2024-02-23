@@ -9,10 +9,7 @@ namespace Kurmann.InfuseMediaIntegrator.Entities;
 /// </summary>
 public class CategoryInfo
 {
-    private CategoryInfo(List<string> categories)
-    {
-        Categories = categories;
-    }
+    private CategoryInfo(List<string> categories) => Categories = categories;
 
     /// <summary>
     /// Liste der Kategorien. Das erste Element ist die Hauptkategorie, die weiteren Elemente sind die Unterkategorien.
