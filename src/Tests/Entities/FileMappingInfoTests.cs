@@ -73,7 +73,7 @@ public class FileMappingInfoTests
         var result = FileMappingInfo.Create(category, fileName);
         
         // Assert
-        Assert.IsTrue(result.IsSuccess);
+        Assert.IsTrue(result.IsSuccess, result.Error);
         Assert.AreEqual(2024, result.Value.Year);
     }
 
@@ -102,7 +102,7 @@ public class FileMappingInfoTests
         var result = FileMappingInfo.Create(category, fileName);
         
         // Assert
-        Assert.IsTrue(result.IsSuccess);
+        Assert.IsTrue(result.IsSuccess, result.Error);
         Assert.AreEqual(2024, result.Value.Year);
     }
 
@@ -117,7 +117,7 @@ public class FileMappingInfoTests
         var result = FileMappingInfo.Create(category, fileName);
         
         // Assert
-        Assert.IsTrue(result.IsSuccess);
+        Assert.IsTrue(result.IsSuccess, result.Error);
         Assert.AreEqual(category, result.Value.Category);
         Assert.AreEqual(2024, result.Value.Year);
         Assert.AreEqual(fileName, result.Value.SourcePath);
@@ -135,7 +135,7 @@ public class FileMappingInfoTests
         var result = FileMappingInfo.Create(category, fileName);
         
         // Assert
-        Assert.IsTrue(result.IsSuccess);
+        Assert.IsTrue(result.IsSuccess, result.Error);
         Assert.AreEqual(category, result.Value.Category);
         Assert.AreEqual(2024, result.Value.Year);
         Assert.AreEqual(fileName, result.Value.SourcePath);
@@ -153,7 +153,7 @@ public class FileMappingInfoTests
         var result = FileMappingInfo.Create(category, fileName);
         
         // Assert
-        Assert.IsTrue(result.IsSuccess);
+        Assert.IsTrue(result.IsSuccess, result.Error);
         Assert.AreEqual(category, result.Value.Category);
         Assert.AreEqual(2024, result.Value.Year);
         Assert.AreEqual(fileName, result.Value.SourcePath);
@@ -171,7 +171,7 @@ public class FileMappingInfoTests
         var result = FileMappingInfo.Create(category, fileName);
         
         // Assert
-        Assert.IsTrue(result.IsSuccess);
+        Assert.IsTrue(result.IsSuccess, result.Error);
         Assert.AreEqual(InfuseMediaType.FanartImage, result.Value.MediaType);
         Assert.AreEqual(category, result.Value.Category);
         Assert.AreEqual(fileName, result.Value.SourcePath);
@@ -188,7 +188,7 @@ public class FileMappingInfoTests
         var result = FileMappingInfo.Create(category, fileName);
         
         // Assert
-        Assert.IsTrue(result.IsSuccess);
+        Assert.IsTrue(result.IsSuccess, result.Error);
         Assert.AreEqual(InfuseMediaType.MovieFile, result.Value.MediaType);
         Assert.AreEqual(category, result.Value.Category);
         Assert.AreEqual(fileName, result.Value.SourcePath);
@@ -205,7 +205,7 @@ public class FileMappingInfoTests
         var result = FileMappingInfo.Create(category, fileName);
         
         // Assert
-        Assert.IsTrue(result.IsSuccess);
+        Assert.IsTrue(result.IsSuccess, result.Error);
         Assert.AreEqual(InfuseMediaType.FanartImage, result.Value.MediaType);
         Assert.AreEqual(category, result.Value.Category);
         Assert.AreEqual(fileName, result.Value.SourcePath);
@@ -223,7 +223,7 @@ public class FileMappingInfoTests
         var result = FileMappingInfo.Create(category, fileName);
         
         // Assert
-        Assert.IsTrue(result.IsSuccess);
+        Assert.IsTrue(result.IsSuccess, result.Error);
         Assert.AreEqual(InfuseMediaType.FanartImage, result.Value.MediaType);
         Assert.AreEqual(category, result.Value.Category);
         Assert.AreEqual(fileName, result.Value.SourcePath);
@@ -241,7 +241,7 @@ public class FileMappingInfoTests
         var result = FileMappingInfo.Create(category, fileName);
         
         // Assert
-        Assert.IsTrue(result.IsSuccess);
+        Assert.IsTrue(result.IsSuccess, result.Error);
         Assert.AreEqual(InfuseMediaType.FanartImage, result.Value.MediaType);
         Assert.AreEqual(category, result.Value.Category);
         Assert.AreEqual(fileName, result.Value.SourcePath);
