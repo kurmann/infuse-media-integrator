@@ -224,25 +224,25 @@ public partial class FileMappingInfo
     private static DateOnly GetRecordedDateOrCurrentDate(FileMetadata metadata, FileInfo fileInfo)
     {
         // Übernimm das Aufnahmedatum aus den Metadaten, wenn es gesetzt ist und sonst versuche es aus dem Dateinamen zu lesen
-        DateOnly? recordedDate = metadata.RecordingDate;
-        if (metadata.RecordingDate == null)
+        DateOnly? recordingDate = metadata.RecordingData != null ? DateOnly.FromDateTime(metadata.RecordingData.Value) : null;
+        if (recordingDate == null)
         {
             // Versuche das Datum aus dem Dateinamen zu lesen
             var recordedDateResult = RecordedDate.CreateFromFilename(fileInfo);
             if (recordedDateResult.IsSuccess)
             {
-                recordedDate = recordedDateResult.Value.Value;
+                recordingDate = recordedDateResult.Value.Value;
             }
         }
 
         // Wenn weder ein Aufnahmedatum in den Meta-Daten noch im Dateinamen gefunden wurde, dann verwende das aktuelle Datum
-        if (recordedDate == null)
+        if (recordingDate == null)
         {
-            recordedDate = DateOnly.FromDateTime(DateTime.Now);
+            recordingDate = DateOnly.FromDateTime(DateTime.Now);
         }
 
         // Gib das Aufnahmedatum zurück
-        return recordedDate.Value;
+        return recordingDate.Value;
     }
 
     /// <summary>
@@ -367,7 +367,7 @@ public enum InfuseMediaType
 /// <summary>
 /// Umfasst Metadaten einer Datei, die einen Einfluss auf das Mapping der Datei haben.
 /// </summary>
-/// <param name="RecordingDate">Das Aufnahmedatum</param>
+/// <param name="RecordingData">Das Aufnahmedatum</param>
 /// <param name="CommaSeparatedCategories">Die Kategorien, die durch Kommas getrennt sind</param>
 /// <param name="Title">Der Titel</param>
-public record FileMetadata(DateOnly? RecordingDate, string CommaSeparatedCategories, string? Title);
+public record FileMetadata(DateTime? RecordingData, string CommaSeparatedCategories, string? Title);
