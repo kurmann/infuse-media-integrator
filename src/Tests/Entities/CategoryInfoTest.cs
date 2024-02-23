@@ -27,6 +27,20 @@ namespace Kurmann.InfuseMediaIntegrator.Tests.Entities
         }
 
         [TestMethod]
+        public void Create_ShouldReturnSuccess_WhenRootAndDirectoryAreTheSame()
+        {
+            // Arrange
+
+            // Act
+            var result = CategoryInfo.CreateFromDirectoryStructure(RootPath, RootPath);
+
+            // Assert
+            Assert.IsTrue(result.IsSuccess);
+            Assert.IsNotNull(result.Value);
+            Assert.AreEqual(0, result.Value.Categories.Count);
+        }
+
+        [TestMethod]
         public void Create_ShouldReturnFailure_WhenRootPathIsNull()
         {
             // Arrange

@@ -31,6 +31,10 @@ public class CategoryInfo
         if (string.IsNullOrWhiteSpace(directoryPath))
             return Result.Failure<CategoryInfo>("DirectoryPath is null or empty");
 
+        // Entferne Trennzeichen am Anfang und am Ende.
+        rootPath = rootPath.Trim(Path.DirectorySeparatorChar);
+        directoryPath = directoryPath.Trim(Path.DirectorySeparatorChar);
+
         var root = new DirectoryInfo(rootPath);
         if (!root.Exists)
             return Result.Failure<CategoryInfo>($"RootPath '{rootPath}' does not exist");
@@ -39,11 +43,12 @@ public class CategoryInfo
         if (!directory.Exists)
             return Result.Failure<CategoryInfo>($"DirectoryPath '{directoryPath}' does not exist");
 
+        // Wenn das Wurzelverzeichnis und das Verzeichnis das gleiche sind, dann ist die Kategorie leer
+        if (root.FullName == directory.FullName)
+            return Result.Success(new CategoryInfo([]));
+
         // Erstelle das relative Verzeichnis, vom Wurzelverzeichnis aus gesehen.
         var relativeDirectory = directory.FullName[(root.FullName.Length + 1)..];
-
-        // Entferne Trennzeichen am Anfang und am Ende.
-        relativeDirectory = relativeDirectory.Trim(Path.DirectorySeparatorChar);
 
         // Erstelle die Kategorien aus dem relativen Verzeichnis.
         var categories = relativeDirectory.Split(Path.DirectorySeparatorChar).ToList();
