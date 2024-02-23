@@ -66,3 +66,37 @@ public class CategoryInfo
         return Result.Success(new CategoryInfo(categoriesList));
     }
 }
+
+/// <summary>
+/// Repräsentiert eine Kategorie.
+/// </summary>
+public class Category
+{
+    /// <summary>
+    /// Name der Kategorie.
+    /// </summary>
+    public string Name { get; }
+
+    /// <summary>
+    /// Liste der Unterkategorien.
+    /// </summary>
+    public IReadOnlyList<Category> Subcategories { get; }
+
+    private Category(string name, List<Category> subcategories)
+    {
+        Name = name;
+        Subcategories = subcategories.AsReadOnly();
+    }
+
+    public static Result<Category> Create(string name, List<Category>? subcategories = null)
+    {
+        subcategories ??= [];
+
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return Result.Failure<Category>("Category name cannot be empty.");
+        }
+
+        return Result.Success(new Category(name, subcategories));
+    }
+}
