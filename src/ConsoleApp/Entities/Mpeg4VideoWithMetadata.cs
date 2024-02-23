@@ -8,14 +8,50 @@ namespace Kurmann.InfuseMediaIntegrator.Entities
     /// </summary>
     public class Mpeg4VideoWithMetadata
     {
+        /// <summary>
+        /// Der Titel des Videos.
+        /// </summary>
         public string Title { get; }
+
+        /// <summary>
+        /// Der sortierbare Titel des Videos.
+        /// Oft mit dem Iso-Datumsformat (YYYY-MM-DD) vorangestellt.
+        /// </summary>
         public string TitleSort { get; }
+
+        /// <summary>
+        /// Die Beschreibung des Videos.
+        /// </summary>
         public string Description { get; }
+
+        /// <summary>
+        /// Das Jahr des Videos. Bei den meisten Videos handelt es sich um das Aufnahmejahr.
+        /// </summary>
         public uint? Year { get; }
+
+        /// <summary>
+        /// Das Album des Videos.
+        /// </summary>
         public string Album { get; }
+
+        /// <summary>
+        /// Das Titelbild (Artwork) des Videos.
+        /// </summary>
         public byte[]? Artwork { get; }
+
+        /// <summary>
+        /// Der MIME-Typ des Titelbilds (Artwork) des Videos.
+        /// </summary>
         public string? ArtworkMimeType { get; }
+
+        /// <summary>
+        /// Die Dateiendung des Titelbilds (Artwork) des Videos.
+        /// </summary>
         public string? ArtworkExtension { get; }
+
+        /// <summary>
+        /// Das Mpeg4Video-Objekt.
+        /// </summary>
         public Mpeg4Video Mpeg4Video { get; }
 
         private Mpeg4VideoWithMetadata(Mpeg4Video mpeg4Video,
