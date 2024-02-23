@@ -247,4 +247,27 @@ public class FileMappingInfoTests
         Assert.AreEqual(fileName, result.Value.SourcePath);
         Assert.AreEqual("Familie/2024/2024-21-03 Ausflug nach Willisau-fanart.JPG", result.Value.TargetPath);
     }
+
+    [TestMethod] 
+    public void Create_ShouldReturnSuccess_WhenFileNameHasIsoDateAndTitleWithSpecialCharactersAndIsFanartImage()
+    {
+        // Arrange
+        var categories = "Familie";
+        var fileName = "Ausflug nach Willisau.jpg";
+        var recordedDate = new DateTime(2024, 3, 21);
+        var title = "Ausflug nach Willisau";
+        
+        // Act
+        var fileMetadata = new FileMetadata(recordedDate, categories, title);
+        var result = FileMappingInfo.Create(fileName, fileMetadata);
+        
+        // Assert
+        Assert.IsTrue(result.IsSuccess, result.Error);
+        Assert.AreEqual(InfuseMediaType.FanartImage, result.Value.MediaType);
+        Assert.AreEqual(1, result.Value.Categories.Count);
+        Assert.AreEqual(categories, result.Value.Categories.First());
+        Assert.AreEqual(2024, result.Value.Year);
+        Assert.AreEqual(fileName, result.Value.SourcePath);
+        Assert.AreEqual("Familie/2024/2024-21-03 Ausflug nach Willisau.jpg", result.Value.TargetPath);
+    }
 }
