@@ -18,6 +18,8 @@ public class CategoryInfo
 
     /// <summary>
     /// Erstellt eine neue Instanz der Klasse <see cref="CategoryInfo"/> aus einem Wurzelverzeichnis und einem Verzeichnis.
+    /// Beispiel: RootPath = "Data/Input/Testcase 3", DirectoryPath = "Data/Input/Testcase 3/Lyssach/Garten"
+    /// Result: ["Lyssach", "Garten"]
     /// </summary>
     /// <param name="rootPath"></param>
     /// <param name="directoryPath"></param>
@@ -37,11 +39,14 @@ public class CategoryInfo
         if (!directory.Exists)
             return Result.Failure<CategoryInfo>($"DirectoryPath '{directoryPath}' does not exist");
 
-        var categories = new List<string>
-        {
-            root.Name
-        };
-        categories.AddRange(directory.GetDirectories().Select(d => d.Name));
+        // Erstelle das relative Verzeichnis, vom Wurzelverzeichnis aus gesehen.
+        var relativeDirectory = directory.FullName[(root.FullName.Length + 1)..];
+
+        // Entferne Trennzeichen am Anfang und am Ende.
+        relativeDirectory = relativeDirectory.Trim(Path.DirectorySeparatorChar);
+
+        // Erstelle die Kategorien aus dem relativen Verzeichnis.
+        var categories = relativeDirectory.Split(Path.DirectorySeparatorChar).ToList();
 
         return Result.Success(new CategoryInfo(categories));
     }

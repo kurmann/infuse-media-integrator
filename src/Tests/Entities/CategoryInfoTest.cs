@@ -5,8 +5,8 @@ namespace Kurmann.InfuseMediaIntegrator.Tests.Entities
     [TestClass]
     public class CategoryInfoTests
     {
-        private const string RootPath = "Data/Root";
-        private const string DirectoryPath = "Data/Root/Category1";
+        private const string RootPath = "Data/Input/Testcase 3";
+        private const string DirectoryPath = "Data/Input/Testcase 3/Lyssach/Garten/";
 
         [TestMethod]
         public void Create_ShouldReturnSuccess_WhenRootAndDirectoryExist()
@@ -19,8 +19,11 @@ namespace Kurmann.InfuseMediaIntegrator.Tests.Entities
             // Assert
             Assert.IsTrue(result.IsSuccess);
             Assert.IsNotNull(result.Value);
-            CollectionAssert.Contains(result.Value.Categories, "Root");
-            CollectionAssert.Contains(result.Value.Categories, "Category1");
+            CollectionAssert.Contains(result.Value.Categories, "Lyssach");
+            CollectionAssert.Contains(result.Value.Categories, "Garten");
+            Assert.AreEqual(2, result.Value.Categories.Count);
+            Assert.AreEqual("Lyssach", result.Value.Categories.ElementAt(0));
+            Assert.AreEqual("Garten", result.Value.Categories.ElementAt(1));
         }
 
         [TestMethod]
