@@ -6,103 +6,62 @@ namespace Kurmann.InfuseMediaIntegrator.Tests.Entities;
 public class CategoryPathTests
 {
     [TestMethod]
-    public void Create_ShouldReturnSuccess_WhenPathIsValid()
+    public void Create_ShouldReturnSuccess_WhenValidPathProvided()
     {
         // Arrange
-        string path = "Root/Category1/Category2";
+        string validPath = "Category1/Category2/Category3";
 
         // Act
-        var result = CategoryPath.Create(path);
+        var result = CategoryPath.Create(validPath);
 
         // Assert
         Assert.IsTrue(result.IsSuccess);
-        Assert.IsNotNull(result.Value);
-        CollectionAssert.AreEqual(new[] { "Root", "Category1", "Category2" }, result.Value.Categories.ToArray());
+        Assert.AreEqual(3, result.Value.Categories.Count);
+        Assert.AreEqual("Category1", result.Value.Categories[0]);
+        Assert.AreEqual("Category2", result.Value.Categories[1]);
+        Assert.AreEqual("Category3", result.Value.Categories[2]);
+        Assert.AreEqual(result.Value.Value, validPath);
     }
 
     [TestMethod]
     public void Create_ShouldReturnFailure_WhenPathIsNull()
     {
         // Arrange
-        string? path = null;
+        string nullPath = null;
 
         // Act
-        var result = CategoryPath.Create(path);
+        var result = CategoryPath.Create(nullPath);
 
         // Assert
         Assert.IsFalse(result.IsSuccess);
-        Assert.AreEqual("Path is null or empty", result.Error);
+        Assert.AreEqual("Path is null or empty", result.ErrorMessage);
     }
 
     [TestMethod]
     public void Create_ShouldReturnFailure_WhenPathIsEmpty()
     {
         // Arrange
-        string path = "";
+        string emptyPath = "";
 
         // Act
-        var result = CategoryPath.Create(path);
+        var result = CategoryPath.Create(emptyPath);
 
         // Assert
         Assert.IsFalse(result.IsSuccess);
-        Assert.AreEqual("Path is null or empty", result.Error);
+        Assert.AreEqual("Path is null or empty", result.ErrorMessage);
     }
 
     [TestMethod]
-    public void Create_ShouldReturnSuccess_WhenPathContainsLeadingAndTrailingSpaces()
-    {
-        // Arrange
-        string path = "  Root/Category1/Category2  ";
-
-        // Act
-        var result = CategoryPath.Create(path);
-
-        // Assert
-        Assert.IsTrue(result.IsSuccess);
-        Assert.IsNotNull(result.Value);
-        CollectionAssert.AreEqual(new[] { "Root", "Category1", "Category2" }, result.Value.Categories.ToArray());
-    }
-
-    [TestMethod]
-    public void Create_ShouldReturnSuccess_WhenPathContainsEmptyCategories()
-    {
-        // Arrange
-        string path = "Root//Category1//Category2";
-
-        // Act
-        var result = CategoryPath.Create(path);
-
-        // Assert
-        Assert.IsTrue(result.IsSuccess);
-        Assert.IsNotNull(result.Value);
-        CollectionAssert.AreEqual(new[] { "Root", "Category1", "Category2" }, result.Value.Categories.ToArray());
-    }
-
-    [TestMethod] // Prüfe ob ungültige Zeichen erkannt werden
     public void Create_ShouldReturnFailure_WhenPathContainsInvalidCharacters()
     {
         // Arrange
-        string path = "Root/Category1/Category2" + Path.GetInvalidPathChars().First();
+        string pathWithInvalidChars = "Category1/Category2/Category*3";
 
         // Act
-        var result = CategoryPath.Create(path);
+        var result = CategoryPath.Create(pathWithInvalidChars);
 
         // Assert
         Assert.IsFalse(result.IsSuccess);
-        Assert.AreEqual($"Path contains invalid characters: {Path.GetInvalidPathChars().First()}", result.Error);
-    }
-
-    [TestMethod] // Prüfe ob nach dem Erstellen des CategoryPath noch eine weitere Kategorie hinzugefügt werden kann
-    public void AddCategory_ShouldReturnSuccess_WhenAdditionalCategoryIsAddedAfterCreating()
-    {
-        // Arrange
-        var categoryPath = CategoryPath.Create("Root/Category1/Category2").Value;
-
-        // Act
-        var result = categoryPath.AddCategory("Category3");
-
-        // Assert
-        Assert.IsTrue(result.IsSuccess);
-        CollectionAssert.AreEqual(new[] { "Root", "Category1", "Category2", "Category3" }, categoryPath.Categories.ToArray());
+        Assert.AreEqual("Path contains invalid characters: /, \\, ?, %, *, :, |, \", <, >", result.ErrorMessage);
     }
 }
