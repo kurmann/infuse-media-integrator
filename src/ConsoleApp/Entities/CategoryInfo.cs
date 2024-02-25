@@ -90,29 +90,3 @@ public class CategoryInfo
         return Result.Success();
     }
 }
-
-public class CategoryPath
-{
-    private readonly List<string> _categories = new List<string>();
-
-    public CategoryPath(string path)
-    {
-        if (!string.IsNullOrEmpty(path))
-        {
-            _categories.AddRange(path.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries));
-        }
-    }
-
-    public void AddCategory(string category)
-    {
-        if (!string.IsNullOrEmpty(category))
-        {
-            _categories.Add(category);
-        }
-    }
-
-    public override string ToString()
-    {
-        return string.Join("/", _categories);
-    }
-}
