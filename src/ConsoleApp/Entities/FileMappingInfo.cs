@@ -20,15 +20,9 @@ public partial class FileMappingInfo
     public string TargetPath { get; }
 
     /// <summary>
-    /// Die Kategorie der Datei.
+    /// Der Kategorienpfad bestehehend aus Hauptkategorien und Unterkategorien.
     /// </summary>
-    [Obsolete("Use Categories instead")]
-    public string Category { get; }
-
-    /// <summary>
-    /// Die Kategorien der Datei (oft nur eine)
-    /// </summary>
-    public List<string> Categories { get; } = [];
+    public Maybe<CategoryPath> Category { get; }
 
     /// <summary>
     /// Der Titel der Datei.
@@ -38,7 +32,13 @@ public partial class FileMappingInfo
     /// <summary>
     /// Das Jahr der Datei.
     /// </summary>
+    [Obsolete("Use RecordingDate.Year instead.")]
     public int Year { get; }
+
+    /// <summary>
+    /// Das Aufnahmedatum der Datei.
+    /// </summary>
+    public DateOnly RecordingDate { get; }
 
     /// <summary>
     /// Das Suffix, das an den Dateinamen angehängt wird, um das Bild als Fanart zu kennzeichnen.
@@ -50,30 +50,23 @@ public partial class FileMappingInfo
     /// </summary>
     public InfuseMediaType MediaType { get; }
 
-    private FileMappingInfo(string category, int year, string sourcePath, string targetPath, InfuseMediaType mediaType)
+    private FileMappingInfo(string title, CategoryPath category, DateOnly recordingDate, string sourcePath, string targetPath, InfuseMediaType mediaType)
     {
+        Title = title;
         Category = category;
-        Year = year;
+        RecordingDate = recordingDate;
         SourcePath = sourcePath;
         TargetPath = targetPath;
         MediaType = mediaType;
     }
 
-    private FileMappingInfo(List<string> categories, int year, string title, string sourcePath, string targetPath, InfuseMediaType mediaType)
-    {
-        Categories = categories ?? [];
-        Year = year;
-        Title = title;
-        SourcePath = sourcePath;
-        TargetPath = targetPath;
-        MediaType = mediaType;
-    }
     /// <summary>
     /// Erstellt eine Instanz von FileMappingInfo basierend auf der Kategorie und dem Dateinamen.
     /// </summary>
     /// <param name="category">Die Kategorie der Datei.</param>
     /// <param name="filePath">Der Pfad der Quelldatei</param>
     /// <returns>Ein Result-Objekt, das bei Erfolg eine Instanz von FileMappingInfo enthält.</returns>
+    [Obsolete("Use Create(FileMappingInfoArgs args) instead.")]
     public static Result<FileMappingInfo> Create(string category, string filePath)
     {
         if (string.IsNullOrWhiteSpace(category))
@@ -86,13 +79,8 @@ public partial class FileMappingInfo
             return Result.Failure<FileMappingInfo>("File name does not match the expected format '{{ISO-Datum}} {{Titel}}.{{Extension}}'.");
         }
 
-        var targetPath = GenerateTargetPath(category, year, filePath, mediaType);
-        if (targetPath.IsFailure)
-        {
-            return Result.Failure<FileMappingInfo>(targetPath.Error);
-        }
-
-        return new FileMappingInfo(category, year, filePath, targetPath.Value, mediaType);
+        var args = new FileMappingInfoArgs(filePath, null, category, null);
+        return Create(args);
     }
 
     /// <summary>
@@ -101,33 +89,33 @@ public partial class FileMappingInfo
     /// <param name="filePath">Der Pfad der Quelldatei.</param>
     /// <param name="metadata">Das FileMetadata-Objekt mit den Metadaten der Datei.</param>
     /// <returns>Ein Result-Objekt, das bei Erfolg eine Instanz von FileMappingInfo enthält.</returns>
-    public static Result<FileMappingInfo> Create(string filePath, FileMetadata metadata)
+    public static Result<FileMappingInfo> Create(FileMappingInfoArgs args)
     {
         // Prüfe, ob die Datei existiert
-        var fileInfo = new FileInfo(filePath);
+        var fileInfo = new FileInfo(args.SourceFilePath);
         if (!fileInfo.Exists)
         {
-            return Result.Failure<FileMappingInfo>($"File '{filePath}' does not exist.");
+            return Result.Failure<FileMappingInfo>($"File '{args.SourceFilePath}' does not exist.");
         }
 
         // Prüfe, ob aus dem Dateinamen das Verzeichnis abgeleitet werden kann
         if (string.IsNullOrWhiteSpace(fileInfo.Directory?.FullName))
         {
-            return Result.Failure<FileMappingInfo>($"Directory of file '{filePath}' does not exist.");
+            return Result.Failure<FileMappingInfo>($"Directory of file '{args.SourceFilePath}' cannot be read.");
         }
 
         // Versuche die für das Dateimanagement relevanten Informationen aus den Metadaten oder dem Dateinamen zu lesen
-        var title = GetTitle(metadata, fileInfo);
-        var categories = GetCategoryInfoOrEmptyList(metadata, fileInfo, fileInfo.Directory);
-        var recordedDate = GetRecordedDateOrCurrentDate(metadata, fileInfo);
+        var title = GetTitle(args.Title, fileInfo);
+        var categories = GetCategoryPathOrEmpty(fileInfo, args.CategoryPath);
+        var recordedDate = GetRecordedDateOrCurrentDate(fileInfo, args.RecordingDate);
 
-        var targetPath = GenerateTargetPath(title, categories, recordedDate);
+        var targetPath = GenerateTargetPath(title, recordedDate.Year, fileInfo.Name, InfuseMediaType.MovieFile);
         if (targetPath.IsFailure)
         {
             return Result.Failure<FileMappingInfo>(targetPath.Error);
         }
 
-        return new FileMappingInfo(categories, recordedDate.Year, title, filePath, targetPath.Value, InfuseMediaType.MovieFile);
+        return new FileMappingInfo(title, categories, recordedDate, args.SourceFilePath, targetPath.Value, InfuseMediaType.MovieFile);
     }
 
     /// <summary>
@@ -136,16 +124,16 @@ public partial class FileMappingInfo
     /// <param name="metadata"></param>
     /// <param name="fileInfo"></param>
     /// <returns></returns>
-    private static string GetTitle(FileMetadata metadata, FileInfo fileInfo)
+    private static string GetTitle(string? titleFromMetadata, FileInfo fileInfo)
     {
         // Prüfe ob der Titel in den Metadaten gesetzt ist und ob dieser für das Dateisystem gültig ist
         string title;
-        if (metadata != null && !string.IsNullOrWhiteSpace(metadata.Title))
+        if (!string.IsNullOrWhiteSpace(titleFromMetadata))
         {
-            var titleFromMetadata = DirectoryOrFilename.Create(metadata.Title);
-            if (titleFromMetadata.IsSuccess)
+            var directoryOrFilename = DirectoryOrFilename.Create(titleFromMetadata);
+            if (directoryOrFilename.IsSuccess)
             {
-                title = titleFromMetadata.Value.Name;
+                title = directoryOrFilename.Value.Name;
             }
             else
             {
@@ -182,36 +170,24 @@ public partial class FileMappingInfo
         return title;
     }
 
-    /// <summary>
-    /// Versucht die Kategorie aus den Metadaten oder dem Dateipfad zu lesen.
-    /// </summary>
-    /// <param name="metadata"></param>
-    /// <param name="filePath"></param>
-    /// <param name="rootSourceDirectory"></param>
-    /// <returns></returns>
-    private static List<string> GetCategoryInfoOrEmptyList(FileMetadata metadata, FileInfo filePath, DirectoryInfo rootSourceDirectory)
+    private static CategoryPath? GetCategoryPathOrEmpty(FileInfo fileInfo, string? categoryPath)
     {
-        // Wenn die Kategorie in den Metadaten gesetzt ist, dann prüfe ob jede Kategorie einen Namen hat, der als Verzeichnisname gültig ist
-        // Die Kateorienlisten werden durch Kommas getrennt
-        var categories = new List<string>();
-        if (metadata != null && !string.IsNullOrWhiteSpace(metadata.CommaSeparatedCategories))
+        // Versuche einen Kategorienpfad aus den Metadaten zu lesen
+        var categoryPathFromMetadata = CategoryPath.Create(categoryPath);
+        if (categoryPathFromMetadata.IsSuccess)
         {
-            var categoryInfoByMetadata = CategoryInfo.CreateFromCommaSeparatedList(metadata.CommaSeparatedCategories);
-            if (categoryInfoByMetadata.IsSuccess)
-            {
-                return categoryInfoByMetadata.Value.Categories.ToList();
-            }
+            return categoryPathFromMetadata.Value;
         }
 
-        // Wenn die Kategorie in den Metadaten nicht gesetzt ist versuche die Kategorie aus dem Dateipfad zu lesen
-        var categoryInfoByDirectoryStructure = CategoryInfo.CreateFromDirectoryStructure(rootSourceDirectory.FullName, filePath.DirectoryName);
-        if (categoryInfoByDirectoryStructure.IsSuccess)
+        // Versuche einen Kategorienpfad aus dem Dateinamen zu lesen
+        var categoryPathFromFilename = CategoryPath.Create(fileInfo.Directory?.FullName);
+        if (categoryPathFromFilename.IsSuccess)
         {
-            return categoryInfoByDirectoryStructure.Value.Categories.ToList();
+            return categoryPathFromFilename.Value;
         }
 
-        // Wenn weder in den Metadaten noch im Dateipfad eine Kategorie gefunden wurde, gib eine leere Liste zurück
-        return categories;
+        // Wenn weder in den Metadaten noch im Dateinamen ein Kategorienpfad gefunden wurde, dann gib einen leeren Kategorienpfad zurück
+        return null;
     }
 
     /// <summary>
@@ -221,18 +197,19 @@ public partial class FileMappingInfo
     /// <param name="metadata"></param>
     /// <param name="fileInfo"></param>
     /// <returns></returns>
-    private static DateOnly GetRecordedDateOrCurrentDate(FileMetadata metadata, FileInfo fileInfo)
+    private static DateOnly GetRecordedDateOrCurrentDate(FileInfo fileInfo, DateOnly? recordingDate)
     {
-        // Übernimm das Aufnahmedatum aus den Metadaten, wenn es gesetzt ist und sonst versuche es aus dem Dateinamen zu lesen
-        DateOnly? recordingDate = metadata.RecordingData != null ? DateOnly.FromDateTime(metadata.RecordingData.Value) : null;
-        if (recordingDate == null)
+        // Übernimm das Aufnahmedatum aus den Metadaten, wenn es gesetzt
+        if (recordingDate != null)
         {
-            // Versuche das Datum aus dem Dateinamen zu lesen
-            var recordedDateResult = RecordedDate.CreateFromFilename(fileInfo);
-            if (recordedDateResult.IsSuccess)
-            {
-                recordingDate = recordedDateResult.Value.Value;
-            }
+            return recordingDate.Value;
+        }
+
+        // Versuche das Datum aus dem Dateinamen zu lesen
+        var recordedDateResult = RecordedDate.CreateFromFilename(fileInfo);
+        if (recordedDateResult.IsSuccess)
+        {
+            recordingDate = recordedDateResult.Value.Value;
         }
 
         // Wenn weder ein Aufnahmedatum in den Meta-Daten noch im Dateinamen gefunden wurde, dann verwende das aktuelle Datum
@@ -365,9 +342,10 @@ public enum InfuseMediaType
 }
 
 /// <summary>
-/// Umfasst Metadaten einer Datei, die einen Einfluss auf das Mapping der Datei haben.
+/// Enthält Informationen, die für das Mapping einer Datei benötigt werden.
 /// </summary>
-/// <param name="RecordingData">Das Aufnahmedatum</param>
-/// <param name="CommaSeparatedCategories">Die Kategorien, die durch Kommas getrennt sind</param>
-/// <param name="Title">Der Titel</param>
-public record FileMetadata(DateTime? RecordingData, string CommaSeparatedCategories, string? Title);
+/// <param name="sourceFilePath"></param>
+/// <param name="RecordingDate"></param>
+/// <param name="CategoryPath"></param>
+/// <param name="Title"></param>
+public record FileMappingInfoArgs(string SourceFilePath, DateOnly? RecordingDate, string CategoryPath, string? Title);
