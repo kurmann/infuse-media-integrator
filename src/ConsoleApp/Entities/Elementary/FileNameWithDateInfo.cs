@@ -2,7 +2,7 @@ using System.Globalization;
 using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
 
-namespace Kurmann.InfuseMediaIntegrator.Entities;
+namespace Kurmann.InfuseMediaIntegrator.Entities.Elementary;
 
 /// <summary>
 /// Klasse um ein Aufnahmedatum zu erstellen.
@@ -14,7 +14,7 @@ public class RecordedDate
     /// Das Aufnahmedatum.
     /// </summary>
     /// <value></value>
-    public DateOnly Value { get; }
+    public DateOnly Date { get; }
 
     /// <summary>
     /// Der Text, der als das Aufnahmedatum interpretiert wurde.
@@ -22,35 +22,10 @@ public class RecordedDate
     /// </summary>
     public Maybe<string> MatchedString { get; }
 
-    private RecordedDate(DateOnly value, Maybe<string> matchedString)
+    private RecordedDate(DateOnly date, Maybe<string> matchedString)
     {
-        Value = value;
+        Date = date;
         MatchedString = matchedString;
-    }
-
-    public static Result<RecordedDate> CreateFromKeywords(IEnumerable<string>? keywords)
-    {
-        // Prüfe ob die Schlagwortliste leer ist
-        keywords ??= new List<string>();
-        var extractedDates = ExtractDates(keywords);
-
-        // Prüfe ob ein Datum gefunden wurde
-        if (extractedDates.IsFailure)
-        {
-            return Result.Failure<RecordedDate>(extractedDates.Error);
-        }
-
-        // Wenn mehrere Daten gefunden wurden, dann verwende das älteste Datum
-        if (extractedDates.Value != null && extractedDates.Value.Any())
-        {
-            var foundRecordedDate = extractedDates.Value.Min();
-            // todo: return all matched strings
-            return new RecordedDate(foundRecordedDate, Maybe<string>.None);
-        }
-        else
-        {
-            return Result.Failure<RecordedDate>("No recorded dates found in keyword list");
-        }
     }
 
     /// <summary>
@@ -60,55 +35,53 @@ public class RecordedDate
     /// Beispiel: 2021 Rückblick Familie.mp4.
     /// In diesem Fall wird der 31.12. des Jahres als Aufnahmedatum verwendet.
     /// </summary>
-    /// <param name="fileInfo"></param>
+    /// <param name="fileName"></param>
     /// <returns></returns>
-    public static Result<RecordedDate> CreateFromFilename(FileInfo? fileInfo)
+    public static Result<RecordedDate> Create(string? fileName)
     {
-        // Prüfe ob der Dateiname leer ist
-        if (fileInfo == null)
+        var fileNameInfo = FileNameInfo.Create(fileName);
+        if (fileNameInfo.IsFailure)
         {
-            return Result.Failure<RecordedDate>("Filename is empty");
+            return Result.Failure<RecordedDate>(fileNameInfo.Error);
         }
 
         // Versuche ein ISO-Datum aus dem Dateinamen zu extrahieren
-        (var isoDate, var matchedIsoDateString) = TryParseIsoDate(fileInfo.Name);
+        (var isoDate, var matchedIsoDateString) = TryParseIsoDate(fileNameInfo.Value.Name);
         if (isoDate.HasValue)
         {
             return new RecordedDate(isoDate.Value, matchedIsoDateString);
         }
 
         // Versuche ein deutsches Datum aus dem Dateinamen zu extrahieren
-        (var germanDate, var matchedGermanIsoString) = TryParseGermanDate(fileInfo.Name);
+        (var germanDate, var matchedGermanIsoString) = TryParseGermanDate(fileNameInfo.Value.Name);
         if (germanDate.HasValue)
         {
             return new RecordedDate(germanDate.Value, matchedGermanIsoString);
         }
 
         // Versuche ein Monat aus dem Dateinamen zu extrahieren
-        (var month, var matchedMonthString) = TryParseMonth(fileInfo.Name);
+        (var month, var matchedMonthString) = TryParseMonth(fileNameInfo.Value.Name);
         if (month.HasValue)
         {
             return new RecordedDate(month.Value, matchedMonthString);
         }
 
         // Versuche eine Jahreszeit aus dem Dateinamen zu extrahieren
-        (var season, var matchedSeasonString) = TryParseSeason(fileInfo.Name);
+        (var season, var matchedSeasonString) = TryParseSeason(fileNameInfo.Value.Name);
         if (season.HasValue)
         {
             return new RecordedDate(season.Value, matchedSeasonString);
         }
 
         // Versuche ein Jahr aus dem Dateinamen zu extrahieren
-        (var year, var matchedYearString) = TryParseYear(fileInfo.Name);
+        (var year, var matchedYearString) = TryParseYear(fileNameInfo.Value.Name);
         if (year.HasValue)
         {
             return new RecordedDate(year.Value, matchedYearString);
         }
 
-        // Wenn kein Datum gefunden wurde, dann verwende das Erstellungsdatum der Datei
-        var createdDate = fileInfo.CreationTime.Date;
-        var dateOnly = new DateOnly(createdDate.Year, createdDate.Month, createdDate.Day);
-        return new RecordedDate(dateOnly, Maybe<string>.None);
+        // Wenn kein Datum gefunden wurde, gib einen Fehler zurück
+        return Result.Failure<RecordedDate>("No date found in file name");
     }
 
     internal static Result<RecordedDate> CreateFromDateTime(DateTime? dateTime)
