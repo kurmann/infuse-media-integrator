@@ -2,13 +2,13 @@ using System.Globalization;
 using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
 
-namespace Kurmann.InfuseMediaIntegrator.Entities.Elementary;
+namespace Kurmann.InfuseMediaIntegrator.Entities;
 
 /// <summary>
 /// Klasse um ein Aufnahmedatum zu erstellen.
 /// Enthält wesentliche Logik um ein Aufnahmedatum aus einer Schlagwortliste zu extrahieren.
 /// </summary>
-public class RecordedDate
+public class FileNameWithDateInfo
 {
     /// <summary>
     /// Das Aufnahmedatum.
@@ -22,7 +22,7 @@ public class RecordedDate
     /// </summary>
     public Maybe<string> MatchedString { get; }
 
-    private RecordedDate(DateOnly date, Maybe<string> matchedString)
+    private FileNameWithDateInfo(DateOnly date, Maybe<string> matchedString)
     {
         Date = date;
         MatchedString = matchedString;
@@ -37,64 +37,64 @@ public class RecordedDate
     /// </summary>
     /// <param name="fileName"></param>
     /// <returns></returns>
-    public static Result<RecordedDate> Create(string? fileName)
+    public static Result<FileNameWithDateInfo> Create(string? fileName)
     {
         var fileNameInfo = FileNameInfo.Create(fileName);
         if (fileNameInfo.IsFailure)
         {
-            return Result.Failure<RecordedDate>(fileNameInfo.Error);
+            return Result.Failure<FileNameWithDateInfo>(fileNameInfo.Error);
         }
 
         // Versuche ein ISO-Datum aus dem Dateinamen zu extrahieren
         (var isoDate, var matchedIsoDateString) = TryParseIsoDate(fileNameInfo.Value.Name);
         if (isoDate.HasValue)
         {
-            return new RecordedDate(isoDate.Value, matchedIsoDateString);
+            return new FileNameWithDateInfo(isoDate.Value, matchedIsoDateString);
         }
 
         // Versuche ein deutsches Datum aus dem Dateinamen zu extrahieren
         (var germanDate, var matchedGermanIsoString) = TryParseGermanDate(fileNameInfo.Value.Name);
         if (germanDate.HasValue)
         {
-            return new RecordedDate(germanDate.Value, matchedGermanIsoString);
+            return new FileNameWithDateInfo(germanDate.Value, matchedGermanIsoString);
         }
 
         // Versuche ein Monat aus dem Dateinamen zu extrahieren
         (var month, var matchedMonthString) = TryParseMonth(fileNameInfo.Value.Name);
         if (month.HasValue)
         {
-            return new RecordedDate(month.Value, matchedMonthString);
+            return new FileNameWithDateInfo(month.Value, matchedMonthString);
         }
 
         // Versuche eine Jahreszeit aus dem Dateinamen zu extrahieren
         (var season, var matchedSeasonString) = TryParseSeason(fileNameInfo.Value.Name);
         if (season.HasValue)
         {
-            return new RecordedDate(season.Value, matchedSeasonString);
+            return new FileNameWithDateInfo(season.Value, matchedSeasonString);
         }
 
         // Versuche ein Jahr aus dem Dateinamen zu extrahieren
         (var year, var matchedYearString) = TryParseYear(fileNameInfo.Value.Name);
         if (year.HasValue)
         {
-            return new RecordedDate(year.Value, matchedYearString);
+            return new FileNameWithDateInfo(year.Value, matchedYearString);
         }
 
         // Wenn kein Datum gefunden wurde, gib einen Fehler zurück
-        return Result.Failure<RecordedDate>("No date found in file name");
+        return Result.Failure<FileNameWithDateInfo>("No date found in file name");
     }
 
-    internal static Result<RecordedDate> CreateFromDateTime(DateTime? dateTime)
+    internal static Result<FileNameWithDateInfo> CreateFromDateTime(DateTime? dateTime)
     {
         // Prüfe ob das Erstellungsdatum leer ist
         if (dateTime == null)
         {
-            return Result.Failure<RecordedDate>("DateTime is empty");
+            return Result.Failure<FileNameWithDateInfo>("DateTime is empty");
         }
 
         // Erstelle ein Aufnahmedatum aus dem Erstellungsdatum
         var dateOnly = new DateOnly(dateTime.Value.Year, dateTime.Value.Month, dateTime.Value.Day);
-        return new RecordedDate(dateOnly, dateTime.Value.ToString()); // In diesem Fall wird der Wert des Aufnahmedatums als Text verwendet
+        return new FileNameWithDateInfo(dateOnly, dateTime.Value.ToString()); // In diesem Fall wird der Wert des Aufnahmedatums als Text verwendet
     }
 
     /// <summary>
