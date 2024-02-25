@@ -12,6 +12,11 @@ public class PathInfo
     /// </summary>
     public string FullPath { get; }
 
+    /// <summary>
+    /// Der Dateiname.
+    /// </summary>
+    public string Name => Path.GetFileName(FullPath);
+
     private PathInfo(string fullPath) => FullPath = fullPath;
 
     /// <summary>
