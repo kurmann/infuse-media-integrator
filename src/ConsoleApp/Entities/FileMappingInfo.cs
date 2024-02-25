@@ -355,7 +355,7 @@ public enum InfuseMediaType
 public record FileMappingInfoArgs
 {
     public string SourceFilePath { get; init; }
-    public DateOnly? RecordingDate { get; }
+    public DateOnly? RecordingDate { get; init; }
     public string? CategoryPath { get; init; }
     public string? Title { get; init; }
 }

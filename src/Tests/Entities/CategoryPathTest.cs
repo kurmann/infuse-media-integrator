@@ -34,7 +34,7 @@ public class CategoryPathTests
 
         // Assert
         Assert.IsFalse(result.IsSuccess);
-        Assert.AreEqual("Path is null or empty", result.ErrorMessage);
+        Assert.AreEqual("Path is null or empty", result.Error);
     }
 
     [TestMethod]
@@ -48,7 +48,7 @@ public class CategoryPathTests
 
         // Assert
         Assert.IsFalse(result.IsSuccess);
-        Assert.AreEqual("Path is null or empty", result.ErrorMessage);
+        Assert.AreEqual("Path is null or empty", result.Error);
     }
 
     [TestMethod]
@@ -62,6 +62,6 @@ public class CategoryPathTests
 
         // Assert
         Assert.IsFalse(result.IsSuccess);
-        Assert.AreEqual("Path contains invalid characters: /, \\, ?, %, *, :, |, \", <, >", result.ErrorMessage);
+        Assert.AreEqual("Path contains invalid characters: /, \\, ?, %, *, :, |, \", <, >", result.Error);
     }
 }

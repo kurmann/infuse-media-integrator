@@ -118,7 +118,7 @@ public class FileMappingInfoTests
         
         // Assert
         Assert.IsTrue(result.IsSuccess, result.Error);
-        Assert.AreEqual(category, result.Value.Category);
+        Assert.AreEqual(category, result.Value.Category.Value);
         Assert.AreEqual(2024, result.Value.Year);
         Assert.AreEqual(fileName, result.Value.SourcePath);
         Assert.AreEqual("Familie/2024/2024-21-03 Ausflug nach Willisau.m4v", result.Value.TargetPath);
@@ -136,7 +136,7 @@ public class FileMappingInfoTests
         
         // Assert
         Assert.IsTrue(result.IsSuccess, result.Error);
-        Assert.AreEqual(category, result.Value.Category);
+        Assert.AreEqual(category, result.Value.Category.Value);
         Assert.AreEqual(2024, result.Value.Year);
         Assert.AreEqual(fileName, result.Value.SourcePath);
         Assert.AreEqual("Familie/2024/2024-21-03 Ausflug nach Willisäu.m4v", result.Value.TargetPath);
@@ -154,7 +154,7 @@ public class FileMappingInfoTests
         
         // Assert
         Assert.IsTrue(result.IsSuccess, result.Error);
-        Assert.AreEqual(category, result.Value.Category);
+        Assert.AreEqual(category, result.Value.Category.Value);
         Assert.AreEqual(2024, result.Value.Year);
         Assert.AreEqual(fileName, result.Value.SourcePath);
         Assert.AreEqual("Familie/2024/2024-21-03 Ausflug nach Willisäu!?.m4v", result.Value.TargetPath);
@@ -173,7 +173,7 @@ public class FileMappingInfoTests
         // Assert
         Assert.IsTrue(result.IsSuccess, result.Error);
         Assert.AreEqual(InfuseMediaType.FanartImage, result.Value.MediaType);
-        Assert.AreEqual(category, result.Value.Category);
+        Assert.AreEqual(category, result.Value.Category.Value);
         Assert.AreEqual(fileName, result.Value.SourcePath);
     }
 
@@ -190,7 +190,7 @@ public class FileMappingInfoTests
         // Assert
         Assert.IsTrue(result.IsSuccess, result.Error);
         Assert.AreEqual(InfuseMediaType.MovieFile, result.Value.MediaType);
-        Assert.AreEqual(category, result.Value.Category);
+        Assert.AreEqual(category, result.Value.Category.Value);
         Assert.AreEqual(fileName, result.Value.SourcePath);
     }
 
@@ -207,7 +207,7 @@ public class FileMappingInfoTests
         // Assert
         Assert.IsTrue(result.IsSuccess, result.Error);
         Assert.AreEqual(InfuseMediaType.FanartImage, result.Value.MediaType);
-        Assert.AreEqual(category, result.Value.Category);
+        Assert.AreEqual(category, result.Value.Category.Value);
         Assert.AreEqual(fileName, result.Value.SourcePath);
         Assert.AreEqual("Familie/2024/2024-21-03 Ausflug nach Willisau-fanart.jpg", result.Value.TargetPath);
     }
@@ -225,7 +225,7 @@ public class FileMappingInfoTests
         // Assert
         Assert.IsTrue(result.IsSuccess, result.Error);
         Assert.AreEqual(InfuseMediaType.FanartImage, result.Value.MediaType);
-        Assert.AreEqual(category, result.Value.Category);
+        Assert.AreEqual(category, result.Value.Category.Value);
         Assert.AreEqual(fileName, result.Value.SourcePath);
         Assert.AreEqual("Familie/2024/2024-21-03 Ausflug nach Willisau-fanart.jpg", result.Value.TargetPath);
     }
@@ -243,7 +243,7 @@ public class FileMappingInfoTests
         // Assert
         Assert.IsTrue(result.IsSuccess, result.Error);
         Assert.AreEqual(InfuseMediaType.FanartImage, result.Value.MediaType);
-        Assert.AreEqual(category, result.Value.Category);
+        Assert.AreEqual(category, result.Value.Category.Value);
         Assert.AreEqual(fileName, result.Value.SourcePath);
         Assert.AreEqual("Familie/2024/2024-21-03 Ausflug nach Willisau-fanart.JPG", result.Value.TargetPath);
     }
@@ -252,20 +252,24 @@ public class FileMappingInfoTests
     public void Create_ShouldReturnSuccess_WhenFileNameHasIsoDateAndTitleWithSpecialCharactersAndIsFanartImage()
     {
         // Arrange
-        var categories = "Familie";
+        var category = "Familie";
         var fileName = "Ausflug nach Willisau.jpg";
-        var recordedDate = new DateTime(2024, 3, 21);
+        var recordingDate = new DateOnly(2024, 3, 21);
         var title = "Ausflug nach Willisau";
         
         // Act
-        var fileMetadata = new FileMetadata(recordedDate, categories, title);
-        var result = FileMappingInfo.Create(fileName, fileMetadata);
+        var args = new FileMappingInfoArgs
+        {
+            SourceFilePath = fileName,
+            Title = title,
+            RecordingDate = recordingDate
+        };
+        var result = FileMappingInfo.Create(args);
         
         // Assert
         Assert.IsTrue(result.IsSuccess, result.Error);
         Assert.AreEqual(InfuseMediaType.FanartImage, result.Value.MediaType);
-        Assert.AreEqual(1, result.Value.Categories.Count);
-        Assert.AreEqual(categories, result.Value.Categories.First());
+        Assert.AreEqual(category, result.Value.Category.Value);
         Assert.AreEqual(2024, result.Value.Year);
         Assert.AreEqual(fileName, result.Value.SourcePath);
         Assert.AreEqual("Familie/2024/2024-21-03 Ausflug nach Willisau.jpg", result.Value.TargetPath);
