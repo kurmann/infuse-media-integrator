@@ -14,7 +14,7 @@ public class FileNameInfo
 
     private FileNameInfo(string fullPath) => Value = Path.GetFileName(fullPath);
 
-    public static Result<FileNameInfo> Create(string fileName)
+    public static Result<FileNameInfo> Create(string? fileName)
     {
         if (string.IsNullOrWhiteSpace(fileName))
         {
