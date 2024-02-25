@@ -11,6 +11,7 @@ public class CategoryInfo
     private CategoryInfo(HashSet<string> categories) => Categories = categories;
     private CategoryInfo(string? category) => Categories = category != null ? [category] : [];
     private CategoryInfo() => Categories = [];
+    private CategoryInfo(CategoryPath? categoryPath) => CategoryPath = categoryPath ?? Maybe<CategoryPath>.None;
 
     /// <summary>
     /// Liste der Kategorien. Eine Kategorie kann auch Unterkategorien haben, die durch einen Schrägstrich getrennt sind.
@@ -19,6 +20,11 @@ public class CategoryInfo
     /// Dieser Ansatz wird verwendet aufgrund der Einfachheit und der Tatsache, dass die Kategorien eine Verzeichnisstruktur nachahmen.
     /// </summary>
     public HashSet<string> Categories { get; }
+
+    /// <summary>
+    /// Kategoriepfad. Eine Kategorie kann auch Unterkategorien haben, die durch einen Schrägstrich getrennt sind.
+    /// </summary>
+    public Maybe<CategoryPath> CategoryPath { get; }
 
     /// <summary>
     /// Erstellt eine neue Instanz der Klasse <see cref="CategoryInfo"/> aus einem Wurzelverzeichnis und einem Verzeichnis.
