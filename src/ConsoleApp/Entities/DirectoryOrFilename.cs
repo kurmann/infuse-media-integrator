@@ -5,6 +5,7 @@ namespace Kurmann.InfuseMediaIntegrator.Entities;
 /// <summary>
 /// Definiert den Namen einer Datei oder eines Verzeichnisses ohne Pfad. Prüft ob der Name für ein Verzeichnis gültig ist.
 /// </summary>
+[Obsolete("Use PathInfo instead.")]
 public class DirectoryOrFilename
 {
     /// <summary>
