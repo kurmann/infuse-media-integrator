@@ -20,14 +20,14 @@ public partial class FileMappingInfo
     public string TargetPath { get; }
 
     /// <summary>
-    /// Der Kategorienpfad bestehehend aus Hauptkategorien und Unterkategorien.
-    /// </summary>
-    public Maybe<CategoryPath> Category { get; }
-
-    /// <summary>
     /// Der Titel der Datei.
     /// </summary>
     public string Title { get; }
+
+    /// <summary>
+    /// Der Kategorienpfad bestehehend aus Hauptkategorien und Unterkategorien.
+    /// </summary>
+    public CategoryPath? Category { get; }
 
     /// <summary>
     /// Das Jahr der Datei.
@@ -79,7 +79,11 @@ public partial class FileMappingInfo
             return Result.Failure<FileMappingInfo>("File name does not match the expected format '{{ISO-Datum}} {{Titel}}.{{Extension}}'.");
         }
 
-        var args = new FileMappingInfoArgs(filePath, null, category, null);
+        var args = new FileMappingInfoArgs
+        {
+            SourceFilePath = filePath,
+            CategoryPath = category
+        };
         return Create(args);
     }
 
@@ -348,4 +352,10 @@ public enum InfuseMediaType
 /// <param name="RecordingDate"></param>
 /// <param name="CategoryPath"></param>
 /// <param name="Title"></param>
-public record FileMappingInfoArgs(string SourceFilePath, DateOnly? RecordingDate, string CategoryPath, string? Title);
+public record FileMappingInfoArgs
+{
+    public string SourceFilePath { get; init; }
+    public DateOnly? RecordingDate { get; }
+    public string? CategoryPath { get; init; }
+    public string? Title { get; init; }
+}
