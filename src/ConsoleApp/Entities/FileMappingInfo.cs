@@ -199,7 +199,7 @@ public partial class FileMappingInfo
             var categoryInfoByMetadata = CategoryInfo.CreateFromCommaSeparatedList(metadata.CommaSeparatedCategories);
             if (categoryInfoByMetadata.IsSuccess)
             {
-                return categoryInfoByMetadata.Value.Categories;
+                return categoryInfoByMetadata.Value.Categories.ToList();
             }
         }
 
@@ -207,7 +207,7 @@ public partial class FileMappingInfo
         var categoryInfoByDirectoryStructure = CategoryInfo.CreateFromDirectoryStructure(rootSourceDirectory.FullName, filePath.DirectoryName);
         if (categoryInfoByDirectoryStructure.IsSuccess)
         {
-            return categoryInfoByDirectoryStructure.Value.Categories;
+            return categoryInfoByDirectoryStructure.Value.Categories.ToList();
         }
 
         // Wenn weder in den Metadaten noch im Dateipfad eine Kategorie gefunden wurde, gib eine leere Liste zurück
