@@ -10,9 +10,9 @@ public class FileNameInfo
     /// <summary>
     /// Der Dateiname.
     /// </summary>
-    public string Value { get; }
+    public string Name { get; }
 
-    private FileNameInfo(string fullPath) => Value = Path.GetFileName(fullPath);
+    private FileNameInfo(string fullPath) => Name = Path.GetFileName(fullPath);
 
     public static Result<FileNameInfo> Create(string? fileName)
     {
