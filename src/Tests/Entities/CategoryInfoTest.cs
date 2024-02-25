@@ -19,11 +19,8 @@ namespace Kurmann.InfuseMediaIntegrator.Tests.Entities
             // Assert
             Assert.IsTrue(result.IsSuccess);
             Assert.IsNotNull(result.Value);
-            CollectionAssert.Contains(result.Value.Categories, "Lyssach");
-            CollectionAssert.Contains(result.Value.Categories, "Garten");
-            Assert.AreEqual(2, result.Value.Categories.Count);
-            Assert.AreEqual("Lyssach", result.Value.Categories.ElementAt(0));
-            Assert.AreEqual("Garten", result.Value.Categories.ElementAt(1));
+            Assert.AreEqual(1, result.Value.Categories.Count);
+            Assert.AreEqual("Lyssach/Garten", result.Value.Categories.FirstOrDefault());
         }
 
         [TestMethod]
