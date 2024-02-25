@@ -10,14 +10,9 @@ public class PathInfo
     /// <summary>
     /// Der vollständige Pfad.
     /// </summary>
-    public string FullPath { get; }
+    public string Value { get; }
 
-    /// <summary>
-    /// Der Dateiname.
-    /// </summary>
-    public string Name => Path.GetFileName(FullPath);
-
-    private PathInfo(string fullPath) => FullPath = fullPath;
+    private PathInfo(string value) => Value = value;
 
     /// <summary>
     /// Erstellt eine Instanz von PathInfo, wenn der gegebene Pfad gültig ist.
