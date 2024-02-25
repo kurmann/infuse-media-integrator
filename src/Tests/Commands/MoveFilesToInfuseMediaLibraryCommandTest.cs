@@ -21,7 +21,7 @@ namespace Kurmann.InfuseMediaIntegrator.Tests.Commands
             var result = command.Execute();
 
             // Assert
-            Assert.IsTrue(result.IsSuccess);
+            Assert.IsTrue(result.IsSuccess, result.Error); 
             Assert.IsTrue(Directory.Exists(InfuseMediaLibraryPath));
 
             // Verify that the files are moved
