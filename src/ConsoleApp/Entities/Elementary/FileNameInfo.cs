@@ -1,6 +1,6 @@
 using CSharpFunctionalExtensions;
 
-namespace Kurmann.InfuseMediaIntegrator.Entities;
+namespace Kurmann.InfuseMediaIntegrator.Entities.Elementary;
 
 /// <summary>
 /// Repräsentiert Informationen über einen Dateinamen, ohne direkt vom Dateisystem abhängig zu sein. Diese Klasse ist unveränderlich.
