@@ -17,10 +17,13 @@ namespace Kurmann.InfuseMediaIntegrator.Entities.Elementary
 
         /// <summary>
         /// Liste der Verzeichnisse. Die oberste Kategorie ist an erster Stelle, gefolgt von den Unterkategorien.
+        /// Entfernt leere Verzeichnisse und Leerzeichen.
         /// </summary>
         public List<DirectoryNameInfo> Directories => DirectoryPath
             .Split(Path.DirectorySeparatorChar)
-            .Select(d => DirectoryNameInfo.Create(d).Value).ToList();
+            .Select(d => DirectoryNameInfo.Create(d).Value)
+            .Where(d => !string.IsNullOrWhiteSpace(d.DirectoryName))
+            .ToList();
 
         /// <summary>
         /// Erstellt eine Instanz von DirectoryPathInfo, wenn der gegebene Pfad gültig ist.
