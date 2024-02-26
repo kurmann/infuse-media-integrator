@@ -10,9 +10,9 @@ public class FileNameInfo
     /// <summary>
     /// Der Dateiname.
     /// </summary>
-    public string Name { get; }
+    public string FileName { get; }
 
-    private FileNameInfo(string fullPath) => Name = Path.GetFileName(fullPath);
+    private FileNameInfo(string fileName) => FileName = Path.GetFileName(fileName);
 
     public static Result<FileNameInfo> Create(string? fileName)
     {
@@ -20,6 +20,15 @@ public class FileNameInfo
         {
             return Result.Failure<FileNameInfo>("File name is null or empty");
         }
+
+        // Prüfe, ob der Dateiname nur ein Verzeichnis ist
+        if (Path.HasExtension(fileName))
+        {
+            return Result.Failure<FileNameInfo>("File name is not a file");
+        }
+
+        // Entferne den Pfad, falls vorhanden
+        fileName = Path.GetFileName(fileName);
 
         // Prüfe auf unzulässige Zeichen im Dateinamen
         char[] invalidFileNameChars = Path.GetInvalidFileNameChars();
