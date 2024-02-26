@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
+using Kurmann.InfuseMediaIntegrator.Entities.Elementary;
 
 namespace Kurmann.InfuseMediaIntegrator.Entities;
 
@@ -95,21 +96,21 @@ public partial class FileMappingInfo
     /// <returns>Ein Result-Objekt, das bei Erfolg eine Instanz von FileMappingInfo enthält.</returns>
     public static Result<FileMappingInfo> Create(FileMappingInfoArgs args)
     {
-        // Prüfe, ob die Datei existiert
-        var fileInfo = new FileInfo(args.SourceFilePath);
-        if (!fileInfo.Exists)
+        // Prüfe, ob der Dateipfad gesetzt ist
+        if (string.IsNullOrWhiteSpace(args.SourceFilePath))
         {
-            return Result.Failure<FileMappingInfo>($"File '{args.SourceFilePath}' does not exist.");
+            return Result.Failure<FileMappingInfo>("SourceFilePath cannot be null or whitespace.");
         }
 
-        // Prüfe, ob aus dem Dateinamen das Verzeichnis abgeleitet werden kann
-        if (string.IsNullOrWhiteSpace(fileInfo.Directory?.FullName))
+        // Prüfe, ob der Dateipfad gültig ist
+        var sourceFile = FilePathInfo.Create(args.SourceFilePath);
+        if (sourceFile.IsFailure)
         {
-            return Result.Failure<FileMappingInfo>($"Directory of file '{args.SourceFilePath}' cannot be read.");
+            return Result.Failure<FileMappingInfo>(sourceFile.Error);
         }
 
         // Versuche die für das Dateimanagement relevanten Informationen aus den Metadaten oder dem Dateinamen zu lesen
-        var title = GetTitle(args.Title, fileInfo);
+        var title = GetTitle(args.Title);
         var categories = GetCategoryPathOrEmpty(fileInfo, args.CategoryPath);
         var recordedDate = GetRecordedDateOrCurrentDate(fileInfo, args.RecordingDate);
 
@@ -120,57 +121,46 @@ public partial class FileMappingInfo
         }
 
         return new FileMappingInfo(title, categories, recordedDate, args.SourceFilePath, targetPath.Value, InfuseMediaType.MovieFile);
+
     }
 
     /// <summary>
     /// Versucht einen Titel aus den Metadaten oder dem Dateinamen zu lesen.
     /// </summary>
     /// <param name="metadata"></param>
-    /// <param name="fileInfo"></param>
+    /// <param name="fileNameInfo"></param>
     /// <returns></returns>
-    private static string GetTitle(string? titleFromMetadata, FileInfo fileInfo)
+    private static string GetTitle(string? titleFromMetadata, FileNameInfo fileNameInfo)
     {
         // Prüfe ob der Titel in den Metadaten gesetzt ist und ob dieser für das Dateisystem gültig ist
-        string title;
         if (!string.IsNullOrWhiteSpace(titleFromMetadata))
         {
-            var directoryOrFilename = DirectoryOrFilename.Create(titleFromMetadata);
-            if (directoryOrFilename.IsSuccess)
+            var titleFromMetadataResult = FilePathInfo.Create(titleFromMetadata);
+            if (titleFromMetadataResult.IsSuccess)
             {
-                title = directoryOrFilename.Value.Name;
+                // Titel aus den Metadaten ist gültig für das Dateisystem
+                return titleFromMetadata;
             }
-            else
-            {
-                title = fileInfo.Name;
-            }
-
-            return title;
         }
 
-        // Versuche den Titel aus dem Dateinamen zu lesen, indem das Aufnahmedatum entfernt wird
-        var titleWithRecordedDate = TitleWithRecordedDate.Create(fileInfo);
-        if (titleWithRecordedDate.IsSuccess)
+        // Versuche den Titel aus dem Dateinamen zu lesen, indem das Datum entfernt wird
+        var fileNameWithDateInfo = FileNameWithDateInfo.Create(fileNameInfo.Name);
+        if (fileNameWithDateInfo.IsSuccess)
         {
-            title = titleWithRecordedDate.Value.Title;
-
-            // Wenn der Titel aus dem Dateinamen gelesen wurde, dann prüfe ob dieser für das Dateisystem gültig ist
-            var titleFromFilename = DirectoryOrFilename.Create(title);
-            if (titleFromFilename.IsSuccess)
+            // Wenn das Datum zu Beginn oder am Ende des Dateinamens steht
+            if (fileNameWithDateInfo.Value.IsDateAtStart || fileNameWithDateInfo.Value.IsDateAtEnd)
             {
-                title = titleFromFilename.Value.Name;
-            }
-            else
-            {
-                title = fileInfo.Name;
-            }
+                // Entferne das Datum aus dem Dateinamen indem der gefundene Datums-Sting entfernt wird
+                var foundDateString = fileNameWithDateInfo.Value.DateString;
+                var titleWithoutDate = fileNameInfo.Name.Replace(foundDateString, string.Empty);
 
-            return title;
-        }
-        else
-        {
-            title = fileInfo.Name;
+                // Retourniere den Titel ohne das Datum
+                return titleWithoutDate;
+            }
         }
 
+        // Wenn das Datum in der Mitte des Dateinamens steht, dann lasse das Datum im Titel
+        var title = fileNameInfo.Name;
         return title;
     }
 
@@ -199,9 +189,9 @@ public partial class FileMappingInfo
     /// Gibt das aktuelle Datum zurück, wenn weder in den Metadaten noch im Dateinamen ein Aufnahmedatum gefunden wurde.
     /// </summary>
     /// <param name="metadata"></param>
-    /// <param name="fileInfo"></param>
+    /// <param name="fileNameInfo"></param>
     /// <returns></returns>
-    private static DateOnly GetRecordedDateOrCurrentDate(FileInfo fileInfo, DateOnly? recordingDate)
+    private static DateOnly GetRecordedDateOrCurrentDate(FileNameInfo fileNameInfo, DateOnly? recordingDate)
     {
         // Übernimm das Aufnahmedatum aus den Metadaten, wenn es gesetzt
         if (recordingDate != null)
@@ -210,19 +200,15 @@ public partial class FileMappingInfo
         }
 
         // Versuche das Datum aus dem Dateinamen zu lesen
-        var recordedDateResult = RecordedDate.CreateFromFilename(fileInfo);
+        var recordedDateResult = FileNameWithDateInfo.Create(fileNameInfo.Name);
         if (recordedDateResult.IsSuccess)
         {
-            recordingDate = recordedDateResult.Value.Value;
+            recordingDate = recordedDateResult.Value.Date;
+            return recordingDate.Value;
         }
 
         // Wenn weder ein Aufnahmedatum in den Meta-Daten noch im Dateinamen gefunden wurde, dann verwende das aktuelle Datum
-        if (recordingDate == null)
-        {
-            recordingDate = DateOnly.FromDateTime(DateTime.Now);
-        }
-
-        // Gib das Aufnahmedatum zurück
+        recordingDate = DateOnly.FromDateTime(DateTime.Now);
         return recordingDate.Value;
     }
 
@@ -295,7 +281,7 @@ public partial class FileMappingInfo
         }
     }
 
-        /// <summary>
+    /// <summary>
     /// Generiert den Zielpfad basierend auf den übergebenen Metadaten und dem Dateinamen.
     /// </summary>
     /// <param name="fileInfo">Das FileInfo-Objekt der Quelldatei.</param>
@@ -354,7 +340,7 @@ public enum InfuseMediaType
 /// <param name="Title"></param>
 public record FileMappingInfoArgs
 {
-    public string SourceFilePath { get; init; }
+    public string? SourceFilePath { get; init; }
     public DateOnly? RecordingDate { get; init; }
     public string? CategoryPath { get; init; }
     public string? Title { get; init; }
