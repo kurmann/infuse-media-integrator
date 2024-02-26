@@ -39,23 +39,23 @@ public class FilePathInfo
         }
 
         // Prüfe auf unzulässige Zeichen im Pfad
-        char[] invalidPathChars = System.IO.Path.GetInvalidPathChars();
+        char[] invalidPathChars = Path.GetInvalidPathChars();
         if (filePath.Any(c => invalidPathChars.Contains(c)))
         {
             return Result.Failure<FilePathInfo>("Path contains invalid characters: " + string.Join(", ", invalidPathChars));
         }
 
         // Prüft, ob der Pfad nicht nur ein Verzeichnis ist
-        if (System.IO.Path.HasExtension(filePath))
+        if (Path.HasExtension(filePath))
         {
             return Result.Failure<FilePathInfo>("Path is not a file");
         }
 
         // Prüfe auf unzulässige Zeichen im Dateinamen, falls ein Dateiname vorhanden ist
-        string fileName = System.IO.Path.GetFileName(filePath);
+        string fileName = Path.GetFileName(filePath);
         if (!string.IsNullOrEmpty(fileName))
         {
-            char[] invalidFileNameChars = System.IO.Path.GetInvalidFileNameChars();
+            char[] invalidFileNameChars = Path.GetInvalidFileNameChars();
             if (fileName.Any(c => invalidFileNameChars.Contains(c)))
             {
                 return Result.Failure<FilePathInfo>("File name contains invalid characters: " + string.Join(", ", invalidFileNameChars));
