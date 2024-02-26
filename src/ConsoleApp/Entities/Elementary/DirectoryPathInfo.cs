@@ -11,9 +11,16 @@ namespace Kurmann.InfuseMediaIntegrator.Entities.Elementary
         /// <summary>
         /// Der vollständige Pfad.
         /// </summary>
-        public string Path { get; }
+        public string Value { get; }
 
-        private DirectoryPathInfo(string path) => Path = path;
+        private DirectoryPathInfo(string value) => Value = value;
+
+        /// <summary>
+        /// Liste der Verzeichnisse. Die oberste Kategorie ist an erster Stelle, gefolgt von den Unterkategorien.
+        /// </summary>
+        public List<DirectoryNameInfo> Directories => Value
+            .Split(Path.DirectorySeparatorChar)
+            .Select(d => DirectoryNameInfo.Create(d).Value).ToList();
 
         /// <summary>
         /// Erstellt eine Instanz von DirectoryPathInfo, wenn der gegebene Pfad gültig ist.
