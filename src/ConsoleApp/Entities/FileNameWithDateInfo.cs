@@ -104,44 +104,6 @@ public class FileNameWithDateInfo
     }
 
     /// <summary>
-    /// Extrahiert ein Datum aus einer Schlagwortliste.
-    /// </summary>
-    /// <param name="keywords"></param>
-    /// <returns></returns>
-    private static Result<List<DateOnly>> ExtractDates(IEnumerable<string> keywords)
-    {
-        try
-        {
-            var dates = new List<DateOnly>();
-
-            // iterate over keywords
-            foreach (var keyword in keywords)
-            {
-                // search for ISO date
-                var (isoDate, matchedString) = TryParseIsoDate(keyword);
-                if (isoDate.HasValue)
-                {
-                    dates.Add(isoDate.Value);
-                    continue;
-                }
-
-                // search for german date
-                (var germanDate, var foundGermanDateString) = TryParseGermanDate(keyword);
-                if (germanDate.HasValue)
-                {
-                    dates.Add(germanDate.Value);
-                }
-            }
-
-            return dates;
-        }
-        catch (Exception ex)
-        {
-            return Result.Failure<List<DateOnly>>($"Error on parsing date values from keyword list: {ex.Message}");
-        }
-    }
-
-    /// <summary>
     /// Versucht aus dem <paramref name="text"/> ein ISO-Datum zu parsen.
     /// </summary>
     /// <param name="text"></param>
