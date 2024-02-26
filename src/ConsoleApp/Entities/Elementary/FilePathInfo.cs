@@ -12,6 +12,8 @@ public class FilePathInfo
     /// </summary>
     public string Path { get; }
 
+    public DirectoryPathInfo DirectoryPathInfo => DirectoryPathInfo.Create(Path).Value;
+
     /// <summary>
     /// Informationen über den Dateinamen.
     /// </summary>
