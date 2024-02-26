@@ -8,9 +8,9 @@ namespace Kurmann.InfuseMediaIntegrator.Entities.Elementary;
 /// </summary>
 public class DirectoryNameInfo
 {
-    public string Name { get; }
+    public string DirectoryName { get; }
 
-    private DirectoryNameInfo(string name) => Name = name;
+    private DirectoryNameInfo(string directoryName) => DirectoryName = directoryName;
 
     public static Result<DirectoryNameInfo> Create(string? name)
     {
