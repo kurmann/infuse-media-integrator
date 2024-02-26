@@ -5,7 +5,7 @@ namespace Kurmann.InfuseMediaIntegrator.Entities.Elementary;
 /// <summary>
 /// Repräsentiert Informationen über einen Pfad, ohne direkt vom Dateisystem abhängig zu sein. Diese Klasse ist unveränderlich.
 /// </summary>
-public class PathInfo
+public class FilePathInfo
 {
     /// <summary>
     /// Der vollständige Pfad.
@@ -17,7 +17,7 @@ public class PathInfo
     /// </summary>
     public FileNameInfo? FileName { get; }
 
-    private PathInfo(string path, FileNameInfo? fileNameInfo)
+    private FilePathInfo(string path, FileNameInfo? fileNameInfo)
     {
         Path = path;
         FileName = fileNameInfo;
@@ -28,18 +28,18 @@ public class PathInfo
     /// </summary>
     /// <param name="path">Der Pfad, der validiert und gespeichert werden soll.</param>
     /// <returns>Ein Result-Objekt, das entweder eine PathInfo-Instanz oder einen Fehler enthält.</returns>
-    public static Result<PathInfo> Create(string path)
+    public static Result<FilePathInfo> Create(string path)
     {
         if (string.IsNullOrWhiteSpace(path))
         {
-            return Result.Failure<PathInfo>("Path is null or empty");
+            return Result.Failure<FilePathInfo>("Path is null or empty");
         }
 
         // Prüfe auf unzulässige Zeichen im Pfad
         char[] invalidPathChars = System.IO.Path.GetInvalidPathChars();
         if (path.Any(c => invalidPathChars.Contains(c)))
         {
-            return Result.Failure<PathInfo>("Path contains invalid characters: " + string.Join(", ", invalidPathChars));
+            return Result.Failure<FilePathInfo>("Path contains invalid characters: " + string.Join(", ", invalidPathChars));
         }
 
         // Prüfe auf unzulässige Zeichen im Dateinamen, falls ein Dateiname vorhanden ist
@@ -50,19 +50,19 @@ public class PathInfo
             char[] invalidFileNameChars = System.IO.Path.GetInvalidFileNameChars();
             if (fileName.Any(c => invalidFileNameChars.Contains(c)))
             {
-                return Result.Failure<PathInfo>("File name contains invalid characters: " + string.Join(", ", invalidFileNameChars));
+                return Result.Failure<FilePathInfo>("File name contains invalid characters: " + string.Join(", ", invalidFileNameChars));
             }
 
             // Erstellen von FileNameInfo
             var fileNameInfoResult = FileNameInfo.Create(fileName);
             if (fileNameInfoResult.IsFailure)
             {
-                return Result.Failure<PathInfo>(fileNameInfoResult.Error);
+                return Result.Failure<FilePathInfo>(fileNameInfoResult.Error);
             }
 
             fileNameInfo = fileNameInfoResult.Value;
         }
 
-        return new PathInfo(path, fileNameInfo);
+        return new FilePathInfo(path, fileNameInfo);
     }
 }
