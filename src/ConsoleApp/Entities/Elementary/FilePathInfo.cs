@@ -3,7 +3,9 @@ using CSharpFunctionalExtensions;
 namespace Kurmann.InfuseMediaIntegrator.Entities.Elementary;
 
 /// <summary>
-/// Repräsentiert Informationen über einen Pfad, ohne direkt vom Dateisystem abhängig zu sein. Diese Klasse ist unveränderlich.
+/// Repräsentiert Informationen über einen Datei-Pfad, ohne direkt vom Dateisystem abhängig zu sein. Diese Klasse ist unveränderlich.
+/// Prüft auf das Vorhandensein von unzulässigen Zeichen im Pfad und Dateinamen.
+/// Prüft auf das Vorhandensein eines Dateinamens und eines Verzeichnisses.
 /// </summary>
 public class FilePathInfo
 {
@@ -17,13 +19,9 @@ public class FilePathInfo
     /// <summary>
     /// Informationen über den Dateinamen.
     /// </summary>
-    public FileNameInfo? FileName { get; }
+    public FileNameInfo FileName => FileNameInfo.Create(Path).Value;
 
-    private FilePathInfo(string path, FileNameInfo? fileNameInfo)
-    {
-        Path = path;
-        FileName = fileNameInfo;
-    }
+    private FilePathInfo(string path) => Path = path;
 
     /// <summary>
     /// Erstellt eine Instanz von PathInfo, wenn der gegebene Pfad gültig ist.
@@ -44,9 +42,14 @@ public class FilePathInfo
             return Result.Failure<FilePathInfo>("Path contains invalid characters: " + string.Join(", ", invalidPathChars));
         }
 
+        // Prüft, ob der Pfad nicht nur ein Verzeichnis ist
+        if (System.IO.Path.HasExtension(path))
+        {
+            return Result.Failure<FilePathInfo>("Path is not a file");
+        }
+
         // Prüfe auf unzulässige Zeichen im Dateinamen, falls ein Dateiname vorhanden ist
         string fileName = System.IO.Path.GetFileName(path);
-        FileNameInfo? fileNameInfo = null;
         if (!string.IsNullOrEmpty(fileName))
         {
             char[] invalidFileNameChars = System.IO.Path.GetInvalidFileNameChars();
@@ -54,17 +57,8 @@ public class FilePathInfo
             {
                 return Result.Failure<FilePathInfo>("File name contains invalid characters: " + string.Join(", ", invalidFileNameChars));
             }
-
-            // Erstellen von FileNameInfo
-            var fileNameInfoResult = FileNameInfo.Create(fileName);
-            if (fileNameInfoResult.IsFailure)
-            {
-                return Result.Failure<FilePathInfo>(fileNameInfoResult.Error);
-            }
-
-            fileNameInfo = fileNameInfoResult.Value;
         }
 
-        return new FilePathInfo(path, fileNameInfo);
+        return new FilePathInfo(path);
     }
 }
