@@ -31,7 +31,7 @@ public class FilePathInfo
     /// </summary>
     /// <param name="filePath">Der Pfad, der validiert und gespeichert werden soll.</param>
     /// <returns>Ein Result-Objekt, das entweder eine PathInfo-Instanz oder einen Fehler enthält.</returns>
-    public static Result<FilePathInfo> Create(string filePath)
+    public static Result<FilePathInfo> Create(string? filePath)
     {
         if (string.IsNullOrWhiteSpace(filePath))
         {
