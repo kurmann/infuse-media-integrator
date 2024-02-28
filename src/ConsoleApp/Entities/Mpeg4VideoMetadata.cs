@@ -1,4 +1,5 @@
 using CSharpFunctionalExtensions;
+using Kurmann.InfuseMediaIntegrator.Entities.MediaFileTypes;
 
 namespace Kurmann.InfuseMediaIntegrator.Entities
 {
@@ -6,7 +7,7 @@ namespace Kurmann.InfuseMediaIntegrator.Entities
     /// Repräsentiert eine MPEG4-Video-Datei mit eingebetteten Metadaten.
     /// Enthält die Logik um die Metadaten auszulesen.
     /// </summary>
-    public class Mpeg4VideoWithMetadata
+    public class Mpeg4VideoMetadata
     {
         /// <summary>
         /// Der Titel des Videos.
@@ -54,7 +55,7 @@ namespace Kurmann.InfuseMediaIntegrator.Entities
         /// </summary>
         public Mpeg4Video Mpeg4Video { get; }
 
-        private Mpeg4VideoWithMetadata(Mpeg4Video mpeg4Video,
+        private Mpeg4VideoMetadata(Mpeg4Video mpeg4Video,
                                        string title,
                                        string titleSort,
                                        string description,
@@ -75,21 +76,21 @@ namespace Kurmann.InfuseMediaIntegrator.Entities
             ArtworkExtension = artworkExtension;
         }
 
-        public static Result<Mpeg4VideoWithMetadata> Create(string? file)
+        public static Result<Mpeg4VideoMetadata> Create(string? file)
         {
             var mpeg4Video = Mpeg4Video.Create(file);
             if (mpeg4Video.IsFailure)
-                return Result.Failure<Mpeg4VideoWithMetadata>(mpeg4Video.Error);
+                return Result.Failure<Mpeg4VideoMetadata>(mpeg4Video.Error);
 
             return Create(mpeg4Video.Value);
         }
 
-        public static Result<Mpeg4VideoWithMetadata> Create(Mpeg4Video mpeg4Video)
+        public static Result<Mpeg4VideoMetadata> Create(Mpeg4Video mpeg4Video)
         {
             try
             {
                 // Erstelle ein TagLib-Objekt
-                var tagLibFile = TagLib.File.Create(mpeg4Video.FileInfo.FullName);
+                var tagLibFile = TagLib.File.Create(mpeg4Video.FilePath.FilePath);
 
                 // Lies das Titelbild (Artwork) aus den Metadaten
                 var tagLibPicture = tagLibFile.Tag.Pictures.ElementAtOrDefault(0);
@@ -98,7 +99,7 @@ namespace Kurmann.InfuseMediaIntegrator.Entities
                 string? artworkExtension = MimeTypeToExtensionMapping.Create(artworkMimeType).GetValueOrDefault()?.Extension;
 
                 // Lies die restlichen Metadaten aus und erstelle ein Mpeg4VideoWithMetadata-Objekt
-                return new Mpeg4VideoWithMetadata(mpeg4Video: mpeg4Video,
+                return new Mpeg4VideoMetadata(mpeg4Video: mpeg4Video,
                                                   title: tagLibFile.Tag.Title,
                                                   titleSort: tagLibFile.Tag.TitleSort,
                                                   description: tagLibFile.Tag.Description,
@@ -110,7 +111,7 @@ namespace Kurmann.InfuseMediaIntegrator.Entities
             }
             catch (Exception ex)
             {
-                return Result.Failure<Mpeg4VideoWithMetadata>(ex.Message);
+                return Result.Failure<Mpeg4VideoMetadata>(ex.Message);
             }
         }
     }
