@@ -1,4 +1,5 @@
 using CSharpFunctionalExtensions;
+using Kurmann.InfuseMediaIntegrator.Entities.MediaFileTypes;
 
 namespace Kurmann.InfuseMediaIntegrator.Entities;
 
@@ -8,13 +9,12 @@ namespace Kurmann.InfuseMediaIntegrator.Entities;
 public class VideoIntegrationDirectory(IEnumerable<Mpeg4Video> mpeg4VideoFiles,
                                        IEnumerable<QuickTimeVideo> quickTimeVideoFiles,
                                        IEnumerable<NotSupportedFile> notSupportedFiles,
-                                       IEnumerable<FileInfo> jpegFiles)
+                                       IEnumerable<JpegImage> jpegFiles)
 {
     public IReadOnlyList<Mpeg4Video> Mpeg4VideoFiles { get; } = mpeg4VideoFiles.ToList();
     public IReadOnlyList<QuickTimeVideo> QuickTimeVideoFiles { get; } = quickTimeVideoFiles.ToList();
+    public IReadOnlyList<JpegImage> JpegFiles { get; } = jpegFiles.ToList();
     public IReadOnlyList<NotSupportedFile> NotSupportedFiles { get; } = notSupportedFiles.ToList();
-    public IReadOnlyList<FileInfo> JpegFiles { get; } = jpegFiles.ToList();
-
     public static Result<VideoIntegrationDirectory> Create(string directoryPath)
     {
         try
@@ -36,7 +36,7 @@ public class VideoIntegrationDirectory(IEnumerable<Mpeg4Video> mpeg4VideoFiles,
             var mpeg4VideoFiles = new List<Mpeg4Video>();
             var quickTimeVideoFiles = new List<QuickTimeVideo>();
             var notSupportedFiles = new List<NotSupportedFile>();
-            var jpegFiles = new List<FileInfo>();
+            var jpegFiles = new List<JpegImage>();
             foreach (var file in files)
             {
                 // Prüfe, ob die Datei existiert
@@ -45,28 +45,27 @@ public class VideoIntegrationDirectory(IEnumerable<Mpeg4Video> mpeg4VideoFiles,
                     return Result.Failure<VideoIntegrationDirectory>($"File not found: {file.FullName}");
                 }
 
-                // Ermittle den unterstützten Video-Dateityp
-                var fileType = SupportedVideoFileType.Create(file.FullName);
+                // Ermittle den Medientyp der Datei
+                var fileType = MediaFileTypeDetector.GetMediaFile(file.FullName);
                 if (fileType.IsFailure)
                 {
                     return Result.Failure<VideoIntegrationDirectory>($"Error on reading file info: {fileType.Error}");
                 }
 
                 // Füge das Video-Objekt der entsprechenden Liste hinzu anhand des Dateityps
-                switch (fileType.Value.Type)
+                switch (fileType.Value)
                 {
-                    case VideoFileType.Mpeg4:
-                        Mpeg4Video.Create(file.FullName).Tap(mpeg4VideoFiles.Add);
+                    case Mpeg4Video mpeg4Video:
+                        mpeg4VideoFiles.Add(mpeg4Video);
                         break;
-                    case VideoFileType.QuickTime:
-                        QuickTimeVideo.Create(file.FullName).Tap(quickTimeVideoFiles.Add);
+                    case QuickTimeVideo quickTimeVideo:
+                        quickTimeVideoFiles.Add(quickTimeVideo);
                         break;
-                    case VideoFileType.Jpeg:
-                        jpegFiles.Add(file);
+                    case JpegImage jpegImage:
+                        jpegFiles.Add(jpegImage);
                         break;
-                    case VideoFileType.NotSupported:
-                        // Retourniere eine NotSupportedFile-Instanz mit der Datei und dem Grund, dass die Dateiendung nicht unterstützt wird
-                        NotSupportedFile.Create(file.FullName, $"File extension not supported.").Tap(notSupportedFiles.Add);
+                    case NotSupportedFile notSupportedFile:
+                        notSupportedFiles.Add(notSupportedFile);
                         break;
                 }
             }
