@@ -1,6 +1,6 @@
 using CSharpFunctionalExtensions;
 
-namespace Kurmann.InfuseMediaIntegrator.Entities;
+namespace Kurmann.InfuseMediaIntegrator.Entities.MediaFileTypes;
 
 /// <summary>
 /// Repräsentiert eine QuickTime-Video-Datei mit eingebetteten Metadaten.
