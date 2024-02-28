@@ -1,6 +1,6 @@
 using CSharpFunctionalExtensions;
 
-namespace Kurmann.InfuseMediaIntegrator;
+namespace Kurmann.InfuseMediaIntegrator.Entities.MediaFileTypes;
 
 
 public class MediaFileTypeDetector
