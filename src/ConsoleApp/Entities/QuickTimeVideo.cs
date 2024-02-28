@@ -23,7 +23,7 @@ public class QuickTimeVideo
                 return Result.Failure<QuickTimeVideo>("File not found.");
 
             // Prüfe, ob die Datei eine QuickTime-Datei ist
-            var videoFileType = SupportedVideoFileType.Create(fileInfo.FullName);
+            var videoFileType = MediaFileTypeDetector.Create(fileInfo.FullName);
             if (videoFileType.IsFailure)
                 return Result.Failure<QuickTimeVideo>($"Error on reading file info: {videoFileType.Error}");
 

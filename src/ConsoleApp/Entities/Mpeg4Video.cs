@@ -27,7 +27,7 @@ public class Mpeg4Video
                 return Result.Failure<Mpeg4Video>("File not found.");
 
             // Prüfe, ob die Datei eine MPEG4-Datei ist
-            var videoFileType = SupportedVideoFileType.Create(fileInfo.FullName);
+            var videoFileType = MediaFileTypeDetector.Create(fileInfo.FullName);
             if (videoFileType.IsFailure)
                 return Result.Failure<Mpeg4Video>($"Error on reading file info: {videoFileType.Error}");
             

@@ -2,11 +2,8 @@ using CSharpFunctionalExtensions;
 
 namespace Kurmann.InfuseMediaIntegrator;
 
-/// <summary>
-/// Nimmt eine Datei entgegen und prüft, ob es sich um eine unterstützte Video-Datei handelt und bestimmt den Video-Datentyp.
-/// Prüft nicht, ob die Datei existiert, wertet als nur die Dateiendung aus.
-/// </summary>
-public class SupportedVideoFileType
+
+public class MediaFileTypeDetector
 {
     private static readonly string[] quickTimeFileExtensions = [".mov", ".qt"];
     private static readonly string[] mpeg4FileExtensions = [".mp4", ".m4v"];
@@ -14,9 +11,9 @@ public class SupportedVideoFileType
 
     public VideoFileType Type { get;}
 
-    private SupportedVideoFileType(VideoFileType type) => Type = type;
+    private MediaFileTypeDetector(VideoFileType type) => Type = type;
 
-    public static Result<SupportedVideoFileType> Create(string path)
+    public static Result<MediaFileTypeDetector> Create(string path)
     {
         try
         {
@@ -25,16 +22,16 @@ public class SupportedVideoFileType
 
             // Bestimme den Dateityp anhand der Dateiendung und berücksichtige dabei die Groß-/Kleinschreibung nicht
             if (quickTimeFileExtensions.Contains(fileInfo.Extension, StringComparer.OrdinalIgnoreCase))
-                return new SupportedVideoFileType(VideoFileType.QuickTime);
+                return new MediaFileTypeDetector(VideoFileType.QuickTime);
             if (mpeg4FileExtensions.Contains(fileInfo.Extension, StringComparer.OrdinalIgnoreCase))
-                return new SupportedVideoFileType(VideoFileType.Mpeg4);
+                return new MediaFileTypeDetector(VideoFileType.Mpeg4);
             if (jpegFileExtensions.Contains(fileInfo.Extension, StringComparer.OrdinalIgnoreCase))
-                return new SupportedVideoFileType(VideoFileType.Jpeg);
-            return new SupportedVideoFileType(VideoFileType.NotSupported);
+                return new MediaFileTypeDetector(VideoFileType.Jpeg);
+            return new MediaFileTypeDetector(VideoFileType.NotSupported);
         }
         catch (Exception e)
         {
-            return Result.Failure<SupportedVideoFileType>($"Error on reading file info: {e.Message}");
+            return Result.Failure<MediaFileTypeDetector>($"Error on reading file info: {e.Message}");
         }
     }
 }
