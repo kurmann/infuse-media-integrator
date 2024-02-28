@@ -1,4 +1,5 @@
 using CSharpFunctionalExtensions;
+using Kurmann.InfuseMediaIntegrator.Entities.Elementary;
 
 namespace Kurmann.InfuseMediaIntegrator.Entities.MediaFileTypes;
 
@@ -6,37 +7,26 @@ namespace Kurmann.InfuseMediaIntegrator.Entities.MediaFileTypes;
 /// Repräsentiert eine nicht unterstützte Datei. Diese Dateien sind in der Mediathek nicht nutzbar,
 /// werden aber dennoch in der Mediathek abgelegt.
 /// </summary>
-public class NotSupportedFile
+public class NotSupportedFile : IMediaFileType
 {
     /// <summary>
-    /// Repräsentiert eine nicht unterstützte Datei.
+    /// Der Dateipfad.
     /// </summary>
-    public FileInfo FileInfo { get; }
+    public FilePathInfo FileInfo { get; }
 
-    /// <summary>
-    /// Der Grund, warum die Datei nicht unterstützt wird.
-    /// </summary>
-    public string Reason { get; }
-
-    private NotSupportedFile(FileInfo fileInfo, string reason)
-    {
-        FileInfo = fileInfo;
-        Reason = reason;
-    }
+    private NotSupportedFile(FilePathInfo fileInfo) => FileInfo = fileInfo;
 
     public static Result<NotSupportedFile> Create(string path, string reason)
     {
         try
         {
-            // Erstelle ein FileInfo-Objekt
-            var fileInfo = new FileInfo(path);
-
-            // Prüfe, ob die Datei existiert
-            if (!fileInfo.Exists)
-                return Result.Failure<NotSupportedFile>("File not found.");
+            // Erstelle ein FilePathInfo-Objekt
+            var fileInfo = FilePathInfo.Create(path);
+            if (fileInfo.IsFailure)
+                return Result.Failure<NotSupportedFile>($"Error on reading file info: {fileInfo.Error}");
 
             // Rückgabe des FileInfo-Objekts
-            return new NotSupportedFile(fileInfo, reason);
+            return new NotSupportedFile(fileInfo);
         }
         catch (Exception e)
         {
