@@ -3,9 +3,12 @@ using Kurmann.InfuseMediaIntegrator.Entities.Elementary;
 
 namespace Kurmann.InfuseMediaIntegrator.Entities.MediaFileTypes;
 
+/// <summary>
+/// Erkennt den Medientyp einer Datei.
+/// Gib ein IMediaFileType-Objekt zurück, das den Medientyp der Datei repräsentiert.
+/// </summary>
 public class MediaFileTypeDetector
 {
-
     public static Result<IMediaFileType> GetMediaFile(string path)
     {
         try
