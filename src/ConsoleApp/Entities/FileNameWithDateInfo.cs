@@ -32,13 +32,13 @@ public class FileNameWithDateInfo
     /// Prüft ob der DateString am Anfang des Dateinamens steht.
     /// Berücksichgt etwaige Leerzeichen zu Beginn des Dateinamens.
     /// </summary>
-    public bool IsDateAtStart => FileName.Name.StartsWith(DateString.TrimStart());
+    public bool IsDateAtStart => FileName.FileName.StartsWith(DateString.TrimStart());
 
     /// <summary>
     /// Gibt an, ob das gefundene Datum am Anfang des Dateinamens steht.
     /// Berücksichtigt etwaige Leerzeichen am Ende des Dateinamens.
     /// </summary>
-    public bool IsDateAtEnd => FileName.Name.EndsWith(DateString.TrimEnd());
+    public bool IsDateAtEnd => FileName.FileName.EndsWith(DateString.TrimEnd());
 
     private FileNameWithDateInfo(DateOnly date, string dateString, FileNameInfo fileNameInfo)
     {
@@ -65,35 +65,35 @@ public class FileNameWithDateInfo
         }
 
         // Versuche ein ISO-Datum aus dem Dateinamen zu extrahieren
-        (var isoDate, var matchedIsoDateString) = TryParseIsoDate(fileNameInfo.Value.Name);
+        (var isoDate, var matchedIsoDateString) = TryParseIsoDate(fileNameInfo.Value.FileName);
         if (isoDate.HasValue)
         {
             return new FileNameWithDateInfo(isoDate.Value, matchedIsoDateString.Value, fileNameInfo.Value);
         }
 
         // Versuche ein deutsches Datum aus dem Dateinamen zu extrahieren
-        (var germanDate, var matchedGermanIsoString) = TryParseGermanDate(fileNameInfo.Value.Name);
+        (var germanDate, var matchedGermanIsoString) = TryParseGermanDate(fileNameInfo.Value.FileName);
         if (germanDate.HasValue)
         {
             return new FileNameWithDateInfo(germanDate.Value, matchedGermanIsoString.Value, fileNameInfo.Value);
         }
 
         // Versuche ein Monat aus dem Dateinamen zu extrahieren
-        (var month, var matchedMonthString) = TryParseMonth(fileNameInfo.Value.Name);
+        (var month, var matchedMonthString) = TryParseMonth(fileNameInfo.Value.FileName);
         if (month.HasValue)
         {
             return new FileNameWithDateInfo(month.Value, matchedMonthString.Value, fileNameInfo.Value);
         }
 
         // Versuche eine Jahreszeit aus dem Dateinamen zu extrahieren
-        (var season, var matchedSeasonString) = TryParseSeason(fileNameInfo.Value.Name);
+        (var season, var matchedSeasonString) = TryParseSeason(fileNameInfo.Value.FileName);
         if (season.HasValue)
         {
             return new FileNameWithDateInfo(season.Value, matchedSeasonString.Value, fileNameInfo.Value);
         }
 
         // Versuche ein Jahr aus dem Dateinamen zu extrahieren
-        (var year, var matchedYearString) = TryParseYear(fileNameInfo.Value.Name);
+        (var year, var matchedYearString) = TryParseYear(fileNameInfo.Value.FileName);
         if (year.HasValue)
         {
             return new FileNameWithDateInfo(year.Value, matchedYearString.Value, fileNameInfo.Value);
