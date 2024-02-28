@@ -43,7 +43,7 @@ public class MediaFileTypeDetector
                     return Result.Failure<IMediaFileType>($"Error on reading file info: {jpegImage.Error}");
                 return jpegImage.Value;
             }
-            var notSupportedFile = NotSupportedFile.Create(path, "File type not supported");
+            var notSupportedFile = NotSupportedFile.Create(path);
             if (notSupportedFile.IsFailure)
                 return Result.Failure<IMediaFileType>($"Error on reading file info: {notSupportedFile.Error}");
             return notSupportedFile.Value;
