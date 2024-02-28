@@ -2,6 +2,10 @@ using CSharpFunctionalExtensions;
 
 namespace Kurmann.InfuseMediaIntegrator.Entities.MediaFileTypes;
 
+/// <summary>
+/// Repräsentiert eine nicht unterstützte Datei. Diese Dateien sind in der Mediathek nicht nutzbar,
+/// werden aber dennoch in der Mediathek abgelegt.
+/// </summary>
 public class NotSupportedFile
 {
     /// <summary>
