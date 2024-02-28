@@ -12,21 +12,21 @@ public class NotSupportedFile : IMediaFileType
     /// <summary>
     /// Der Dateipfad.
     /// </summary>
-    public FilePathInfo FileInfo { get; }
+    public FilePathInfo FilePath { get; }
 
-    private NotSupportedFile(FilePathInfo fileInfo) => FileInfo = fileInfo;
+    private NotSupportedFile(FilePathInfo filePath) => FilePath = filePath;
 
-    public static Result<NotSupportedFile> Create(string path, string reason)
+    public static Result<NotSupportedFile> Create(string path)
     {
         try
         {
             // Erstelle ein FilePathInfo-Objekt
-            var fileInfo = FilePathInfo.Create(path);
-            if (fileInfo.IsFailure)
-                return Result.Failure<NotSupportedFile>($"Error on reading file info: {fileInfo.Error}");
+            var filePath = FilePathInfo.Create(path);
+            if (filePath.IsFailure)
+                return Result.Failure<NotSupportedFile>($"Error on reading file info: {filePath.Error}");
 
             // Rückgabe des FileInfo-Objekts
-            return new NotSupportedFile(fileInfo);
+            return new NotSupportedFile(filePath.Value);
         }
         catch (Exception e)
         {
