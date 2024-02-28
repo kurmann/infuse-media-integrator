@@ -1,15 +1,24 @@
 using CSharpFunctionalExtensions;
+using Kurmann.InfuseMediaIntegrator.Entities.Elementary;
 
 namespace Kurmann.InfuseMediaIntegrator.Entities.MediaFileTypes;
 
 /// <summary>
 /// Repräsentiert eine MPEG4-Video-Datei mit eingebetteten Metadaten.
 /// </summary>
-public class Mpeg4Video
+public class Mpeg4Video : IMediaFileType
 {
-    public FileInfo FileInfo { get; }
+    /// <summary>
+    /// Der Dateipfad.
+    /// </summary>
+    public FilePathInfo FilePath { get; }
 
-    private Mpeg4Video(FileInfo fileInfo) => FileInfo = fileInfo;
+    /// <summary>
+    /// Die zugehörigen Dateiendungen.
+    /// </summary>
+    public static readonly string[] FileExtensions = [".mp4", ".m4v"];
+
+    private Mpeg4Video(FilePathInfo filePath) => FilePath = filePath;
 
     public static Result<Mpeg4Video> Create(string? path)
     {
@@ -19,23 +28,18 @@ public class Mpeg4Video
             if (string.IsNullOrWhiteSpace(path))
                 return Result.Failure<Mpeg4Video>("Path is empty.");
 
-            // Erstelle ein FileInfo-Objekt
-            var fileInfo = new FileInfo(path);
+            // Erstelle ein FilePathInfo-Objekt
+            var fileInfo = FilePathInfo.Create(path);
+            if (fileInfo.IsFailure)
+                return Result.Failure<Mpeg4Video>($"Error on reading file info: {fileInfo.Error}");
 
-            // Prüfe, ob die Datei existiert
-            if (!fileInfo.Exists)
-                return Result.Failure<Mpeg4Video>("File not found.");
-
-            // Prüfe, ob die Datei eine MPEG4-Datei ist
-            var videoFileType = MediaFileTypeDetector.Create(fileInfo.FullName);
-            if (videoFileType.IsFailure)
-                return Result.Failure<Mpeg4Video>($"Error on reading file info: {videoFileType.Error}");
-            
-            if (videoFileType.Value.Type != VideoFileType.Mpeg4)
+            // Prüfe anhand der Dateiendung, ob es sich um eine MPEG4-Datei handelt
+            var extension = Path.GetExtension(fileInfo.Value.FilePath).ToLowerInvariant();
+            if (!FileExtensions.Contains(extension))
                 return Result.Failure<Mpeg4Video>("File is not a MPEG4 video.");
 
             // Rückgabe des FileInfo-Objekts
-            return new Mpeg4Video(fileInfo);
+            return new Mpeg4Video(fileInfo.Value);
         }
         catch (Exception e)
         {
