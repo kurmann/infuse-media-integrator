@@ -48,4 +48,6 @@ public class JpegImage : IMediaFileType
     }
 
     public override string ToString() => FilePath.FilePath;
+
+    public static implicit operator string(JpegImage jpegImage) => jpegImage.FilePath.FilePath;
 }

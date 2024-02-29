@@ -50,4 +50,6 @@ public class QuickTimeVideo : IMediaFileType
     }
 
     public override string ToString() => FilePath.FilePath;
+
+    public static implicit operator string(QuickTimeVideo quickTimeVideo) => quickTimeVideo.FilePath.FilePath;
 }

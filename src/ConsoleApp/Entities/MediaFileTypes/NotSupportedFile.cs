@@ -40,4 +40,6 @@ public class NotSupportedFile : IMediaFileType
     }
 
     public override string ToString() => FilePath.FilePath;
+
+    public static implicit operator string(NotSupportedFile notSupportedFile) => notSupportedFile.FilePath.FilePath;
 }
