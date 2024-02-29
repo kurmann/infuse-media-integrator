@@ -55,7 +55,7 @@ public class MoveFilesToInfuseMediaLibraryCommand(string inputDirectoryPath, str
             var category = string.Empty;
 
             // Lese die Metadaten aus dem Mpeg4VideoWithMetadata
-            var metadata = Mpeg4VideoWithMetadata.Create(mpeg4VideoFile.FileInfo.FullName);
+            var metadata = MediaFileMetadata.Create(mpeg4VideoFile.FileInfo.FullName);
             if (metadata.IsSuccess)
             {
                 // Verwende die Videokategorie aus den Metadaten (entspricht "Album" in den Metadaten)

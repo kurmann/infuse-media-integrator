@@ -8,7 +8,7 @@ public class Mpeg4VideoWithMetadataTests
     private const string InputDirectoryPath = "Data/Input/Testcase 1";
 
     /// <summary>
-    /// Testet die Methode <see cref="Mpeg4VideoWithMetadata.Create(Mpeg4Video)"/>.
+    /// Testet die Methode <see cref="MediaFileMetadata.Create(Mpeg4Video)"/>.
     /// Ausganssituation ist eine MPEG4-Datei mit eingebetteten Metadaten.
     /// </summary>
     [TestMethod]
@@ -18,7 +18,7 @@ public class Mpeg4VideoWithMetadataTests
         var videoPath = new FileInfo(Path.Combine(InputDirectoryPath, "Zwillinge Testvideo.m4v"));
         
         // Act
-        var mpeg4VideoWithMetadata = Mpeg4VideoWithMetadata.Create(videoPath.FullName);
+        var mpeg4VideoWithMetadata = MediaFileMetadata.Create(videoPath.FullName);
         
         // Assert
         Assert.IsTrue(mpeg4VideoWithMetadata.IsSuccess);
