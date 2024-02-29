@@ -8,9 +8,19 @@ namespace Kurmann.InfuseMediaIntegrator.Entities.Elementary;
 public class FileNameInfo
 {
     /// <summary>
-    /// Der Dateiname.
+    /// Der Dateiname mit Dateierweiterung.
     /// </summary>
     public string FileName { get; }
+
+    /// <summary>
+    /// Der Dateiname ohne Dateierweiterung.
+    /// </summary>
+    public string FileNameWithoutExtension => Path.GetFileNameWithoutExtension(FileName);
+
+    /// <summary>
+    /// Die Dateierweiterung.
+    /// </summary>
+    public string Extension => Path.GetExtension(FileName);
 
     private FileNameInfo(string fileName) => FileName = Path.GetFileName(fileName);
 
