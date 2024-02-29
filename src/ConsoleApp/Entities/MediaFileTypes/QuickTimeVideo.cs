@@ -8,16 +8,25 @@ namespace Kurmann.InfuseMediaIntegrator.Entities.MediaFileTypes;
 /// </summary>
 public class QuickTimeVideo : IMediaFileType
 {
+    /// <summary>
+    /// Der Dateipfad.
+    /// </summary>
     public FilePathInfo FilePath { get; }
 
-    private QuickTimeVideo(FilePathInfo filePath) => FilePath = filePath;
+    /// <summary>
+    /// Die Metadaten des Videos.
+    /// </summary>
+    public MediaFileMetadata? Metadata { get; }
 
     /// <summary>
     /// Die zugehörigen Dateiendungen.
     /// </summary>
     public static readonly string[] FileExtensions = [".mov", ".qt"];
 
-    public static Result<QuickTimeVideo> Create(string path)
+    private QuickTimeVideo(FilePathInfo filePath, MediaFileMetadata? mediaFileMetadata)
+        => (FilePath, Metadata) = (filePath, mediaFileMetadata);
+
+    public static Result<QuickTimeVideo> Create(string path, MediaFileMetadata? metadata = null)
     {
         try
         {
@@ -32,7 +41,7 @@ public class QuickTimeVideo : IMediaFileType
                 return Result.Failure<QuickTimeVideo>("File is not a QuickTime video.");
 
             // Rückgabe des FileInfo-Objekts
-            return new QuickTimeVideo(fileInfo.Value);
+            return new QuickTimeVideo(fileInfo.Value, metadata);
         }
         catch (Exception e)
         {
