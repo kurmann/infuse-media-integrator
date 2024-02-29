@@ -200,18 +200,28 @@ public class FileNameWithDateInfo
     private static (Maybe<DateOnly>, Maybe<string>) TryParseMonth(string text)
     {
         string[] patterns =
-        [
+        {
             @"\b\d{4}-\d{2}\b",  // ISO-Monat: 2021-06
             @"\b(January|February|March|April|May|June|July|August|September|October|November|December)\b \d{4}",  // Englischer Monatsname: June 2021
             @"\b(Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember)\b \d{4}",  // Deutscher Monatsname: Juni 2021
-        ];
+        };
 
         foreach (string pattern in patterns)
         {
             var match = Regex.Match(text, pattern);
-            if (match.Success && DateOnly.TryParse(match.Value, out DateOnly date))
+
+            // Nimm den letzten Tag des Monats als Datum
+            if (match.Success)
             {
-                return (date, match.Value);
+                var fromCulture = new CultureInfo("de-CH");
+                if (DateTime.TryParseExact(match.Value, "MMMM yyyy", fromCulture, DateTimeStyles.None, out var date))
+                {
+                    return (DateOnly.FromDateTime(date), match.Value);
+                }
+                else if (DateTime.TryParseExact(match.Value + "-01", "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var yearOnlyDate))
+                {
+                    return (DateOnly.FromDateTime(yearOnlyDate), match.Value);
+                }
             }
         }
 

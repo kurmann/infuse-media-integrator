@@ -111,6 +111,7 @@ public class FileNameWithDateInfoTests
         Assert.AreEqual("2021-12 example_file.txt", result.Value.FileName);
         Assert.IsTrue(result.Value.IsDateAtStart);
         Assert.IsFalse(result.Value.IsDateAtEnd);
+        Assert.AreEqual(new DateOnly(2021, 12, 31), result.Value.Date);
     }
 
     [TestMethod] // Erfolgreich wenn ein Monat und ein Jahr auf Deutsch am Anfang des Dateinamens steht
