@@ -6,15 +6,11 @@ namespace Kurmann.InfuseMediaIntegrator.Commands;
 
 public class MetadataFromFileQuery(string? filePath) : IQueryService<MediaFileMetadata>
 {
-    public string? FilePath { get; } = filePath;
+    private string? FilePath { get; } = filePath;
 
-    IReadOnlyList<Result<IReadOnlyList<MediaFileMetadata>>> IQueryService<MediaFileMetadata>.Execute()
+    public Result<MediaFileMetadata> Execute()
     {
-        var result = GetMetadataWithArtworkImage(FilePath);
-        if (result.IsSuccess)
-            return [Result.Success<IReadOnlyList<MediaFileMetadata>>([result.Value])];
-        else
-            return [Result.Failure<IReadOnlyList<MediaFileMetadata>>(result.Error)];
+        return GetMetadataWithArtworkImage(FilePath);
     }
 
     private static Result<MediaFileMetadata> GetMetadataWithArtworkImage(string? filePath)
