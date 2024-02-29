@@ -1,17 +1,21 @@
 using CSharpFunctionalExtensions;
 using Kurmann.InfuseMediaIntegrator.Entities;
-using Kurmann.InfuseMediaIntegrator.Entities.Elementary;
-using Kurmann.InfuseMediaIntegrator.Entities.MediaFileTypes;
+using Kurmann.InfuseMediaIntegrator.Queries;
 
 namespace Kurmann.InfuseMediaIntegrator.Commands;
 
-public class MetadataReader
+public class MetadataFromFileQuery(string? filePath) : IQueryService<MediaFileMetadata>
 {
-    public static Result ReadMetadata(string? filePath) => GetMetadataWithArtworkImage(filePath);
+    public string? FilePath { get; } = filePath;
 
-    public static Result ReadMetadata(FilePathInfo? filePathInfo) => GetMetadataWithArtworkImage(filePathInfo?.FilePath);
-
-    public static Result ReadMetadata(IMediaFileType mediaFile) => GetMetadataWithArtworkImage(mediaFile.FilePath);
+    IReadOnlyList<Result<IReadOnlyList<MediaFileMetadata>>> IQueryService<MediaFileMetadata>.Execute()
+    {
+        var result = GetMetadataWithArtworkImage(FilePath);
+        if (result.IsSuccess)
+            return [Result.Success<IReadOnlyList<MediaFileMetadata>>([result.Value])];
+        else
+            return [Result.Failure<IReadOnlyList<MediaFileMetadata>>(result.Error)];
+    }
 
     private static Result<MediaFileMetadata> GetMetadataWithArtworkImage(string? filePath)
     {
