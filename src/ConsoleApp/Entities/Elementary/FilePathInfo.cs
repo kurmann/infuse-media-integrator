@@ -46,7 +46,7 @@ public class FilePathInfo
         }
 
         // Prüft, ob der Pfad nicht nur ein Verzeichnis ist
-        if (Path.HasExtension(filePath))
+        if (!Path.HasExtension(filePath))
         {
             return Result.Failure<FilePathInfo>("Path is not a file");
         }
