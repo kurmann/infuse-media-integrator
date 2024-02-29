@@ -32,13 +32,13 @@ public class FileNameWithDateInfo
     /// Prüft ob der DateString am Anfang des Dateinamens steht.
     /// Berücksichgt etwaige Leerzeichen zu Beginn des Dateinamens.
     /// </summary>
-    public bool IsDateAtStart => FileName.FileName.StartsWith(DateString.TrimStart());
+    public bool IsDateAtStart => FileName.FileNameWithoutExtension.StartsWith(DateString.TrimStart());
 
     /// <summary>
     /// Gibt an, ob das gefundene Datum am Anfang des Dateinamens steht.
     /// Berücksichtigt etwaige Leerzeichen am Ende des Dateinamens.
     /// </summary>
-    public bool IsDateAtEnd => FileName.FileName.EndsWith(DateString.TrimEnd());
+    public bool IsDateAtEnd => FileName.FileNameWithoutExtension.EndsWith(DateString.TrimEnd());
 
     private FileNameWithDateInfo(DateOnly date, string dateString, FileNameInfo fileNameInfo)
     {

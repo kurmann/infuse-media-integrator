@@ -19,7 +19,7 @@ public class FileNameWithDateInfoTests
         Assert.IsNotNull(result.Value);
         Assert.AreEqual(fileName, result.Value.FileName);
         Assert.AreEqual("2021-12-31", result.Value.DateString);
-        Assert.AreEqual("example_file.txt", result.Value.FileName);
+        Assert.AreEqual("2021-12-31 example_file.txt", result.Value.FileName);
         Assert.IsTrue(result.Value.IsDateAtStart);
         Assert.IsFalse(result.Value.IsDateAtEnd);
     }
