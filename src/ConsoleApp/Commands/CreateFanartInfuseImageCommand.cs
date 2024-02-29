@@ -28,7 +28,7 @@ public class CreateFanartInfuseImageCommand(string? mpeg4VideoPath) : ICommand
         }
 
         // Erstelle ein Mpeg4VideoWithMetadata-Objekt
-        var mpeg4VideoWithMetadata = Mpeg4VideoWithMetadata.Create(Mpeg4VideoPath);
+        var mpeg4VideoWithMetadata = MediaFileMetadata.Create(Mpeg4VideoPath);
         if (mpeg4VideoWithMetadata.IsFailure)
         {
             return Result.Failure(mpeg4VideoWithMetadata.Error);
