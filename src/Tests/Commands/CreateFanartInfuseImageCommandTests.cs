@@ -1,5 +1,3 @@
-using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
-
 namespace Kurmann.InfuseMediaIntegrator.Commands;
 
 [TestClass]
