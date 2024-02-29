@@ -84,13 +84,6 @@ public class FileNameWithDateInfo
             return new FileNameWithDateInfo(germanDate.Value, matchedGermanIsoString.Value, fileNameInfo);
         }
 
-        // Versuche ein Monat aus dem Dateinamen zu extrahieren
-        (var month, var matchedMonthString) = TryParseMonth(fileNameInfo.FileName);
-        if (month.HasValue)
-        {
-            return new FileNameWithDateInfo(month.Value, matchedMonthString.Value, fileNameInfo);
-        }
-
         // Versuche ein Jahr aus dem Dateinamen zu extrahieren
         (var year, var matchedYearString) = TryParseYear(fileNameInfo.FileName);
         if (year.HasValue)
@@ -115,30 +108,6 @@ public class FileNameWithDateInfo
         if (isoMatch.Success && DateOnly.TryParse(isoMatch.Value, out DateOnly isoDate))
         {
             return (isoDate, isoMatch.Value);
-        }
-
-        // Beispiel: "Oktober 2021"
-        string germanMonthPattern = @"\b(Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember)\b \d{4}";
-        string englishMonthPattern = @"\b(January|February|March|April|May|June|July|August|September|October|November|December)\b \d{4}";
-
-        var germanMonthMatch = Regex.Match(text, germanMonthPattern);
-        if (germanMonthMatch.Success)
-        {
-            var fromCulture = new CultureInfo("de-CH");
-            if (DateTime.TryParseExact(germanMonthMatch.Value, "MMMM yyyy", fromCulture, DateTimeStyles.None, out var germanMonthDate))
-            {
-                return (DateOnly.FromDateTime(germanMonthDate), germanMonthMatch.Value);
-            }
-        }
-
-        var englishMonthMatch = Regex.Match(text, englishMonthPattern);
-        if (englishMonthMatch.Success)
-        {
-            var fromCulture = new CultureInfo("en-US");
-            if (DateTime.TryParseExact(englishMonthMatch.Value, "MMMM yyyy", fromCulture, DateTimeStyles.None, out var englishMonthDate))
-            {
-                return (DateOnly.FromDateTime(englishMonthDate), englishMonthMatch.Value);
-            }
         }
 
         return (Maybe<DateOnly>.None, Maybe<string>.None);
@@ -187,44 +156,5 @@ public class FileNameWithDateInfo
         }
 
         return(Maybe<DateOnly>.None, Maybe<string>.None);
-    }
-
-    /// <summary>
-    /// Versucht aus dem <paramref name="text"/> ein Datum zu parsen.
-    /// Sucht nach ISO-Monatsangaben, z.B. 2021-06.
-    /// Sucht nach deutschen und englischen Monatsnamen, z.B. Juni 2021 oder June 2021.
-    /// Für den jeweiligen Monat wird der erste Tag des Monats als Datum verwendet.
-    /// </summary>
-    /// <param name="text"></param>
-    /// <returns></returns>
-    private static (Maybe<DateOnly>, Maybe<string>) TryParseMonth(string text)
-    {
-        string[] patterns =
-        {
-            @"\b\d{4}-\d{2}\b",  // ISO-Monat: 2021-06
-            @"\b(January|February|March|April|May|June|July|August|September|October|November|December)\b \d{4}",  // Englischer Monatsname: June 2021
-            @"\b(Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember)\b \d{4}",  // Deutscher Monatsname: Juni 2021
-        };
-
-        foreach (string pattern in patterns)
-        {
-            var match = Regex.Match(text, pattern);
-
-            // Nimm den letzten Tag des Monats als Datum
-            if (match.Success)
-            {
-                var fromCulture = new CultureInfo("de-CH");
-                if (DateTime.TryParseExact(match.Value, "MMMM yyyy", fromCulture, DateTimeStyles.None, out var date))
-                {
-                    return (DateOnly.FromDateTime(date), match.Value);
-                }
-                else if (DateTime.TryParseExact(match.Value + "-01", "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var yearOnlyDate))
-                {
-                    return (DateOnly.FromDateTime(yearOnlyDate), match.Value);
-                }
-            }
-        }
-
-        return (Maybe<DateOnly>.None, Maybe<string>.None);
     }
 }

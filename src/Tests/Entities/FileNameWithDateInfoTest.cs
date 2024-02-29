@@ -94,66 +94,6 @@ public class FileNameWithDateInfoTests
         Assert.IsTrue(result.Value.IsDateAtEnd);
     }
 
-    [TestMethod] // Erfolgreich wenn ein Monat und ein Jahr im ISO-Format am Anfang des Dateinamens steht
-    public void Create_ShouldReturnSuccess_WhenFileNameStartsWithMonthAndYear()
-    {
-        // Arrange
-        string fileName = "2021-12 example_file.txt";
-
-        // Act
-        var result = FileNameWithDateInfo.Create(fileName);
-
-        // Assert
-        Assert.IsTrue(result.IsSuccess);
-        Assert.IsNotNull(result.Value);
-        Assert.AreEqual(fileName, result.Value.FileName);
-        Assert.AreEqual("2021-12", result.Value.DateString);
-        Assert.AreEqual("2021-12 example_file.txt", result.Value.FileName);
-        Assert.IsTrue(result.Value.IsDateAtStart);
-        Assert.IsFalse(result.Value.IsDateAtEnd);
-        Assert.AreEqual(new DateOnly(2021, 12, 31), result.Value.Date);
-    }
-
-    [TestMethod] // Erfolgreich wenn ein Monat und ein Jahr auf Deutsch am Anfang des Dateinamens steht
-    public void Create_ShouldReturnSuccess_WhenFileNameStartsWithGermanMonthAndYear()
-    {
-        // Arrange
-        string fileName = "April 2021 example_file.txt";
-
-        // Act
-        var result = FileNameWithDateInfo.Create(fileName);
-
-        // Assert
-        Assert.IsTrue(result.IsSuccess);
-        Assert.IsNotNull(result.Value);
-        Assert.AreEqual(fileName, result.Value.FileName);
-        Assert.AreEqual("April 2021", result.Value.DateString);
-        Assert.AreEqual("April 2021 example_file.txt", result.Value.FileName);
-        Assert.IsTrue(result.Value.IsDateAtStart);
-        Assert.IsFalse(result.Value.IsDateAtEnd);
-        Assert.AreEqual(new DateOnly(2021, 4, 30), result.Value.Date);
-    }
-
-    [TestMethod] // Erfolgreich wenn ein Monat und ein Jahr auf Deutsch am Ende des Dateinamens steht
-    public void Create_ShouldReturnSuccess_WhenFileNameEndsWithGermanMonthAndYear()
-    {
-        // Arrange
-        string fileName = "example_file Dezember 2021.txt";
-
-        // Act
-        var result = FileNameWithDateInfo.Create(fileName);
-
-        // Assert
-        Assert.IsTrue(result.IsSuccess);
-        Assert.IsNotNull(result.Value);
-        Assert.AreEqual(fileName, result.Value.FileName);
-        Assert.AreEqual("Dezember 2021", result.Value.DateString);
-        Assert.AreEqual("example_file Dezember 2021.txt", result.Value.FileName);
-        Assert.IsFalse(result.Value.IsDateAtStart);
-        Assert.IsTrue(result.Value.IsDateAtEnd);
-        Assert.AreEqual(new DateOnly(2021, 12, 31), result.Value.Date);
-    }
-
     [TestMethod] // Erfolgreich wenn nur ein Jahr im Dateinamen steht
     public void Create_ShouldReturnSuccess_WhenFileNameContainsOnlyYear()
     {
