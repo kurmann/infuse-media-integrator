@@ -60,6 +60,12 @@ public class LibraryVideoFileName
         return new LibraryVideoFileName(targetFileName.Value, fileNameWithDateInfo.Value.Date);
     }
 
+    /// <summary>
+    /// Erstellt ein LibraryVideoFileName-Objekt.
+    /// </summary>
+    /// <param name="fileName"></param>
+    /// <param name="recordingDate"></param>
+    /// <returns></returns>
     public static Result<LibraryVideoFileName> Create(FileNameInfo fileName, DateOnly recordingDate)
     {
         var fileNameWithDateInfo = FileNameWithDateInfo.Create(fileName.FileName);

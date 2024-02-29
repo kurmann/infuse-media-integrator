@@ -16,7 +16,7 @@ public class Mpeg4Video : IMediaFileType
     /// <summary>
     /// Die Metadaten des Videos.
     /// </summary>
-    public MediaFileMetadata? Metadata { get; }
+    public MediaFileMetadata? Metadata { get; private set; }
 
     /// <summary>
     /// Die zugehörigen Dateiendungen.
@@ -48,4 +48,6 @@ public class Mpeg4Video : IMediaFileType
             return Result.Failure<Mpeg4Video>($"Error on reading file info: {e.Message}");
         }
     }
+
+    public void SetMetadata(MediaFileMetadata metadata) => Metadata = metadata;
 }

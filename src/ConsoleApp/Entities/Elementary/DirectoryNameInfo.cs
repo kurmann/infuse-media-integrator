@@ -8,10 +8,18 @@ namespace Kurmann.InfuseMediaIntegrator.Entities.Elementary;
 /// </summary>
 public class DirectoryNameInfo
 {
+    /// <summary>
+    /// Der Verzeichnisname.
+    /// </summary>
     public string DirectoryName { get; }
 
     private DirectoryNameInfo(string directoryName) => DirectoryName = directoryName;
 
+    /// <summary>
+    /// Erstellt ein DirectoryNameInfo-Objekt.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
     public static Result<DirectoryNameInfo> Create(string? name)
     {
         // Gib eine Fehlermeldung zurück, wenn der Name null oder leer ist

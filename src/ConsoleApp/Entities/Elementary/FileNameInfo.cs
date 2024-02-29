@@ -14,6 +14,11 @@ public class FileNameInfo
 
     private FileNameInfo(string fileName) => FileName = Path.GetFileName(fileName);
 
+    /// <summary>
+    /// Erstellt ein FileNameInfo-Objekt.
+    /// </summary>
+    /// <param name="fileName"></param>
+    /// <returns></returns>
     public static Result<FileNameInfo> Create(string? fileName)
     {
         if (string.IsNullOrWhiteSpace(fileName))
