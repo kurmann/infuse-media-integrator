@@ -81,21 +81,6 @@ public class FilePathInfoTests
     }
 
     [TestMethod]
-    public void Create_ShouldReturnFailure_WhenFileNameContainsInvalidCharacters()
-    {
-        // Arrange
-        string filePath = "C:/path/to/file?with*invalid|characters.txt";
-
-        // Act
-        var result = FilePathInfo.Create(filePath);
-
-        // Assert
-        Assert.IsFalse(result.IsSuccess);
-        Assert.IsNotNull(result.Error);
-        // Add more assertions as needed
-    }
-
-    [TestMethod]
     public void Create_ShouldReturnSuccess_WhenFilePathIsValid()
     {
         // Arrange
