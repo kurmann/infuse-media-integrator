@@ -83,7 +83,7 @@ public class MoveFilesToInfuseMediaLibraryCommand(string inputDirectoryPath, str
         }
 
         // Verschiebe die Datei gemäss fileMappingInfo.TargetPath
-        var targetPath = Path.Combine(InfuseMediaLibraryPath, fileMappingInfo.Value.TargetSubDirectory, fileMappingInfo.Value.TargetFileName);
+        var targetPath = Path.Combine(InfuseMediaLibraryPath, fileMappingInfo.Value.TargetSubDirectory ?? string.Empty, fileMappingInfo.Value.TargetFileName);
         try
         {
             // Prüfe ob das Zielverzeichnis existiert und erstelle es, falls es nicht existiert
