@@ -91,13 +91,6 @@ public class FileNameWithDateInfo
             return new FileNameWithDateInfo(month.Value, matchedMonthString.Value, fileNameInfo);
         }
 
-        // Versuche eine Jahreszeit aus dem Dateinamen zu extrahieren
-        (var season, var matchedSeasonString) = TryParseSeason(fileNameInfo.FileName);
-        if (season.HasValue)
-        {
-            return new FileNameWithDateInfo(season.Value, matchedSeasonString.Value, fileNameInfo);
-        }
-
         // Versuche ein Jahr aus dem Dateinamen zu extrahieren
         (var year, var matchedYearString) = TryParseYear(fileNameInfo.FileName);
         if (year.HasValue)
@@ -195,52 +188,6 @@ public class FileNameWithDateInfo
             if (match.Success && DateOnly.TryParse(match.Value, out DateOnly date))
             {
                 return (date, match.Value);
-            }
-        }
-
-        return (Maybe<DateOnly>.None, Maybe<string>.None);
-    }
-
-    /// <summary>
-    /// Versucht aus einem Text eine Jahreszeit zu parsen.
-    /// Sucht nach deutschen und englischen Jahreszeiten, z.B. Sommer 2021 oder Summer 2021.
-    /// Für die jeweilige Jahreszeit werden die folgenden Daten verwendet:
-    /// Frühling: 1. April
-    /// Sommer: 1. Juli
-    /// Herbst: 1. Oktober
-    /// Winter: 1. Januar
-    /// </summary>
-    /// <param name="text"></param>
-    /// <returns></returns>
-    private static (Maybe<DateOnly>, Maybe<string>) TryParseSeason(string text)
-    {
-        string[] patterns =
-        [
-            @"\b(Spring|Summer|Fall|Autumn|Winter)\b \d{4}",  // Englische Jahreszeit: Summer 2021
-            @"\b(Frühling|Sommer|Herbst|Winter)\b \d{4}",  // Deutsche Jahreszeit: Sommer 2021
-        ];
-
-        foreach (string pattern in patterns)
-        {
-            var match = Regex.Match(text, pattern);
-            if (match.Success)
-            {
-                int year = int.Parse(match.Groups[0].Value.Split(' ')[1]);
-                switch (match.Groups[1].Value.ToLower())
-                {
-                    case "spring":
-                    case "frühling":
-                        return (new DateOnly(year, 4, 1), match.Value);
-                    case "summer":
-                    case "sommer":
-                        return (new DateOnly(year, 7, 1), match.Value);
-                    case "fall":
-                    case "autumn":
-                    case "herbst":
-                        return (new DateOnly(year, 10, 1), match.Value);
-                    case "winter":
-                        return (new DateOnly(year, 1, 1), match.Value);
-                }
             }
         }
 

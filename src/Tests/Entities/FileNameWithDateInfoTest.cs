@@ -92,23 +92,4 @@ public class FileNameWithDateInfoTests
         Assert.IsFalse(result.Value.IsDateAtStart);
         Assert.IsTrue(result.Value.IsDateAtEnd);
     }
-
-    [TestMethod] // Erfolgreich wenn Jahreszeit am Ende des Dateinamens steht
-    public void Create_ShouldReturnSuccess_WhenFileNameEndsWithSeason()
-    {
-        // Arrange
-        string fileName = "example_file Winter.txt";
-
-        // Act
-        var result = FileNameWithDateInfo.Create(fileName);
-
-        // Assert
-        Assert.IsTrue(result.IsSuccess);
-        Assert.IsNotNull(result.Value);
-        Assert.AreEqual(fileName, result.Value.FileName);
-        Assert.AreEqual("Winter", result.Value.DateString);
-        Assert.AreEqual("example_file Winter.txt", result.Value.FileName);
-        Assert.IsFalse(result.Value.IsDateAtStart);
-        Assert.IsTrue(result.Value.IsDateAtEnd);
-    }
 }
