@@ -66,4 +66,6 @@ public class FilePathInfo
     }
 
     public override string ToString() => FilePath;
+
+    public static implicit operator string(FilePathInfo filePathInfo) => filePathInfo.FilePath;
 }

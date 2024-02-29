@@ -46,4 +46,6 @@ public class FileNameInfo
     }
 
     public override string ToString() => FileName;
+
+    public static implicit operator string(FileNameInfo fileNameInfo) => fileNameInfo.FileName;
 }

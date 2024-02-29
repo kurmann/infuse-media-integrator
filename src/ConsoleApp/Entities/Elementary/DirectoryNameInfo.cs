@@ -43,4 +43,6 @@ public class DirectoryNameInfo
     }
 
     public override string ToString() => DirectoryName;
+
+    public static implicit operator string(DirectoryNameInfo directoryNameInfo) => directoryNameInfo.DirectoryName;
 }
