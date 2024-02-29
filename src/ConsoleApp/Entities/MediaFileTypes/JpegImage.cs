@@ -46,4 +46,6 @@ public class JpegImage : IMediaFileType
             return Result.Failure<JpegImage>($"Error on reading file info: {e.Message}");
         }
     }
+
+    public override string ToString() => FilePath.FilePath;
 }

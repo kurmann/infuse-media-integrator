@@ -48,4 +48,6 @@ public class QuickTimeVideo : IMediaFileType
             return Result.Failure<QuickTimeVideo>($"Error on reading file info: {e.Message}");
         }
     }
+
+    public override string ToString() => FilePath.FilePath;
 }

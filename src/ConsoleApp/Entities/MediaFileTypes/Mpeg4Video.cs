@@ -50,4 +50,6 @@ public class Mpeg4Video : IMediaFileType
     }
 
     public void SetMetadata(MediaFileMetadata metadata) => Metadata = metadata;
+
+    public override string ToString() => FilePath.FilePath;
 }

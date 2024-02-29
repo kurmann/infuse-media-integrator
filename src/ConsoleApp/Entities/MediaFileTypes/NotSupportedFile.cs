@@ -38,4 +38,6 @@ public class NotSupportedFile : IMediaFileType
             return Result.Failure<NotSupportedFile>($"Error on reading file info: {e.Message}");
         }
     }
+
+    public override string ToString() => FilePath.FilePath;
 }
