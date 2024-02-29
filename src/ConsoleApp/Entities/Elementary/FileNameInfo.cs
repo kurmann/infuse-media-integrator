@@ -37,7 +37,7 @@ public class FileNameInfo
         }
 
         // Prüfe, ob der Dateiname nur ein Verzeichnis ist
-        if (Path.HasExtension(fileName))
+        if (!Path.HasExtension(fileName))
         {
             return Result.Failure<FileNameInfo>("File name is not a file");
         }
