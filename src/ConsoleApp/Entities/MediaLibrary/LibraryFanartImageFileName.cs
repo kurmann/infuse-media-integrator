@@ -55,4 +55,15 @@ public class LibraryFanartImageFileName
         var newFileName = fileNameInfo.Value.FileNameWithoutExtension + FanartPrefix + fileNameInfo.Value.Extension;
         return Create(newFileName);
     }
+
+    public static Result<LibraryFanartImageFileName> CreateWithAddedFanartPrefix(FileNameInfo fileName)
+    {
+        // Wenn der Dateiname bereits mit "-fanart" endet, wird der Dateiname unverändert zurückgegeben
+        if (fileName.FileNameWithoutExtension.ToLowerInvariant().EndsWith("-fanart"))
+            return new LibraryFanartImageFileName(fileName);
+
+        // Füge das "-fanart"-Suffix hinzu
+        var newFileName = fileName.FileNameWithoutExtension + FanartPrefix + fileName.Extension;
+        return Create(newFileName);
+    }
 }
