@@ -48,6 +48,15 @@ public class LibraryVideoFileName
         return new LibraryVideoFileName(fileName, recordingDate);
     }
 
+    public static Result<LibraryVideoFileName> Create(FileNameInfo fileName, DateOnly recordingDate)
+    {
+        var fileNameWithDateInfo = FileNameWithDateInfo.Create(fileName.FileName);
+        if (fileNameWithDateInfo.IsFailure)
+            return Result.Failure<LibraryVideoFileName>($"Error on reading file info: {fileNameWithDateInfo.Error}");
+
+        return new LibraryVideoFileName(fileName, recordingDate);
+    }
+
     private static Result<FileNameInfo> GetTargetFileName(FileNameWithDateInfo fileNameWithDateInfo)
     {
         // Wenn das Datum zu Beginn oder am Ende des Dateinamens steht
