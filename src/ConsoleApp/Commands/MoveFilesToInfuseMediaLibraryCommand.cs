@@ -1,6 +1,7 @@
 using CSharpFunctionalExtensions;
 using Kurmann.InfuseMediaIntegrator.Commands;
 using Kurmann.InfuseMediaIntegrator.Entities;
+using Kurmann.InfuseMediaIntegrator.Entities.MediaFileTypes;
 using Microsoft.Extensions.Logging;
 
 namespace Kurmann.InfuseMediaIntegrator.Tests.Entities;
@@ -51,63 +52,69 @@ public class MoveFilesToInfuseMediaLibraryCommand(string inputDirectoryPath, str
         _logger.LogInformation($"Moving {videoIntegrationDirectory.Value.Mpeg4VideoFiles.Count} MPEG4 video files to {InfuseMediaLibraryPath}");
         foreach (var mpeg4VideoFile in videoIntegrationDirectory.Value.Mpeg4VideoFiles)
         {
-            // Platzhalter für die Videokategorie, die aus den Metadaten ausgelesen wird
-            var category = string.Empty;
-
             // Lese die Metadaten aus dem Mpeg4VideoWithMetadata
-            var metadata = MediaFileMetadata.Create(mpeg4VideoFile.FileInfo.FullName);
-            if (metadata.IsSuccess)
+            var metadata = MediaFileMetadata.Create(mpeg4VideoFile);
+            if (metadata.IsFailure)
             {
-                // Verwende die Videokategorie aus den Metadaten (entspricht "Album" in den Metadaten)
-                _logger.LogInformation($"Category found in metadata: {metadata.Value.Album}");
-                category = metadata.Value.Album;
+                _logger.LogWarning("Error on reading metadata");
+                _logger.LogWarning(metadata.Error);
+                _logger.LogInformation("File mapping will use directory structure and file name for file mapping.");
             }
-            _logger.LogWarning("No category found in metadata. Leaving category empty.");
-
-            // Erstelle ein FileMappingInfo-Objekt
-            var fileMappingInfo = FileMappingInfo.Create(category, mpeg4VideoFile.FileInfo.Name);
-            if (fileMappingInfo.IsFailure)
+            else
             {
-                // Wenn das FileMappingInfo-Objekt nicht erstellt werden konnte, liegt ein kririscher Fehler vor, der das Verschieben der Datei verhindert
-                return Result.Failure(fileMappingInfo.Error);
+                // Aktualisiere das Mpeg4Video-Objekt mit den Metadaten
+                mpeg4VideoFile.SetMetadata(metadata.Value);
             }
 
-            // Verschiebe die Datei gemäss fileMappingInfo.TargetPath
-            var targetPath = Path.Combine(InfuseMediaLibraryPath, fileMappingInfo.Value.TargetPath);
-            try
-            {
-                // Prüfe ob das Zielverzeichnis existiert und erstelle es, falls es nicht existiert
-                var targetDirectory = Path.GetDirectoryName(targetPath);
-                if (targetDirectory == null)
-                {
-                    return Result.Failure($"The target directory could not be determined: {targetPath}");
-                }
-                if (!Directory.Exists(targetDirectory))
-                {
-                    _logger.LogInformation($"Creating directory: {targetDirectory}");
-                    Directory.CreateDirectory(targetDirectory);
-                }
-
-                // Prüfe ob die Datei bereits existiert und lösche sie, falls sie existiert
-                if (File.Exists(targetPath))
-                {
-                    // Lösche die Datei
-                    _logger.LogInformation($"Deleting existing file: {targetPath}");
-                    File.Delete(targetPath);
-                }
-
-                _logger.LogInformation($"Moving file: {mpeg4VideoFile.FileInfo.FullName} to {targetPath}");
-                File.Move(mpeg4VideoFile.FileInfo.FullName, targetPath);
-            }
-            catch (Exception e)
-            {
-                return Result.Failure($"The file could not be moved: {e.Message}");
-            }
-
-            _logger.LogInformation($"File successfully moved: {targetPath}");
+            return MoveFileToLibrary(mpeg4VideoFile);
         }
 
         _logger.LogInformation($"Files successfully moved from {InputDirectoryPath} to {InfuseMediaLibraryPath}");
+        return Result.Success();
+    }
+
+    private Result MoveFileToLibrary(IMediaFileType mediaFile)
+    {
+        // Erstelle ein MediaFileLibraryOrganizationInfo-Objekt
+        var fileMappingInfo = MediaFileLibraryOrganizationInfo.Create(mediaFile, InfuseMediaLibraryPath);
+        if (fileMappingInfo.IsFailure)
+        {
+            return Result.Failure(fileMappingInfo.Error);
+        }
+
+        // Verschiebe die Datei gemäss fileMappingInfo.TargetPath
+        var targetPath = Path.Combine(InfuseMediaLibraryPath, fileMappingInfo.Value.TargetSubDirectory, fileMappingInfo.Value.TargetFileName);
+        try
+        {
+            // Prüfe ob das Zielverzeichnis existiert und erstelle es, falls es nicht existiert
+            var targetDirectory = Path.GetDirectoryName(targetPath);
+            if (targetDirectory == null)
+            {
+                return Result.Failure($"The target directory could not be determined: {targetPath}");
+            }
+            if (!Directory.Exists(targetDirectory))
+            {
+                _logger.LogInformation($"Creating directory: {targetDirectory}");
+                Directory.CreateDirectory(targetDirectory);
+            }
+
+            // Prüfe ob die Datei bereits existiert und lösche sie, falls sie existiert
+            if (File.Exists(targetPath))
+            {
+                // Lösche die Datei
+                _logger.LogInformation($"Deleting existing file: {targetPath}");
+                File.Delete(targetPath);
+            }
+
+            _logger.LogInformation($"Moving file: {mediaFile} to {targetPath}");
+            File.Move(mediaFile.FilePath, targetPath);
+        }
+        catch (Exception e)
+        {
+            return Result.Failure($"The file could not be moved: {e.Message}");
+        }
+
+        _logger.LogInformation($"File successfully moved: {targetPath}");
         return Result.Success();
     }
 }
