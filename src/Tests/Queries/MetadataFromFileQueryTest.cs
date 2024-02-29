@@ -20,7 +20,14 @@ public class MetadataFromFileQueryTests
         // Assert
         Assert.IsTrue(result.IsSuccess);
         Assert.IsNotNull(result.Value);
-        // Add more assertions as needed
+        Assert.AreEqual("Zwillinge Testvideo", result.Value.Title);
+        Assert.AreEqual("2024-02-11 Zwillinge Testvideo", result.Value.TitleSort);
+        Assert.AreEqual("Aufnahme der Zwillinge, die nach draussen wollen (use) als Testaufnahme für die Videoverarbeitung.", result.Value.Description);
+        Assert.AreEqual("Familie Kurmann-Glück", result.Value.Album);
+        Assert.AreEqual((uint)2024, result.Value.Year);
+        Assert.IsNotNull(result.Value.Artwork);
+        Assert.AreEqual("image/jpeg", result.Value.ArtworkMimeType);
+        Assert.AreEqual("jpg", result.Value.ArtworkExtension);
     }
 
     [TestMethod]
