@@ -26,6 +26,11 @@ public class LibraryVideoFileName
         if (fileNameInfo.IsFailure)
             return Result.Failure<LibraryVideoFileName>($"Error on reading file info: {fileNameInfo.Error}");
 
+        return Create(fileNameInfo.Value);
+    }
+
+    public static Result<LibraryVideoFileName> Create(FileNameInfo fileName)
+    {
         // Lies das Datum aus dem Dateinamen
         var fileNameWithDateInfo = FileNameWithDateInfo.Create(fileName);
         if (fileNameWithDateInfo.IsFailure)
@@ -37,15 +42,6 @@ public class LibraryVideoFileName
             return Result.Failure<LibraryVideoFileName>($"Error on reading file info: {targetFileName.Error}");
 
         return new LibraryVideoFileName(targetFileName.Value, fileNameWithDateInfo.Value.Date);
-    }
-
-    public static Result<LibraryVideoFileName> Create(FileNameInfo fileName, DateOnly recordingDate)
-    {
-        var fileNameWithDateInfo = FileNameWithDateInfo.Create(fileName.FileName);
-        if (fileNameWithDateInfo.IsFailure)
-            return Result.Failure<LibraryVideoFileName>($"Error on reading file info: {fileNameWithDateInfo.Error}");
-
-        return new LibraryVideoFileName(fileName, recordingDate);
     }
 
     public static Result<LibraryVideoFileName> Create(FileNameInfo fileName, DateOnly recordingDate)
