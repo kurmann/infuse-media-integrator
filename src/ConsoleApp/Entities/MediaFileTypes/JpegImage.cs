@@ -8,8 +8,19 @@ namespace Kurmann.InfuseMediaIntegrator.Entities.MediaFileTypes;
 /// </summary>
 public class JpegImage : IMediaFileType
 {
+    /// <summary>
+    /// Der Dateipfad.
+    /// </summary>
     public FilePathInfo FilePath { get; }
 
+    /// <summary>
+    /// Die Metadaten des Bildes.
+    /// </summary>
+    public MediaFileMetadata? Metadata { get; }
+
+    /// <summary>
+    /// Die zugehörigen Dateiendungen.
+    /// </summary>
     public static readonly string[] FileExtensions = [".jpg", ".jpeg", ".jpe", ".jif", ".jfif", ".jfi"];
 
     private JpegImage(FilePathInfo filePath) => FilePath = filePath;

@@ -14,6 +14,11 @@ public class NotSupportedFile : IMediaFileType
     /// </summary>
     public FilePathInfo FilePath { get; }
 
+    /// <summary>
+    /// Die Metadaten der Datei, sofern vorhanden.
+    /// </summary>
+    public MediaFileMetadata? Metadata { get; }
+
     private NotSupportedFile(FilePathInfo filePath) => FilePath = filePath;
 
     public static Result<NotSupportedFile> Create(string path)
