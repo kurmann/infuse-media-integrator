@@ -41,4 +41,6 @@ public class DirectoryNameInfo
 
         return Result.Success(new DirectoryNameInfo(name));
     }
+
+    public override string ToString() => DirectoryName;
 }

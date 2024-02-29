@@ -44,4 +44,6 @@ public class FileNameInfo
 
         return Result.Success(new FileNameInfo(fileName));
     }
+
+    public override string ToString() => FileName;
 }

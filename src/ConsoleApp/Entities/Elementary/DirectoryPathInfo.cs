@@ -55,5 +55,7 @@ namespace Kurmann.InfuseMediaIntegrator.Entities.Elementary
 
             return Result.Success(new DirectoryPathInfo(path));
         }
+
+        public override string ToString() => DirectoryPath;
     }
 }

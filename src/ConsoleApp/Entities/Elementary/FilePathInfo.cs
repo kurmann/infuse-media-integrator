@@ -64,4 +64,6 @@ public class FilePathInfo
 
         return new FilePathInfo(filePath);
     }
+
+    public override string ToString() => FilePath;
 }
