@@ -75,4 +75,8 @@ public class LibraryFileSubDirectoryPath
     {
         return Result.Success(new LibraryFileSubDirectoryPath(directoryPath));
     }
+
+    public override string ToString() => DirectoryPath.DirectoryPath;
+
+    public static implicit operator string(LibraryFileSubDirectoryPath libraryFileSubDirectoryPath) => libraryFileSubDirectoryPath.DirectoryPath.DirectoryPath;
 }

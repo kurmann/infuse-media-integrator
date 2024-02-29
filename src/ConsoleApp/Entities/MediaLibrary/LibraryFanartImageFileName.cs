@@ -66,4 +66,8 @@ public class LibraryFanartImageFileName
         var newFileName = fileName.FileNameWithoutExtension + FanartPrefix + fileName.Extension;
         return Create(newFileName);
     }
+
+    public override string ToString() => FileName.FileName;
+
+    public static implicit operator string(LibraryFanartImageFileName libraryFanartImageFileName) => libraryFanartImageFileName.FileName.FileName;
 }

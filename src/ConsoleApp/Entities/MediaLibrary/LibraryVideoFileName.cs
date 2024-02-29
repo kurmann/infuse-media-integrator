@@ -96,4 +96,8 @@ public class LibraryVideoFileName
         // Wenn das Datum in der Mitte des Dateinamens steht, dann lasse das Datum im Titel
         return fileNameWithDateInfo.FileName;
     }
+
+    public override string ToString() => FileName.FileName;
+
+    public static implicit operator string(LibraryVideoFileName libraryVideoFileName) => libraryVideoFileName.FileName.FileName;
 }
