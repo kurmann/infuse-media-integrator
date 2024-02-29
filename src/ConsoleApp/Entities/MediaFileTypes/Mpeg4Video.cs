@@ -14,20 +14,22 @@ public class Mpeg4Video : IMediaFileType
     public FilePathInfo FilePath { get; }
 
     /// <summary>
+    /// Die Metadaten des Videos.
+    /// </summary>
+    public MediaFileMetadata? Metadata { get; }
+
+    /// <summary>
     /// Die zugehörigen Dateiendungen.
     /// </summary>
     public static readonly string[] FileExtensions = [".mp4", ".m4v"];
 
-    private Mpeg4Video(FilePathInfo filePath) => FilePath = filePath;
+    private Mpeg4Video(FilePathInfo filePath, MediaFileMetadata? mediaFileMetadata = null)
+        => (FilePath, Metadata) = (filePath, mediaFileMetadata);
 
-    public static Result<Mpeg4Video> Create(string? path)
+    public static Result<Mpeg4Video> Create(string? path, MediaFileMetadata? metadata = null)
     {
         try
         {
-            // Prüfe, ob der Pfad leer ist
-            if (string.IsNullOrWhiteSpace(path))
-                return Result.Failure<Mpeg4Video>("Path is empty.");
-
             // Erstelle ein FilePathInfo-Objekt
             var fileInfo = FilePathInfo.Create(path);
             if (fileInfo.IsFailure)
@@ -38,8 +40,8 @@ public class Mpeg4Video : IMediaFileType
             if (!FileExtensions.Contains(extension))
                 return Result.Failure<Mpeg4Video>("File is not a MPEG4 video.");
 
-            // Rückgabe des FileInfo-Objekts
-            return new Mpeg4Video(fileInfo.Value);
+            // Rückgabe des FileInfo-Objekts, einschlieslich der Metadaten sofern vorhanden
+            return new Mpeg4Video(fileInfo.Value, metadata);
         }
         catch (Exception e)
         {
