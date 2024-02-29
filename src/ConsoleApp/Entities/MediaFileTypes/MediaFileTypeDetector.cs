@@ -72,12 +72,3 @@ public class MediaFileTypeDetector
         return notSupportedFile.Value;
     }
 }
-
-[Obsolete("Use IMediaFileType instead.")]
-public enum VideoFileType
-{
-    NotSupported,
-    QuickTime,
-    Mpeg4,
-    Jpeg
-}
