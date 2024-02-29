@@ -117,6 +117,30 @@ public class FileNameWithDateInfo
             return (isoDate, isoMatch.Value);
         }
 
+        // Beispiel: "Oktober 2021"
+        string germanMonthPattern = @"\b(Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember)\b \d{4}";
+        string englishMonthPattern = @"\b(January|February|March|April|May|June|July|August|September|October|November|December)\b \d{4}";
+
+        var germanMonthMatch = Regex.Match(text, germanMonthPattern);
+        if (germanMonthMatch.Success)
+        {
+            var fromCulture = new CultureInfo("de-CH");
+            if (DateTime.TryParseExact(germanMonthMatch.Value, "MMMM yyyy", fromCulture, DateTimeStyles.None, out var germanMonthDate))
+            {
+                return (DateOnly.FromDateTime(germanMonthDate), germanMonthMatch.Value);
+            }
+        }
+
+        var englishMonthMatch = Regex.Match(text, englishMonthPattern);
+        if (englishMonthMatch.Success)
+        {
+            var fromCulture = new CultureInfo("en-US");
+            if (DateTime.TryParseExact(englishMonthMatch.Value, "MMMM yyyy", fromCulture, DateTimeStyles.None, out var englishMonthDate))
+            {
+                return (DateOnly.FromDateTime(englishMonthDate), englishMonthMatch.Value);
+            }
+        }
+
         return (Maybe<DateOnly>.None, Maybe<string>.None);
     }
 
