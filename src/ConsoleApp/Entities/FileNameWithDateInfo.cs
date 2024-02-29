@@ -47,6 +47,18 @@ public class FileNameWithDateInfo
         FileName = fileNameInfo;
     }
 
+    public static Result<FileNameWithDateInfo> Create(string? fileName)
+    {
+        // Erstelle ein FileNameInfo-Objekt
+        var fileNameInfo = FileNameInfo.Create(fileName);
+        if (fileNameInfo.IsFailure)
+        {
+            return Result.Failure<FileNameWithDateInfo>(fileNameInfo.Error);
+        }
+
+        return Create(fileNameInfo.Value);
+    }
+
     /// <summary>
     /// Extrahiert das Aufnahmedatum aus dem Dateinamen.
     /// Beispiel: 2021-06-07 Ausflug nach Bern.mp4
@@ -54,49 +66,43 @@ public class FileNameWithDateInfo
     /// Beispiel: 2021 Rückblick Familie.mp4.
     /// In diesem Fall wird der 31.12. des Jahres als Aufnahmedatum verwendet.
     /// </summary>
-    /// <param name="fileName"></param>
+    /// <param name="fileNameInfo"></param>
     /// <returns></returns>
-    public static Result<FileNameWithDateInfo> Create(string? fileName)
+    public static Result<FileNameWithDateInfo> Create(FileNameInfo fileNameInfo)
     {
-        var fileNameInfo = FileNameInfo.Create(fileName);
-        if (fileNameInfo.IsFailure)
-        {
-            return Result.Failure<FileNameWithDateInfo>(fileNameInfo.Error);
-        }
-
         // Versuche ein ISO-Datum aus dem Dateinamen zu extrahieren
-        (var isoDate, var matchedIsoDateString) = TryParseIsoDate(fileNameInfo.Value.FileName);
+        (var isoDate, var matchedIsoDateString) = TryParseIsoDate(fileNameInfo.FileName);
         if (isoDate.HasValue)
         {
-            return new FileNameWithDateInfo(isoDate.Value, matchedIsoDateString.Value, fileNameInfo.Value);
+            return new FileNameWithDateInfo(isoDate.Value, matchedIsoDateString.Value, fileNameInfo);
         }
 
         // Versuche ein deutsches Datum aus dem Dateinamen zu extrahieren
-        (var germanDate, var matchedGermanIsoString) = TryParseGermanDate(fileNameInfo.Value.FileName);
+        (var germanDate, var matchedGermanIsoString) = TryParseGermanDate(fileNameInfo.FileName);
         if (germanDate.HasValue)
         {
-            return new FileNameWithDateInfo(germanDate.Value, matchedGermanIsoString.Value, fileNameInfo.Value);
+            return new FileNameWithDateInfo(germanDate.Value, matchedGermanIsoString.Value, fileNameInfo);
         }
 
         // Versuche ein Monat aus dem Dateinamen zu extrahieren
-        (var month, var matchedMonthString) = TryParseMonth(fileNameInfo.Value.FileName);
+        (var month, var matchedMonthString) = TryParseMonth(fileNameInfo.FileName);
         if (month.HasValue)
         {
-            return new FileNameWithDateInfo(month.Value, matchedMonthString.Value, fileNameInfo.Value);
+            return new FileNameWithDateInfo(month.Value, matchedMonthString.Value, fileNameInfo);
         }
 
         // Versuche eine Jahreszeit aus dem Dateinamen zu extrahieren
-        (var season, var matchedSeasonString) = TryParseSeason(fileNameInfo.Value.FileName);
+        (var season, var matchedSeasonString) = TryParseSeason(fileNameInfo.FileName);
         if (season.HasValue)
         {
-            return new FileNameWithDateInfo(season.Value, matchedSeasonString.Value, fileNameInfo.Value);
+            return new FileNameWithDateInfo(season.Value, matchedSeasonString.Value, fileNameInfo);
         }
 
         // Versuche ein Jahr aus dem Dateinamen zu extrahieren
-        (var year, var matchedYearString) = TryParseYear(fileNameInfo.Value.FileName);
+        (var year, var matchedYearString) = TryParseYear(fileNameInfo.FileName);
         if (year.HasValue)
         {
-            return new FileNameWithDateInfo(year.Value, matchedYearString.Value, fileNameInfo.Value);
+            return new FileNameWithDateInfo(year.Value, matchedYearString.Value, fileNameInfo);
         }
 
         // Wenn kein Datum gefunden wurde, gib einen Fehler zurück
