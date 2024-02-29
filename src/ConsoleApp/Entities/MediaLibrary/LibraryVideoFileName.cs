@@ -9,8 +9,14 @@ namespace Kurmann.InfuseMediaIntegrator.Entities.MediaLibrary;
 /// </summary>
 public class LibraryVideoFileName
 {
+    /// <summary>
+    /// Der Dateiname.
+    /// </summary>
     public FileNameInfo FileName { get; }
 
+    /// <summary>
+    /// Das Aufnahmedatum, das im Dateinamen enthalten ist.
+    /// </summary>
     public DateOnly RecordingDate { get; }
 
     private LibraryVideoFileName(FileNameInfo fileName, DateOnly recordingDate)
@@ -19,6 +25,11 @@ public class LibraryVideoFileName
         RecordingDate = recordingDate;
     }
 
+    /// <summary>
+    /// Erstellt ein LibraryVideoFileName-Objekt.
+    /// </summary>
+    /// <param name="fileName"></param>
+    /// <returns></returns>
     public static Result<LibraryVideoFileName> Create(string? fileName)
     {
         // Erstelle ein FileNameInfo-Objekt
@@ -29,6 +40,11 @@ public class LibraryVideoFileName
         return Create(fileNameInfo.Value);
     }
 
+    /// <summary>
+    /// Erstellt ein LibraryVideoFileName-Objekt.
+    /// </summary>
+    /// <param name="fileName"></param>
+    /// <returns></returns>
     public static Result<LibraryVideoFileName> Create(FileNameInfo fileName)
     {
         // Lies das Datum aus dem Dateinamen
