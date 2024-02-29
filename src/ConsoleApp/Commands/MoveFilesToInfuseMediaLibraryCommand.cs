@@ -53,7 +53,8 @@ public class MoveFilesToInfuseMediaLibraryCommand(string inputDirectoryPath, str
         foreach (var mpeg4VideoFile in videoIntegrationDirectory.Value.Mpeg4VideoFiles)
         {
             // Lese die Metadaten aus dem Mpeg4VideoWithMetadata
-            var metadata = MediaFileMetadata.Create(mpeg4VideoFile);
+            var metadataFromFileQuery = new MetadataFromFileQuery(mpeg4VideoFile.FilePath);
+            var metadata = metadataFromFileQuery.Execute();
             if (metadata.IsFailure)
             {
                 _logger.LogWarning("Error on reading metadata");

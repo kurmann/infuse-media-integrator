@@ -27,8 +27,13 @@ public class CreateFanartInfuseImageCommand(string? mpeg4VideoPath) : ICommand
             return Result.Failure("The output directory of the MP4 video cannot be read.");
         }
 
-        // Erstelle ein Mpeg4VideoWithMetadata-Objekt
-        var mpeg4VideoWithMetadata = MediaFileMetadata.Create(Mpeg4VideoPath);
+        // Lese die Metadaten des MP4-Videos aus
+        var metadataFromFileQuery = new MetadataFromFileQuery(Mpeg4VideoPath);
+        var mpeg4VideoWithMetadata = metadataFromFileQuery.Execute();
+        if (mpeg4VideoWithMetadata.IsFailure)
+        {
+            return Result.Failure(mpeg4VideoWithMetadata.Error);
+        }
         if (mpeg4VideoWithMetadata.IsFailure)
         {
             return Result.Failure(mpeg4VideoWithMetadata.Error);
