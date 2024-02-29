@@ -34,7 +34,7 @@ public class LibraryFanartImageFileName
     public static Result<LibraryFanartImageFileName> Create(FileNameInfo fileName)
     {
         // Prüfe, ob der Dateiname mit "-fanart" endet
-        if (!fileName.FileName.ToLowerInvariant().EndsWith("-fanart"))
+        if (!fileName.FileNameWithoutExtension.ToLowerInvariant().EndsWith("-fanart"))
             return Result.Failure<LibraryFanartImageFileName>("File name does not end with '-fanart'.");
 
         return new LibraryFanartImageFileName(fileName);
