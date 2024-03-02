@@ -4,34 +4,32 @@ using Kurmann.InfuseMediaIntegrator.Entities.MediaFileTypes;
 
 namespace Kurmann.InfuseMediaIntegrator.Queries;
 
-public class MediaLibraryQuery(string mediaLibraryPath) : ICanDecideBetweenIdAndSpecificProperties
-{
-    private string MediaLibraryPath { get; set; } = mediaLibraryPath;
-
-    private MediaLibraryQuery() : this(string.Empty) { }
-
-    ICanQueryMediaLibraryById ICanDecideBetweenIdAndSpecificProperties.ById(string id)
-    {
-        return new CanQueryMediaLibraryById(MediaLibraryPath, id);
-    }
-
-    ICanSetProperty ICanDecideBetweenIdAndSpecificProperties.ByProperties()
-    {
-        return new CanSetProperty(MediaLibraryPath);
-    }
-}
-
 public interface ICanDecideBetweenIdAndSpecificProperties
 {
     ICanQueryMediaLibraryById ById(string id);
     ICanSetProperty ByProperties();
 }
 
-internal class CanDecideBetweenIdAndSpecificProperties(string mediaLibraryPath) : ICanDecideBetweenIdAndSpecificProperties
+public class MediaLibraryQuery(string mediaLibraryPath) : ICanDecideBetweenIdAndSpecificProperties
 {
     private string MediaLibraryPath { get; set; } = mediaLibraryPath;
 
-    private string? Id { get; set; }
+    private MediaLibraryQuery() : this(string.Empty) { }
+
+    public ICanQueryMediaLibraryById ById(string id)
+    {
+        return new CanQueryMediaLibraryById(MediaLibraryPath, id);
+    }
+
+    public ICanSetProperty ByProperties()
+    {
+        return new CanSetProperty(MediaLibraryPath);
+    }
+}
+
+internal class CanDecideBetweenIdAndSpecificProperties(string mediaLibraryPath) : ICanDecideBetweenIdAndSpecificProperties
+{
+    private string MediaLibraryPath { get; set; } = mediaLibraryPath;
 
     /// <summary>
     /// Setzt die eindeutige ID des Mediums, nach dem gesucht werden soll.
@@ -41,8 +39,7 @@ internal class CanDecideBetweenIdAndSpecificProperties(string mediaLibraryPath) 
     /// <returns></returns>
     public ICanQueryMediaLibraryById ById(string id)
     {
-        Id = id;
-        return new CanQueryMediaLibraryById(MediaLibraryPath, Id);
+        return new CanQueryMediaLibraryById(MediaLibraryPath, id);
     }
 
     /// <summary>
@@ -52,7 +49,7 @@ internal class CanDecideBetweenIdAndSpecificProperties(string mediaLibraryPath) 
     /// <exception cref="NotImplementedException"></exception>
     public ICanSetProperty ByProperties()
     {
-        throw new NotImplementedException();
+        return new CanSetProperty(MediaLibraryPath);
     }
 }
 
@@ -87,16 +84,11 @@ public interface ICanQueryMediaLibraryById
     Result<List<IMediaFileType>> Execute();
 }
 
-internal class CanQueryMediaLibraryById : ICanQueryMediaLibraryById, IQueryService<List<IMediaFileType>>
+internal class CanQueryMediaLibraryById(string mediaLibraryPath, string id) : 
+    ICanQueryMediaLibraryById, IQueryService<List<IMediaFileType>>
 {
-    private string MediaLibraryPath { get; set; }
-    private string Id { get; set; }
-
-    public CanQueryMediaLibraryById(string mediaLibraryPath, string id)
-    {
-        MediaLibraryPath = mediaLibraryPath;
-        Id = id;
-    }
+    private string MediaLibraryPath { get; set; } = mediaLibraryPath;
+    private string Id { get; set; } = id;
 
     public Result<List<IMediaFileType>> Execute()
     {
@@ -164,18 +156,12 @@ public interface ICanQueryMediaLibraryByProperties
     Result<List<IMediaFileType>> Execute();
 }
 
-internal class CanQueryMediaLibraryByProperties : ICanQueryMediaLibraryByProperties, IQueryService<List<IMediaFileType>>
+internal class CanQueryMediaLibraryByProperties(string mediaLibraryPath, DateOnly? date = null, string? title = null) : 
+    ICanQueryMediaLibraryByProperties, IQueryService<List<IMediaFileType>>
 {
-    private string MediaLibraryPath { get; set; }
-    private DateOnly? Date { get; set; }
-    private string? Title { get; set; }
-
-    public CanQueryMediaLibraryByProperties(string mediaLibraryPath, DateOnly? date = null, string? title = null)
-    {
-        MediaLibraryPath = mediaLibraryPath;
-        Date = date;
-        Title = title;
-    }
+    private string MediaLibraryPath { get; set; } = mediaLibraryPath;
+    private DateOnly? Date { get; set; } = date;
+    private string? Title { get; set; } = title;
 
     public Result<List<IMediaFileType>> Execute()
     {
