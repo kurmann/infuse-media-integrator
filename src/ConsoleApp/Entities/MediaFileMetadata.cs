@@ -80,7 +80,7 @@ public class MediaFileMetadata
         return new MediaFileMetadata(title, titleSort, description, year, album, artwork, artworkMimeType, artworkExtension);
     }
 
-    public MediaFileMetadataa WithDescription(string description)
+    public MediaFileMetadata WithDescription(string description)
     {
         Description = description;
         return this;
