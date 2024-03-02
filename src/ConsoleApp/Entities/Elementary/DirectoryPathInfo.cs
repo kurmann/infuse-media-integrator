@@ -37,8 +37,12 @@ public class DirectoryPathInfo
             return Result.Failure<DirectoryPathInfo>("Path is null or empty");
         }
 
-        // Entferne die Datei im Pfad, falls vorhanden
-        path = System.IO.Path.GetDirectoryName(path);
+        // Prüfe ob der Pfad eine reguläre Datei ist
+        var isFile = Path.HasExtension(path);
+
+        // Entferne die Datei im Pfad
+        if (isFile)
+            path = Path.GetDirectoryName(path);
 
         // Gib eine Fehlermeldung zurück, wenn der Pfad kein Verzeichnis ist
         if (string.IsNullOrWhiteSpace(path))
@@ -47,10 +51,10 @@ public class DirectoryPathInfo
         }
 
         // Prüfe auf unzulässige Zeichen im Pfad
-        char[] invalidPathChars = System.IO.Path.GetInvalidPathChars();
-        if (path.Any(c => invalidPathChars.Contains(c)))
+
+        if (CrossPlatformInvalidCharsHandler.ContainsInvalidChars(path))
         {
-            return Result.Failure<DirectoryPathInfo>("Path contains invalid characters: " + string.Join(", ", invalidPathChars));
+            return Result.Failure<DirectoryPathInfo>("Path contains invalid characters: " + string.Join(", ", CrossPlatformInvalidCharsHandler.PrintableInvalidChars));
         }
 
         return Result.Success(new DirectoryPathInfo(path));
