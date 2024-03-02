@@ -1,9 +1,8 @@
 using CSharpFunctionalExtensions;
 using Kurmann.InfuseMediaIntegrator.Entities.Elementary;
 using Kurmann.InfuseMediaIntegrator.Entities.MediaFileTypes;
-using Kurmann.InfuseMediaIntegrator.Entities.MediaLibrary;
 
-namespace Kurmann.InfuseMediaIntegrator.Entities;
+namespace Kurmann.InfuseMediaIntegrator.Entities.MediaLibrary;
 
 /// <summary>
 /// Enthält Informationen um eine Mediendatei in einer Mediathek zu organisieren.

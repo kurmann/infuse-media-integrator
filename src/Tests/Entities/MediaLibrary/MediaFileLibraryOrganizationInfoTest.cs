@@ -1,7 +1,7 @@
-using Kurmann.InfuseMediaIntegrator.Entities;
 using Kurmann.InfuseMediaIntegrator.Entities.MediaFileTypes;
+using Kurmann.InfuseMediaIntegrator.Entities.MediaLibrary;
 
-namespace Kurmann.InfuseMediaIntegrator.Tests.Entities;
+namespace Kurmann.InfuseMediaIntegrator.Tests.Entities.MediaLibrary;
 
 [TestClass]
 public class MediaFileLibraryOrganizationInfoTests

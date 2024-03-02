@@ -1,6 +1,6 @@
 using CSharpFunctionalExtensions;
 
-namespace Kurmann.InfuseMediaIntegrator.Entities;
+namespace Kurmann.InfuseMediaIntegrator.Entities.MediaLibrary;
 
 /// <summary>
 /// Repräsentiert eine MPEG4-Video-Datei mit eingebetteten Metadaten.

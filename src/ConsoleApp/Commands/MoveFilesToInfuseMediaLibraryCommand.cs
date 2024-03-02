@@ -2,6 +2,7 @@ using CSharpFunctionalExtensions;
 using Kurmann.InfuseMediaIntegrator.Commands;
 using Kurmann.InfuseMediaIntegrator.Entities;
 using Kurmann.InfuseMediaIntegrator.Entities.MediaFileTypes;
+using Kurmann.InfuseMediaIntegrator.Entities.MediaLibrary;
 using Microsoft.Extensions.Logging;
 
 namespace Kurmann.InfuseMediaIntegrator.Tests.Entities;
