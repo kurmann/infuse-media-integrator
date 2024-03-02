@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using CSharpFunctionalExtensions;
 
 namespace Kurmann.InfuseMediaIntegrator.Entities.Elementary;
@@ -27,6 +28,60 @@ public class DirectoryPathInfo
 
     /// <summary>
     /// Erstellt eine Instanz von DirectoryPathInfo, wenn der gegebene Pfad gültig ist.
+    /// Prüft ob der Pfad unzulässige Zeichen enthält für Windows-Pfade.
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
+    public static Result<DirectoryPathInfo> CreateWindowsPath(string? path)
+    {
+        // Prüfe ob der Pfad leer ist
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return Result.Failure<DirectoryPathInfo>("Path is null or empty");
+        }
+
+        // Erstelle eine Instanz von DirectoryPathInfo, wenn der gegebene Pfad gültig ist
+        var pathInfo = Create(path);
+        if (pathInfo.IsFailure)
+        {
+            return pathInfo;
+        }
+
+        // Prüfe auf unzulässige Zeichen im Pfad
+        if (CrossPlatformInvalidCharsHandler.ContainsInvalidPathCharsInWindowsPath(path))
+        {
+            return Result.Failure<DirectoryPathInfo>("Path contains invalid characters for Windows paths: " + string.Join(", ", CrossPlatformInvalidCharsHandler.InvalidCharsForWindowsPaths));
+        }
+
+        return pathInfo;
+    }
+
+    public static Result<DirectoryPathInfo> CreateUnixPath(string? path)
+    {
+        // Prüfe ob der Pfad leer ist
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return Result.Failure<DirectoryPathInfo>("Path is null or empty");
+        }
+
+        // Erstelle eine Instanz von DirectoryPathInfo, wenn der gegebene Pfad gültig ist
+        var pathInfo = Create(path);
+        if (pathInfo.IsFailure)
+        {
+            return pathInfo;
+        }
+
+        // Prüfe auf unzulässige Zeichen im Pfad
+        if (CrossPlatformInvalidCharsHandler.ContainsInvalidPathCharsInUnixPath(path))
+        {
+            return Result.Failure<DirectoryPathInfo>("Path contains invalid characters for Unix paths: " + string.Join(", ", CrossPlatformInvalidCharsHandler.InvalidCharsForUnixPaths));
+        }
+
+        return pathInfo;
+    }
+
+    /// <summary>
+    /// Erstellt eine Instanz von DirectoryPathInfo, wenn der gegebene Pfad gültig ist.
     /// </summary>
     /// <param name="path">Der Pfad, der validiert und gespeichert werden soll.</param>
     /// <returns>Ein Result-Objekt, das entweder eine DirectoryPathInfo-Instanz oder einen Fehler enthält.</returns>
@@ -48,16 +103,6 @@ public class DirectoryPathInfo
         if (string.IsNullOrWhiteSpace(path))
         {
             return Result.Failure<DirectoryPathInfo>("Path is not a directory");
-        }
-
-        // Prüfe auf unzulässige Zeichen im Pfad
-        if (CrossPlatformInvalidCharsHandler.ContainsInvalidPathCharsInWindowsPath(path))
-        {
-            return Result.Failure<DirectoryPathInfo>("Path contains invalid characters for Windows paths: " + string.Join(", ", CrossPlatformInvalidCharsHandler.InvalidCharsForWindowsPaths));
-        }
-        if (CrossPlatformInvalidCharsHandler.ContainsInvalidPathCharsInUnixPath(path))
-        {
-            return Result.Failure<DirectoryPathInfo>("Path contains invalid characters for Unix paths: " + string.Join(", ", CrossPlatformInvalidCharsHandler.InvalidCharsForUnixPaths));
         }
 
         // Prüfe jedes Verzeichnis auf unzulässige Zeichen
