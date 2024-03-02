@@ -56,7 +56,7 @@ public class SearchDirectoriesQuery
     /// <param name="andSearchText"></param>
     /// <param name="searchAtBeginningOnly"></param>
     /// <returns></returns>
-    public static IEnumerable<string> SearchFiles(string startDirectory, string[] andSearchText)
+    public static IEnumerable<string> SearchFiles(string startDirectory, IEnumerable<string> andSearchText)
     {
         // Überprüfe, ob das Startverzeichnis vorhanden und zugänglich ist.
         Queue<string> directories = new();
