@@ -48,4 +48,43 @@ public class SearchDirectoriesQuery
             }
         }
     }
+
+    /// <summary>
+    /// Diese Methode bietet eine Möglichkeit, nach mehreren Texten in Dateinamen zu suchen, die alle gefunden werden müssen.
+    /// </summary>
+    /// <param name="startDirectory"></param>
+    /// <param name="andSearchText"></param>
+    /// <param name="searchAtBeginningOnly"></param>
+    /// <returns></returns>
+    public static IEnumerable<string> SearchFiles(string startDirectory, string[] andSearchText)
+    {
+        // Überprüfe, ob das Startverzeichnis vorhanden und zugänglich ist.
+        Queue<string> directories = new();
+        directories.Enqueue(startDirectory);
+
+        // Durchsuche das Verzeichnis rekursiv nach Dateien, die mit dem angegebenen Text beginnen.
+        while (directories.Count > 0)
+        {
+            // Entferne das erste Verzeichnis aus der Warteschlange.
+            string currentDirectory = directories.Dequeue();
+
+            // Suche nach Dateien, die mit dem angegebenen Text beginnen
+            // Hinweis: `EnumerateFiles` gibt den vollständigen Pfad der Datei zurück.
+            // Hinweis: TopDirectoryOnly gibt an, dass nur das aktuelle Verzeichnis durchsucht wird, weil wir die rekursive Suche selbst steuern.
+            foreach (var file in Directory.EnumerateFiles(currentDirectory, "*.*", SearchOption.TopDirectoryOnly))
+            {
+                // Prüfe, ob alle Texte in der Datei enthalten sind.
+                if (andSearchText.All(file.Contains))
+                {
+                    yield return file;
+                }
+            }
+
+            // Füge alle Unterverzeichnisse in die Warteschlange ein, um sie später zu durchsuchen.
+            foreach (var subdir in Directory.EnumerateDirectories(currentDirectory))
+            {
+                directories.Enqueue(subdir);
+            }
+        }
+    }
 }
