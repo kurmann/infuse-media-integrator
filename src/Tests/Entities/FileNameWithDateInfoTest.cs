@@ -112,4 +112,19 @@ public class FileNameWithDateInfoTests
         Assert.IsFalse(result.Value.IsDateAtEnd);
         Assert.AreEqual(new DateOnly(2021, 12, 31), result.Value.Date);
     }
+
+    [TestMethod] // Fehlermeldung wenn ungültige Zeichen im Dateinamen
+    public void Create_ShouldReturnFailure_WhenFileNameContainsInvalidCharacters()
+    {
+        // Arrange
+        string fileName = "example_file with?invalid>characters.txt";
+
+        // Act
+        var result = FileNameWithDateInfo.Create(fileName);
+
+        // Assert
+        Assert.IsFalse(result.IsSuccess);
+        Assert.IsNotNull(result.Error);
+        // Add more assertions as needed
+    }
 }
