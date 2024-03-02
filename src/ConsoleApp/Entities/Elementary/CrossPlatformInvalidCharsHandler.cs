@@ -37,14 +37,35 @@ public class CrossPlatformInvalidCharsHandler
         // '/' fügen wir nicht zu InvalidChars hinzu, da es in Unix-Pfaden gültig ist
     }
 
+    /// <summary>
+    /// Gibt zurück, ob der gegebene Datei- oder Verzeichnisname ungültige Zeichen enthält.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
     public static bool ContainsInvalidChars(string name)
     {
         return InvalidChars.Any(name.Contains);
     }
 
-    public static bool ContainsInvalidPathChars(string path, bool isWindowsPath)
+    /// <summary>
+    /// Gibt zurück, ob der gegebene Pfad ungültige Zeichen enthält für Windows-Dateisysteme.
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
+    public static bool ContainsInvalidPathCharsInWindowsPath(string path)
     {
-        var invalidChars = isWindowsPath ? InvalidCharsForWindowsPaths : InvalidCharsForUnixPaths;
+        var invalidChars = InvalidCharsForWindowsPaths;
+        return invalidChars.Any(path.Contains);
+    }
+
+    /// <summary>
+    /// Gibt zurück, ob der gegebene Pfad ungültige Zeichen enthält für Unix-Dateisysteme.
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
+    public static bool ContainsInvalidPathCharsInUnixPath(string path)
+    {
+        var invalidChars = InvalidCharsForUnixPaths;
         return invalidChars.Any(path.Contains);
     }
 
