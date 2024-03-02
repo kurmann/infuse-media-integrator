@@ -94,4 +94,34 @@ public class DirectoryPathInfoTests
         Assert.IsFalse(result.IsSuccess);
         Assert.IsNotNull(result.Error);
     }
+
+    [TestMethod] // Teste ob Leerzeichen am Anfang und Ende des Pfades korrekt entfernt werden können
+    public void CreateTrimmed_ShouldReturnSuccess_WhenPathContainsLeadingAndTrailingSpaces()
+    {
+        // Arrange
+        string path = " /workspaces/infuse-media-integrator/src/ConsoleApp/Entities/Elementary ";
+
+        // Act
+        var result = DirectoryPathInfo.CreateTrimmed(path);
+
+        // Assert
+        Assert.IsTrue(result.IsSuccess);
+        Assert.IsNotNull(result.Value);
+        Assert.AreEqual("/workspaces/infuse-media-integrator/src/ConsoleApp/Entities/Elementary", result.Value);
+    }
+
+    [TestMethod] // Teste ob Leerzeichen am Anfang und Ende jedes Verzeichnisses korrekt entfernt werden können
+    public void CreateTrimmed_ShouldReturnSuccess_WhenPathContainsLeadingAndTrailingSpacesInDirectories()
+    {
+        // Arrange
+        string path = "/workspaces/infuse-media-integrator/src/ConsoleApp/Entities/ Elementary / DirectoryPathInfo.cs";
+
+        // Act
+        var result = DirectoryPathInfo.CreateTrimmed(path);
+
+        // Assert
+        Assert.IsTrue(result.IsSuccess);
+        Assert.IsNotNull(result.Value);
+        Assert.AreEqual("/workspaces/infuse-media-integrator/src/ConsoleApp/Entities/Elementary", result.Value);
+    }
 }

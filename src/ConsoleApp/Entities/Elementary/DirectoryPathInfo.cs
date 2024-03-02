@@ -118,6 +118,28 @@ public class DirectoryPathInfo
         return Result.Success(new DirectoryPathInfo(path));
     }
 
+    /// <summary>
+    /// Erstellt eine Instanz von DirectoryPathInfo, wenn der gegebene Pfad gültig ist.
+    /// Entfernt Leerzeichen am Anfang jedes Verzeichnisses.
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
+    public static Result<DirectoryPathInfo> CreateTrimmed(string? path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return Result.Failure<DirectoryPathInfo>("Path is null or empty");
+        }
+
+        // Lies alle Verzeichnisse aus dem Pfad und entferne bei jedem Verzeichnis Leerzeichen am Anfang und am Ende
+        var directories = path.Split(Path.DirectorySeparatorChar).Select(d => d.Trim()).ToArray();
+
+        // Erstelle einen neuen Pfad aus den Verzeichnissen
+        var newPath = string.Join(Path.DirectorySeparatorChar, directories);
+
+        return Create(newPath);
+    }
+
     public override string ToString() => DirectoryPath;
 
     public static implicit operator string(DirectoryPathInfo directoryPathInfo) => directoryPathInfo.DirectoryPath;

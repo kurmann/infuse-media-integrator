@@ -130,7 +130,8 @@ public class MediaFileLibraryOrganizationInfo
     private static Result<LibraryFileSubDirectoryPath> GetTargetSubDirectoryFromMetadata(IMediaFileType? mediaFile)
     {
         // Der Kategorien-Pfad ist der Album-Name
-        var categoryPathFromMetadata = DirectoryPathInfo.Create(mediaFile?.Metadata?.Album);
+        // Entferne Leerzeichen am Anfang und Ende des Album-Namens
+        var categoryPathFromMetadata = DirectoryPathInfo.CreateTrimmed(mediaFile?.Metadata?.Album);
         if (categoryPathFromMetadata.IsFailure)
             return Result.Failure<LibraryFileSubDirectoryPath>($"Error on reading category path from metadata: {categoryPathFromMetadata.Error}");
 

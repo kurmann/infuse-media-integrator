@@ -97,4 +97,22 @@ public class MediaFileLibraryOrganizationInfoTests
         Assert.AreEqual(SubdirectoryDerivationMode.SourcePath, result.Value.SubdirectoryDerivationMode);
         Assert.AreEqual("/New Project", result.Value.TargetSubDirectory?.ToString());
     }
+
+    [TestMethod] // Prüfe ob Album-Namen mit führender und abschliessender Leerzeichen korrekt verarbeitet werden
+    public void Create_WithAlbumTagWithLeadingAndTrailingSpaces_ReturnsCorrectSubDirectory()
+    {
+        // Arrange
+        var metadata = MediaFileMetadata.Create("Testvideo").Value.WithAlbum(" Familie Kurmann ");
+        var path = Path.Combine(InputDirectoryPath, "Testvideo.m4v");
+        var mediaFile = Mpeg4Video.Create(path, metadata).Value;
+
+        // Act
+        var result = MediaFileLibraryOrganizationInfo.Create(mediaFile, InputDirectoryPath);
+
+        // Assert
+        Assert.IsTrue(result.IsSuccess);
+        Assert.AreEqual("Familie Kurmann", result.Value.TargetSubDirectory?.ToString());
+        Assert.IsTrue(result.Value.HasAlbumNameInMetadata);
+        Assert.AreEqual(SubdirectoryDerivationMode.Metadata, result.Value.SubdirectoryDerivationMode);
+    }
 }
