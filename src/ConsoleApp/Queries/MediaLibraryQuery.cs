@@ -10,6 +10,10 @@ public class MediaLibraryQuery(string mediaLibraryPath) : IQueryService<List<IMe
     private string? Id { get; set; }
     private MediaLibrarySpecificProperties? SpecificProperties { get; set; }
 
+    private MediaLibraryQuery() : this(string.Empty)
+    {
+    }
+
     /// <summary>
     /// Führt die Abfrage aus.
     /// </summary>
@@ -138,3 +142,4 @@ public class MediaLibrarySpecificProperties
     }
 }
 
+pu
