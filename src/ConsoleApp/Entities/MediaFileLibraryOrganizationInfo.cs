@@ -23,10 +23,26 @@ public class MediaFileLibraryOrganizationInfo
     /// </summary>
     public LibraryFileSubDirectoryPath? TargetSubDirectory { get; }
 
-    private MediaFileLibraryOrganizationInfo(FileNameInfo targetFileName, LibraryFileSubDirectoryPath? targetSubDirectory)
+    /// <summary>
+    /// Der Modus, wie das Unterverzeichnis abgeleitet wurde.
+    /// </summary>
+    public SubdirectoryDerivationMode SubdirectoryDerivationMode { get; }
+
+    /// <summary>
+    /// Gibt an, ob der Album-Name in den Metadaten vorhanden ist.
+    /// Dies ist relevant, wenn der Kategorien-Pfad nicht aus den Metadaten abgeleitet wurde, obwohl Metadaten vorhanden sind.
+    /// </summary>
+    public bool HasAlbumNameInMetadata { get; }
+
+    private MediaFileLibraryOrganizationInfo(FileNameInfo targetFileName,
+                                             LibraryFileSubDirectoryPath? targetSubDirectory,
+                                             SubdirectoryDerivationMode subdirectoryDerivationMode,
+                                             bool hasAlbumNameInMetadata)      
     {
         TargetFileName = targetFileName;
         TargetSubDirectory = targetSubDirectory;
+        SubdirectoryDerivationMode = subdirectoryDerivationMode;
+        HasAlbumNameInMetadata = hasAlbumNameInMetadata;
     }
 
     /// <summary>
@@ -47,11 +63,51 @@ public class MediaFileLibraryOrganizationInfo
         var targetFileName = GetTargetFileName(mediaFile);
         if (targetFileName.IsFailure)
             return Result.Failure<MediaFileLibraryOrganizationInfo>($"Error on creating target file name: {targetFileName.Error}");
-        var targetSubDirectory = GetTargetSubDirectoryFromMetadata(mediaFile).GetValueOrDefault() ?? GetTargetSubDirectoryFromSourcePath(mediaFile, rootDirectory);
-        if (targetSubDirectory.IsFailure)
-            return Result.Failure<MediaFileLibraryOrganizationInfo>($"Error on creating target subdirectory: {targetSubDirectory.Error}");
 
-        return Result.Success(new MediaFileLibraryOrganizationInfo(targetFileName.Value, targetSubDirectory.Value));
+        // Prüfe, ob ein Album in den Metadaten vorhanden ist (für die Ableitung des Kategorien-Pfads)
+        var hasAlbumNameInMetadata = mediaFile.Metadata?.Album != null;
+
+        // Versuche den Kategorien-Pfad aus den Metadaten zu lesen
+        if (hasAlbumNameInMetadata)
+        {
+            return ProcessAlbumMetadata(mediaFile, rootDirectory, targetFileName, hasAlbumNameInMetadata);
+        }
+
+        // Wenn kein Album in den Metadaten vorhanden ist, wird der Kategorien-Pfad aus dem Quell-Verzeichnis abgeleitet
+        var targetSubDirectoryFromSourcePath = GetTargetSubDirectoryFromSourcePath(mediaFile, rootDirectory);
+        if (targetSubDirectoryFromSourcePath.IsFailure)
+        {
+            // Teile mit, dass kein Album in den Metadaten vorhanden ist und der Kategorie-Pfad aus dem Quell-Verzeichnis fehlschlägt
+            var message = $"No album name in metadata. Error on creating target subdirectory from source path: {targetSubDirectoryFromSourcePath.Error}";
+            return Result.Failure<MediaFileLibraryOrganizationInfo>(message);
+        }
+
+        // Hier konnte der Kategorien-Pfad aus dem Quell-Verzeichnis abgeleitet werden
+        return new MediaFileLibraryOrganizationInfo(targetFileName.Value, targetSubDirectoryFromSourcePath.Value, SubdirectoryDerivationMode.SourcePath, hasAlbumNameInMetadata);
+
+        static Result<MediaFileLibraryOrganizationInfo> ProcessAlbumMetadata(IMediaFileType mediaFile, string? rootDirectory, Result<FileNameInfo> targetFileName, bool hasAlbumNameInMetadata)
+        {
+            var targetSubDirectory = GetTargetSubDirectoryFromMetadata(mediaFile);
+            if (targetSubDirectory.IsFailure)
+            {
+                // Wenn die Ableitung des Kategorien-Pfads aus den Metadaten fehlschlägt, wird versucht, den Kategorien-Pfad aus dem Quell-Verzeichnis zu lesen
+                var targetSubDirectoryFromSourcePath = GetTargetSubDirectoryFromSourcePath(mediaFile, rootDirectory);
+
+                if (targetSubDirectoryFromSourcePath.IsFailure)
+                {
+                    // Teile in der Fehlermeldung mit, dass der Kategorie-Pfad aus den Metadaten fehlschlägt und der Kategorie-Pfad aus dem Quell-Verzeichnis fehlschlägt
+                    var message = $"Error on creating target subdirectory from metadata: {targetSubDirectory.Error}. Error on creating target subdirectory from source path: {targetSubDirectoryFromSourcePath.Error}";
+                    return Result.Failure<MediaFileLibraryOrganizationInfo>(message);
+                }
+                else
+                {
+                    return new MediaFileLibraryOrganizationInfo(targetFileName.Value, targetSubDirectoryFromSourcePath.Value, SubdirectoryDerivationMode.SourcePath, hasAlbumNameInMetadata);
+                }
+            }
+
+            // Hier konnte der Kategorien-Pfad aus den Metadaten abgeleitet werden
+            return new MediaFileLibraryOrganizationInfo(targetFileName.Value, targetSubDirectory.Value, SubdirectoryDerivationMode.Metadata, hasAlbumNameInMetadata);
+        }
     }
 
     private static Result<LibraryFileSubDirectoryPath?> GetTargetSubDirectoryFromSourcePath(IMediaFileType mediaFile, string? directoryPath)
@@ -60,6 +116,10 @@ public class MediaFileLibraryOrganizationInfo
         if (directoryPath == null)
             return null;
 
+        // Prüfe ob eine Mediendatei angegeben ist
+        if (mediaFile == null)
+            return Result.Failure<LibraryFileSubDirectoryPath?>("Media file is null.");
+
         var path = LibraryFileSubDirectoryPath.Create(mediaFile.FilePath, directoryPath);
         if (path.IsFailure)
             return Result.Failure<LibraryFileSubDirectoryPath?>($"Error on creating subdirectory path: {path.Error}");
@@ -67,10 +127,10 @@ public class MediaFileLibraryOrganizationInfo
         return path.Value;
     }
 
-    private static Result<LibraryFileSubDirectoryPath> GetTargetSubDirectoryFromMetadata(IMediaFileType mediaFile)
+    private static Result<LibraryFileSubDirectoryPath> GetTargetSubDirectoryFromMetadata(IMediaFileType? mediaFile)
     {
         // Der Kategorien-Pfad ist der Album-Name
-        var categoryPathFromMetadata = DirectoryPathInfo.Create(mediaFile.Metadata?.Album);
+        var categoryPathFromMetadata = DirectoryPathInfo.Create(mediaFile?.Metadata?.Album);
         if (categoryPathFromMetadata.IsFailure)
             return Result.Failure<LibraryFileSubDirectoryPath>($"Error on reading category path from metadata: {categoryPathFromMetadata.Error}");
 
@@ -92,4 +152,11 @@ public class MediaFileLibraryOrganizationInfo
         // Wenn die Datei kein Bild ist, wird der Dateiname unverändert zurückgegeben
         return mediaFile.FilePath.FileName;
     }
+}
+
+public enum SubdirectoryDerivationMode
+{
+    Undefinied,
+    Metadata,
+    SourcePath
 }

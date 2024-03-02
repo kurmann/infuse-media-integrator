@@ -28,7 +28,7 @@ public class LibraryFileSubDirectoryPath
     /// <param name="filePath"></param>
     /// <param name="rootDirectory"></param>
     /// <returns></returns>
-    public static Result<LibraryFileSubDirectoryPath> Create(string? filePath, string rootDirectory)
+    public static Result<LibraryFileSubDirectoryPath> Create(string? filePath, string? rootDirectory)
     {
         // Erstelle ein FilePathInfo-Objekt
         var filePathInfo = FilePathInfo.Create(filePath);
