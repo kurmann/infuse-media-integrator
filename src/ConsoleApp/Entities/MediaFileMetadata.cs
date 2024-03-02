@@ -22,32 +22,32 @@ public class MediaFileMetadata
     /// <summary>
     /// Die Beschreibung des Videos.
     /// </summary>
-    public string? Description { get; }
+    public string? Description { get; private set; }
 
     /// <summary>
     /// Das Jahr des Videos. Bei den meisten Videos handelt es sich um das Aufnahmejahr.
     /// </summary>
-    public uint? Year { get; }
+    public uint? Year { get; private set; }
 
     /// <summary>
     /// Das Album des Videos.
     /// </summary>
-    public string? Album { get; }
+    public string? Album { get; private set; }
 
     /// <summary>
     /// Das Titelbild (Artwork) des Videos.
     /// </summary>
-    public byte[]? Artwork { get; }
+    public byte[]? Artwork { get; private set; }
 
     /// <summary>
     /// Der MIME-Typ des Titelbilds (Artwork) des Videos.
     /// </summary>
-    public string? ArtworkMimeType { get; }
+    public string? ArtworkMimeType { get; private set; }
 
     /// <summary>
     /// Die Dateiendung des Titelbilds (Artwork) des Videos.
     /// </summary>
-    public string? ArtworkExtension { get; }
+    public string? ArtworkExtension { get; private set; }
 
     private MediaFileMetadata(string title, string? titleSort, string? description, uint? year, string? album, byte[]? artwork, string? artworkMimeType, string? artworkExtension)
     {
@@ -61,6 +61,16 @@ public class MediaFileMetadata
         ArtworkExtension = artworkExtension;
     }
 
+    private MediaFileMetadata(string title) => Title = title;
+
+    public static Result<MediaFileMetadata> Create(string title)
+    {
+        if (string.IsNullOrWhiteSpace(title))
+            return Result.Failure<MediaFileMetadata>("Title is empty.");
+
+        return new MediaFileMetadata(title);
+    }
+
     public static Result<MediaFileMetadata> Create(string title, string? titleSort, string? description, uint? year, string? album, byte[]? artwork, string? artworkMimeType, string? artworkExtension)
     {
         // Prüfe, ob der Titel leer ist
@@ -68,5 +78,15 @@ public class MediaFileMetadata
             return Result.Failure<MediaFileMetadata>("Title is empty.");
 
         return new MediaFileMetadata(title, titleSort, description, year, album, artwork, artworkMimeType, artworkExtension);
+    }
+
+    public void WithDescription(string description) => Description = description;
+    public void WithYear(uint year) => Year = year;
+    public void WithAlbum(string album) => Album = album;
+    public void WithArtwork(byte[] artwork, string mimeType, string extension)
+    {
+        Artwork = artwork;
+        ArtworkMimeType = mimeType;
+        ArtworkExtension = extension;
     }
 }
