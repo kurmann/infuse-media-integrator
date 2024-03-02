@@ -35,6 +35,7 @@ public class MediaLibraryQuery(string mediaLibraryPath) : IQueryService<List<IMe
         // Wenn spezifische Eigenschaften angegeben sind, suche nach Medien-Dateien im Medienverzeichnis.
         if (SpecificProperties is not null)
         {
+
         }
 
         return new Result<List<IMediaFileType>>();
@@ -78,7 +79,7 @@ public class MediaLibraryQuery(string mediaLibraryPath) : IQueryService<List<IMe
         // Suche nach Medien-Dateien im Medienverzeichnis.
         try
         {
-            var iMediaFiles = SearchFiles(mediaLibraryDirectory, id);
+            var iMediaFiles = SearchDirectoriesQuery.SearchFiles(mediaLibraryDirectory, id);
 
             // Erstelle eine Liste von Medien-Dateien.
             var mediaFiles = new List<IMediaFileType>();
@@ -106,42 +107,7 @@ public class MediaLibraryQuery(string mediaLibraryPath) : IQueryService<List<IMe
         }
     }
 
-    /// <summary>
-    /// Diese Klasse bietet eine Methode zur rekursiven Suche nach Dateien in einem Verzeichnisbaum.
-    /// Die Suche basiert auf einem Startverzeichnis und einem Text, mit dem die Dateinamen beginnen sollen.
-    /// Wir verwenden die Methode `EnumerateDirectories` aus dem `System.IO`-Namespace, um durch die Verzeichnisse zu iterieren.
-    /// </summary>
-    /// <remarks>
-    /// `EnumerateDirectories` wird gegenüber `GetDirectories` bevorzugt, da es eine effizientere Art der Iteration bietet.
-    /// Statt alle Verzeichnispfade sofort in den Speicher zu laden, liefert `EnumerateDirectories` einen Enumerator,
-    /// der die Verzeichnisse nach und nach durchläuft. Dies ist besonders nützlich für die Arbeit mit großen Dateisystemen,
-    /// da es den Speicherverbrauch reduziert und die Performance verbessert, indem es die Verzeichnisse verzögert lädt.
-    /// So kann die Anwendung mit Verzeichnisstrukturen arbeiten, ohne dass der Speicherbedarf stark ansteigt oder die Anwendung verlangsamt wird.
-    /// </remarks>
-    /// <exception cref="ArgumentNullException">Das Startverzeichnis ist `null` oder leer.</exception>
-    /// <exception cref="ArgumentException">Das Startverzeichnis ist nicht vorhanden oder nicht zugänglich.</exception>
-    /// <exception cref="UnauthorizedAccessException">Der Zugriff auf das Startverzeichnis wurde verweigert.</exception>
-    /// <exception cref="DirectoryNotFoundException">Das Startverzeichnis wurde nicht gefunden.</exception>
-    static IEnumerable<string> SearchFiles(string startDirectory, string searchText)
-    {
-        Queue<string> directories = new();
-        directories.Enqueue(startDirectory);
 
-        while (directories.Count > 0)
-        {
-            string currentDirectory = directories.Dequeue();
-
-            foreach (var file in Directory.EnumerateFiles(currentDirectory, $"{searchText}*", SearchOption.TopDirectoryOnly))
-            {
-                yield return file;
-            }
-
-            foreach (var subdir in Directory.EnumerateDirectories(currentDirectory))
-            {
-                directories.Enqueue(subdir);
-            }
-        }
-    }
 }
 
 public class MediaLibrarySpecificProperties
@@ -154,9 +120,10 @@ public class MediaLibrarySpecificProperties
     /// </summary>
     /// <param name="title"></param>
     /// <returns></returns>
-    public void WithTitle(string title)
+    public MediaLibrarySpecificProperties WithTitle(string title)
     {
         Title = title;
+        return this;
     }
 
     /// <summary>
@@ -164,8 +131,10 @@ public class MediaLibrarySpecificProperties
     /// </summary>
     /// <param name="date"></param>
     /// <returns></returns>
-    public void WithDate(DateOnly date)
+    public MediaLibrarySpecificProperties WithDate(DateOnly date)
     {
         Date = date;
+        return this;
     }
 }
+
