@@ -34,10 +34,9 @@ public class DirectoryNameInfo
         if (Path.IsPathRooted(name))
             return Result.Failure<DirectoryNameInfo>("Name is a directory path");
 
-        // Prüfe auf unzulässige Zeichen im Pfad
-        char[] invalidPathChars = Path.GetInvalidPathChars();
-        if (name.Any(c => invalidPathChars.Contains(c)))
-            return Result.Failure<DirectoryNameInfo>("Name contains invalid characters: " + string.Join(", ", invalidPathChars));
+        // Prüfe auf unzulässige Zeichen im Verzeichnisnamen
+        if (CrossPlatformInvalidCharsHandler.ContainsInvalidChars(name))
+            return Result.Failure<DirectoryNameInfo>("Name contains invalid characters: " + string.Join(", ", CrossPlatformInvalidCharsHandler.InvalidChars));
 
         return Result.Success(new DirectoryNameInfo(name));
     }

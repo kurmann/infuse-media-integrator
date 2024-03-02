@@ -51,10 +51,23 @@ public class DirectoryPathInfo
         }
 
         // Prüfe auf unzulässige Zeichen im Pfad
-
-        if (CrossPlatformInvalidCharsHandler.ContainsInvalidChars(path))
+        if (CrossPlatformInvalidCharsHandler.ContainsInvalidPathCharsInWindowsPath(path))
         {
-            return Result.Failure<DirectoryPathInfo>("Path contains invalid characters: " + string.Join(", ", CrossPlatformInvalidCharsHandler.PrintableInvalidChars));
+            return Result.Failure<DirectoryPathInfo>("Path contains invalid characters for Windows paths: " + string.Join(", ", CrossPlatformInvalidCharsHandler.InvalidCharsForWindowsPaths));
+        }
+        if (CrossPlatformInvalidCharsHandler.ContainsInvalidPathCharsInUnixPath(path))
+        {
+            return Result.Failure<DirectoryPathInfo>("Path contains invalid characters for Unix paths: " + string.Join(", ", CrossPlatformInvalidCharsHandler.InvalidCharsForUnixPaths));
+        }
+
+        // Prüfe jedes Verzeichnis auf unzulässige Zeichen
+        var directories = path.Split(Path.DirectorySeparatorChar);
+        foreach (var directory in directories)
+        {
+            if (CrossPlatformInvalidCharsHandler.ContainsInvalidChars(directory))
+            {
+                return Result.Failure<DirectoryPathInfo>($"Directory '{directory}' contains invalid characters: " + string.Join(", ", CrossPlatformInvalidCharsHandler.InvalidChars));
+            }
         }
 
         return Result.Success(new DirectoryPathInfo(path));

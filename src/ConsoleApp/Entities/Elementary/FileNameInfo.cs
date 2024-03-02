@@ -46,10 +46,9 @@ public class FileNameInfo
         fileName = Path.GetFileName(fileName);
 
         // Prüfe auf unzulässige Zeichen im Dateinamen
-        char[] invalidFileNameChars = Path.GetInvalidFileNameChars();
-        if (fileName.Any(c => invalidFileNameChars.Contains(c)))
+        if (CrossPlatformInvalidCharsHandler.ContainsInvalidChars(fileName))
         {
-            return Result.Failure<FileNameInfo>("File name contains invalid characters: " + string.Join(", ", invalidFileNameChars));
+            return Result.Failure<FileNameInfo>("File name contains invalid characters: " + string.Join(", ", CrossPlatformInvalidCharsHandler.InvalidChars));
         }
 
         return Result.Success(new FileNameInfo(fileName));

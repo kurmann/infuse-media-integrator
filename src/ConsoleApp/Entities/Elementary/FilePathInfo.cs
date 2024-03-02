@@ -38,28 +38,30 @@ public class FilePathInfo
             return Result.Failure<FilePathInfo>("Path is null or empty");
         }
 
-        // Prüfe auf unzulässige Zeichen im Pfad
-        char[] invalidPathChars = Path.GetInvalidPathChars();
-        if (filePath.Any(c => invalidPathChars.Contains(c)))
-        {
-            return Result.Failure<FilePathInfo>("Path contains invalid characters: " + string.Join(", ", invalidPathChars));
-        }
-
         // Prüft, ob der Pfad nicht nur ein Verzeichnis ist
         if (!Path.HasExtension(filePath))
         {
             return Result.Failure<FilePathInfo>("Path is not a file");
         }
 
-        // Prüfe auf unzulässige Zeichen im Dateinamen, falls ein Dateiname vorhanden ist
-        string fileName = Path.GetFileName(filePath);
-        if (!string.IsNullOrEmpty(fileName))
+        // Extrahiere den Verzeichnispfad (ohne die Datei)
+        var directoryPath = Path.GetDirectoryName(filePath);
+
+        // Validiere den Verzeichnispfad
+        var directoryPathResult = DirectoryPathInfo.Create(directoryPath);
+        if (directoryPathResult.IsFailure)
         {
-            char[] invalidFileNameChars = Path.GetInvalidFileNameChars();
-            if (fileName.Any(c => invalidFileNameChars.Contains(c)))
-            {
-                return Result.Failure<FilePathInfo>("File name contains invalid characters: " + string.Join(", ", invalidFileNameChars));
-            }
+            return Result.Failure<FilePathInfo>("Path contains invalid characters: " + directoryPathResult.Error);
+        }
+
+        // Extrahiere den Dateinamen
+        var fileName = Path.GetFileName(filePath);
+
+        // Validiere den Dateinamen
+        var fileNameResult = FileNameInfo.Create(fileName);
+        if (fileNameResult.IsFailure)
+        {
+            return Result.Failure<FilePathInfo>("File name contains invalid characters: " + fileNameResult.Error);
         }
 
         return new FilePathInfo(filePath);
