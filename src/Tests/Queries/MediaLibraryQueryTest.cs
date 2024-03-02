@@ -1,25 +1,24 @@
 using Kurmann.InfuseMediaIntegrator.Queries;
 
-namespace Kurmann.InfuseMediaIntegrator.Tests.Queries
+namespace Kurmann.InfuseMediaIntegrator.Tests.Queries;
+
+[TestClass]
+public class MediaLibraryQueryTests
 {
-    [TestClass]
-    public class MediaLibraryQueryTests
+    public const string MediaLibraryPath = "Data/Outout/Mediathek";
+
+    [TestMethod]
+    public void Execute_ShouldReturnFailure_WhenMediaLibraryPathIsEmpty()
     {
-        public const string MediaLibraryPath = "Data/Outout/Mediathek";
+        // Arrange
+        var query = new MediaLibraryQuery(string.Empty);
 
-        [TestMethod]
-        public void Execute_ShouldReturnFailure_WhenMediaLibraryPathIsEmpty()
-        {
-            // Arrange
-            var query = new MediaLibraryQuery(string.Empty);
+        // Act
+        var result = query.Execute();
 
-            // Act
-            var result = query.Execute();
-
-            // Assert
-            Assert.IsFalse(result.IsSuccess);
-            Assert.IsNotNull(result.Error);
-            Assert.AreEqual("Media library path is empty.", result.Error);
-        }
+        // Assert
+        Assert.IsFalse(result.IsSuccess);
+        Assert.IsNotNull(result.Error);
+        Assert.AreEqual("Media library path is empty.", result.Error);
     }
 }
