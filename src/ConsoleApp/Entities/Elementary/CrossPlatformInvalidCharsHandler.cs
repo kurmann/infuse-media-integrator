@@ -23,13 +23,20 @@ public class CrossPlatformInvalidCharsHandler
     /// </summary>
     public static readonly List<char> InvalidChars;
 
+    /// <summary>
+    /// Liste der ungültigen Zeichen für Datei- und Verzeichnisnamen, die druckbar sind.
+    /// </summary>
+    public static List<char> PrintableInvalidChars => InvalidChars.Where(c => c >= 32).ToList();
+
     static CrossPlatformInvalidCharsHandler()
     {
+        // Windows-spezifische ungültige Zeichen
         InvalidChars =
         [
-            '<', '>', ':', '"', '/', '\\', '|', '?', '*' // Windows-spezifische ungültige Zeichen
+            '<', '>', ':', '"', '/', '\\', '|', '?', '*' 
         ];
 
+        // Füge Steuerzeichen hinzu
         for (int i = 0; i < 32; i++)
         {
             InvalidChars.Add((char)i);
