@@ -57,7 +57,7 @@ public interface ICanSetProperty
 {
     ICanSetProperty WithTitle(string title);
     ICanSetProperty WithDate(DateOnly date);
-    ICanQueryMediaLibraryByProperties Query();
+    ICanQueryByProperties Query();
 }
 
 internal class CanSetProperty : ICanSetProperty
@@ -83,9 +83,9 @@ internal class CanSetProperty : ICanSetProperty
         return this;
     }
 
-    public ICanQueryMediaLibraryByProperties Query()
+    public ICanQueryByProperties Query()
     {
-        return new CanQueryMediaLibraryByProperties(MediaLibraryPath, Date, Title);
+        return new CanQueryByProperties(MediaLibraryPath, Date, Title);
     }
 
 }
@@ -121,13 +121,13 @@ internal class CanQueryById(string mediaLibraryPath, string id) : ICanQueryById,
     }
 }
 
-public interface ICanQueryMediaLibraryByProperties
+public interface ICanQueryByProperties
 {
     Result<List<IMediaFileType>> Execute();
 }
 
-internal class CanQueryMediaLibraryByProperties(string mediaLibraryPath, DateOnly? date = null, string? title = null) :
-    ICanQueryMediaLibraryByProperties, IQueryService<List<IMediaFileType>>
+internal class CanQueryByProperties(string mediaLibraryPath, DateOnly? date = null, string? title = null) :
+    ICanQueryByProperties, IQueryService<List<IMediaFileType>>
 {
     private string MediaLibraryPath { get; set; } = mediaLibraryPath;
     private DateOnly? Date { get; set; } = date;
