@@ -27,16 +27,30 @@ public class MediaFileTypeDetector
         }
     }
 
-    public static Result<IMediaFileType> GetMediaFile(FilePathInfo filePath)
+    public static Result<List<IMediaFileType>> GetMediaFile(IEnumerable<string> paths)
     {
-        try
+        var mediaFiles = new List<IMediaFileType>();
+        foreach (var path in paths)
         {
-            return GetMediaFileType(filePath.FilePath, filePath);
+            var mediaFile = GetMediaFile(path);
+            if (mediaFile.IsFailure)
+                return Result.Failure<List<IMediaFileType>>($"Error on reading file info: {mediaFile.Error}");
+            mediaFiles.Add(mediaFile.Value);
         }
-        catch (Exception e)
+        return mediaFiles;
+    }
+
+    public static Result<List<IMediaFileType>> GetMediaFiles(IEnumerable<string> paths)
+    {
+        var mediaFiles = new List<IMediaFileType>();
+        foreach (var path in paths)
         {
-            return Result.Failure<IMediaFileType>($"Error on reading file info: {e.Message}");
+            var mediaFile = GetMediaFile(path);
+            if (mediaFile.IsFailure)
+                return Result.Failure<List<IMediaFileType>>($"Error on reading file info: {mediaFile.Error}");
+            mediaFiles.Add(mediaFile.Value);
         }
+        return mediaFiles;
     }
 
     private static Result<IMediaFileType> GetMediaFileType(string path, Result<FilePathInfo> filePath)

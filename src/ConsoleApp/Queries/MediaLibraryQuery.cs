@@ -133,7 +133,32 @@ internal class CanSetProperty : ICanSetProperty
 
         public Result<List<IMediaFileType>> Execute()
         {
-            throw new NotImplementedException();
+            // Prüfen, ob das Medienverzeichnis angegeben ist.
+            if (string.IsNullOrWhiteSpace(MediaLibraryPath))
+                return Result.Failure<List<IMediaFileType>>("Media library path is empty.");
+
+            // Prüfe, ob das Verzeichnis gültig ist
+            var mediaLibraryDirectory = DirectoryPathInfo.Create(MediaLibraryPath);
+            if (mediaLibraryDirectory.IsFailure)
+                return Result.Failure<List<IMediaFileType>>($"An error occurred while searching the media library: {mediaLibraryDirectory.Error}");
+
+            // Prüfe ob Datum oder Titel angegeben sind.
+            if (Date is null && string.IsNullOrWhiteSpace(Title))
+                return Result.Failure<List<IMediaFileType>>("Date and title are empty. At least one of them must be set.");
+
+            // Das Datum wird nur am Anfang des Dateinamens gesucht.
+            if (Date is not null)
+            {
+                // Suche nach Medien-Dateien im Medienverzeichnis.
+                var dateSearchText = Date.Value.ToString("yyyy-MM-dd");
+                var dateSearchResult = SearchDirectoriesQuery.SearchFiles(mediaLibraryDirectory.Value, dateSearchText, true);
+
+                // Gib die gefundenen Medien-Dateien zurück.
+                return MediaFileTypeDetector.GetMediaFiles(dateSearchResult);
+            }
+
+            // Suche nach Medien-Dateien im Medienverzeichnis.
+            return MediaLibraryQueryBase.SearchMediaLibrary(mediaLibraryDirectory.Value, Id, true);
         }
     }
 }
@@ -160,27 +185,11 @@ internal abstract class MediaLibraryQueryBase
         // Suche nach Medien-Dateien im Medienverzeichnis.
         try
         {
+            // Suche nach Medien-Dateien im Medienverzeichnis.
             var iMediaFiles = SearchDirectoriesQuery.SearchFiles(mediaLibraryDirectory, id, searchAtBeginningOnly);
 
-            // Erstelle eine Liste von Medien-Dateien.
-            var mediaFiles = new List<IMediaFileType>();
-
-            // Initialisiere die Medien-Dateien und füge sie als Ergebnis hinzu.
-            foreach (var iMediaFile in iMediaFiles)
-            {
-                var mediaFile = MediaFileTypeDetector.GetMediaFile(iMediaFile);
-                if (mediaFile.IsFailure)
-                {
-                    return Result.Failure<List<IMediaFileType>>($"An error occurred while searching the media library: {mediaFile.Error}");
-                }
-                else
-                {
-                    mediaFiles.Add(mediaFile.Value);
-                }
-            }
-
-            // Gib die Liste der Medien-Dateien zurück.
-            return mediaFiles;
+            // Gib die gefundenen Medien-Dateien zurück.
+            return MediaFileTypeDetector.GetMediaFiles(iMediaFiles);
         }
         catch (Exception ex)
         {
