@@ -1,13 +1,12 @@
 using CSharpFunctionalExtensions;
 using Kurmann.InfuseMediaIntegrator.Entities.Elementary;
 using Kurmann.InfuseMediaIntegrator.Entities.MediaFileTypes;
-using TagLib.Id3v2;
 
 namespace Kurmann.InfuseMediaIntegrator.Queries;
 
 public interface ICanDecideBetweenIdAndSpecificProperties
 {
-    ICanQuery ById(string id);
+    ICanQueryById ById(string id);
     ICanSetProperty ByProperties();
 }
 
@@ -17,9 +16,9 @@ public class MediaLibraryQuery(string mediaLibraryPath) : ICanDecideBetweenIdAnd
 
     private MediaLibraryQuery() : this(string.Empty) { }
 
-    public ICanQuery ById(string id)
+    public ICanQueryById ById(string id)
     {
-        return new CanQuery(MediaLibraryPath, id);
+        return new CanQueryById(MediaLibraryPath, id);
     }
 
     public ICanSetProperty ByProperties()
@@ -38,9 +37,9 @@ internal class CanDecideBetweenIdAndSpecificProperties(string mediaLibraryPath) 
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    public ICanQuery ById(string id)
+    public ICanQueryById ById(string id)
     {
-        return new CanQuery(MediaLibraryPath, id);
+        return new CanQueryById(MediaLibraryPath, id);
     }
 
     /// <summary>
@@ -56,8 +55,9 @@ internal class CanDecideBetweenIdAndSpecificProperties(string mediaLibraryPath) 
 
 public interface ICanSetProperty
 {
-    ICanQueryMediaLibraryByProperties WithTitle(string title);
-    ICanQueryMediaLibraryByProperties WithDate(DateOnly date);
+    ICanSetProperty WithTitle(string title);
+    ICanSetProperty WithDate(DateOnly date);
+    ICanQueryMediaLibraryByProperties Query();
 }
 
 internal class CanSetProperty : ICanSetProperty
@@ -88,78 +88,104 @@ internal class CanSetProperty : ICanSetProperty
         return new CanQueryMediaLibraryByProperties(MediaLibraryPath, Date, Title);
     }
 
-    public interface ICanQueryById
+}
+
+public interface ICanQueryById
+{
+    Result<List<IMediaFileType>> Execute();
+}
+
+internal class CanQueryById(string mediaLibraryPath, string id) : ICanQueryById, IQueryService<List<IMediaFileType>>
+{
+    private string MediaLibraryPath { get; set; } = mediaLibraryPath;
+    private string Id { get; set; } = id;
+
+    public Result<List<IMediaFileType>> Execute()
     {
-        Result<List<IMediaFileType>> Execute();
+        // Prüfen, ob das Medienverzeichnis angegeben ist.
+        if (string.IsNullOrWhiteSpace(MediaLibraryPath))
+            return Result.Failure<List<IMediaFileType>>("Media library path is empty.");
+
+        // Prüfe, ob das Verzeichnis gültig ist
+        var mediaLibraryDirectory = DirectoryPathInfo.Create(MediaLibraryPath);
+        if (mediaLibraryDirectory.IsFailure)
+            return Result.Failure<List<IMediaFileType>>($"An error occurred while searching the media library: {mediaLibraryDirectory.Error}");
+
+        // Prüfen, ob die ID angegeben ist.
+        if (string.IsNullOrWhiteSpace(Id))
+            return Result.Failure<List<IMediaFileType>>("ID is empty.");
+
+        // Suche nach Medien-Dateien im Medienverzeichnis.
+        var searchAtBeginningOnly = true;
+        return MediaLibraryQueryBase.SearchMediaLibrary(mediaLibraryDirectory.Value, Id, searchAtBeginningOnly);
     }
+}
 
-    internal class CanQueryById(string mediaLibraryPath, string id) : ICanQueryById, IQueryService<List<IMediaFileType>>
+public interface ICanQueryMediaLibraryByProperties
+{
+    Result<List<IMediaFileType>> Execute();
+}
+
+internal class CanQueryMediaLibraryByProperties(string mediaLibraryPath, DateOnly? date = null, string? title = null) :
+    ICanQueryMediaLibraryByProperties, IQueryService<List<IMediaFileType>>
+{
+    private string MediaLibraryPath { get; set; } = mediaLibraryPath;
+    private DateOnly? Date { get; set; } = date;
+    private string? Title { get; set; } = title;
+
+    public Result<List<IMediaFileType>> Execute()
     {
-        private string MediaLibraryPath { get; set; } = mediaLibraryPath;
-        private string Id { get; set; } = id;
+        // Prüfen, ob das Medienverzeichnis angegeben ist.
+        if (string.IsNullOrWhiteSpace(MediaLibraryPath))
+            return Result.Failure<List<IMediaFileType>>("Media library path is empty.");
 
-        public Result<List<IMediaFileType>> Execute()
+        // Prüfe, ob das Verzeichnis gültig ist
+        var mediaLibraryDirectory = DirectoryPathInfo.Create(MediaLibraryPath);
+        if (mediaLibraryDirectory.IsFailure)
+            return Result.Failure<List<IMediaFileType>>($"An error occurred while searching the media library: {mediaLibraryDirectory.Error}");
+
+        // Prüfe ob Datum oder Titel angegeben sind.
+        if (Date is null && string.IsNullOrWhiteSpace(Title))
+            return Result.Failure<List<IMediaFileType>>("Date and title are empty. At least one of them must be set.");
+
+        // Wenn beide Eigenschaften angegeben sind, suche nach beiden.
+        if (Date is not null && !string.IsNullOrWhiteSpace(Title))
         {
-            // Prüfen, ob das Medienverzeichnis angegeben ist.
-            if (string.IsNullOrWhiteSpace(MediaLibraryPath))
-                return Result.Failure<List<IMediaFileType>>("Media library path is empty.");
-
-            // Prüfe, ob das Verzeichnis gültig ist
-            var mediaLibraryDirectory = DirectoryPathInfo.Create(MediaLibraryPath);
-            if (mediaLibraryDirectory.IsFailure)
-                return Result.Failure<List<IMediaFileType>>($"An error occurred while searching the media library: {mediaLibraryDirectory.Error}");
-
-            // Prüfen, ob die ID angegeben ist.
-            if (string.IsNullOrWhiteSpace(Id))
-                return Result.Failure<List<IMediaFileType>>("ID is empty.");
+            // Suche nach Medien-Dateien im Medienverzeichnis.
+            var dateSearchText = Date.Value.ToString("yyyy-MM-dd");
+            var titleSearchText = Title;
+            var andSearchText = new List<string> { dateSearchText, titleSearchText };
 
             // Suche nach Medien-Dateien im Medienverzeichnis.
-            var searchAtBeginningOnly = true;
-            return MediaLibraryQueryBase.SearchMediaLibrary(mediaLibraryDirectory.Value, Id, searchAtBeginningOnly);
+            var searchResult = SearchDirectoriesQuery.SearchFiles(mediaLibraryDirectory.Value, andSearchText);
+
+            // Gib die gefundenen Medien-Dateien zurück.
+            return MediaFileTypeDetector.GetMediaFiles(searchResult);
         }
-    }
 
-    public interface ICanQueryMediaLibraryByProperties
-    {
-        Result<List<IMediaFileType>> Execute();
-    }
-
-    internal class CanQueryMediaLibraryByProperties(string mediaLibraryPath, DateOnly? date = null, string? title = null) :
-        ICanQueryMediaLibraryByProperties, IQueryService<List<IMediaFileType>>
-    {
-        private string MediaLibraryPath { get; set; } = mediaLibraryPath;
-        private DateOnly? Date { get; set; } = date;
-        private string? Title { get; set; } = title;
-
-        public Result<List<IMediaFileType>> Execute()
+        // Das Datum wird nur am Anfang des Dateinamens gesucht.
+        if (Date is not null)
         {
-            // Prüfen, ob das Medienverzeichnis angegeben ist.
-            if (string.IsNullOrWhiteSpace(MediaLibraryPath))
-                return Result.Failure<List<IMediaFileType>>("Media library path is empty.");
-
-            // Prüfe, ob das Verzeichnis gültig ist
-            var mediaLibraryDirectory = DirectoryPathInfo.Create(MediaLibraryPath);
-            if (mediaLibraryDirectory.IsFailure)
-                return Result.Failure<List<IMediaFileType>>($"An error occurred while searching the media library: {mediaLibraryDirectory.Error}");
-
-            // Prüfe ob Datum oder Titel angegeben sind.
-            if (Date is null && string.IsNullOrWhiteSpace(Title))
-                return Result.Failure<List<IMediaFileType>>("Date and title are empty. At least one of them must be set.");
-
-            // Das Datum wird nur am Anfang des Dateinamens gesucht.
-            if (Date is not null)
-            {
-                // Suche nach Medien-Dateien im Medienverzeichnis.
-                var dateSearchText = Date.Value.ToString("yyyy-MM-dd");
-                var dateSearchResult = SearchDirectoriesQuery.SearchFiles(mediaLibraryDirectory.Value, dateSearchText, true);
-
-                // Gib die gefundenen Medien-Dateien zurück.
-                return MediaFileTypeDetector.GetMediaFiles(dateSearchResult);
-            }
-
             // Suche nach Medien-Dateien im Medienverzeichnis.
-            return MediaLibraryQueryBase.SearchMediaLibrary(mediaLibraryDirectory.Value, Id, true);
+            var dateSearchText = Date.Value.ToString("yyyy-MM-dd");
+            var dateSearchResult = SearchDirectoriesQuery.SearchFiles(mediaLibraryDirectory.Value, dateSearchText, true);
+
+            // Gib die gefundenen Medien-Dateien zurück.
+            return MediaFileTypeDetector.GetMediaFiles(dateSearchResult);
         }
+
+        // Der Titel wird im Dateinamen gesucht.
+        if (!string.IsNullOrWhiteSpace(Title))
+        {
+            // Suche nach Medien-Dateien im Medienverzeichnis.
+            var titleSearchResult = SearchDirectoriesQuery.SearchFiles(mediaLibraryDirectory.Value, Title, false);
+
+            // Gib die gefundenen Medien-Dateien zurück.
+            return MediaFileTypeDetector.GetMediaFiles(titleSearchResult);
+        }
+
+        // Wenn keine der Bedingungen zutrifft, gib eine leere Liste zurück.
+        return new List<IMediaFileType>();
     }
 }
 

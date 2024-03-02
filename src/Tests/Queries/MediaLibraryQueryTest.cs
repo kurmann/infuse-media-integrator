@@ -11,7 +11,7 @@ public class MediaLibraryQueryTests
     public void Execute_ShouldReturnFailure_WhenMediaLibraryPathIsEmpty()
     {
         // Arrange
-        var query = new MediaLibraryQuery(string.Empty);
+        var query = new MediaLibraryQuery(string.Empty).ById(string.Empty);
 
         // Act
         var result = query.Execute();
@@ -26,7 +26,24 @@ public class MediaLibraryQueryTests
     public void WithId_ShouldReturnCorrectResult_WhenIdIsSet()
     {
         // Arrange
-        var query = new MediaLibraryQuery(MediaLibraryPath).WithId("2024-02-16 Krokus Testaufnahme");
+        var query = new MediaLibraryQuery(MediaLibraryPath).ById("2024-02-16 Krokus Testaufnahme");
+
+        // Act
+        var result = query.Execute();
+
+        // Assert
+        Assert.IsTrue(result.IsSuccess);
+        Assert.IsNotNull(result.Value);
+        Assert.AreEqual(2, result.Value.Count);
+        Assert.AreEqual("2024-02-16 Krokus Testaufnahme.m4v", result.Value[0].FilePath.FileName);
+        Assert.AreEqual("2024-02-16 Krokus Testaufnahme-fanart.jpg", result.Value[1].FilePath.FileName);
+    }
+
+    [TestMethod] // Suche nach Aufnahme liefert korrektes Ergebnis
+    public void WithRecording_ShouldReturnCorrectResult_WhenDateIsSet()
+    {
+        // Arrange
+        var query = new MediaLibraryQuery(MediaLibraryPath).ByProperties().WithDate(new DateOnly(2024, 2, 16)).Query();
 
         // Act
         var result = query.Execute();
