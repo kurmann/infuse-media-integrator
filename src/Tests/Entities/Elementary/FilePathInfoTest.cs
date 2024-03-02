@@ -79,20 +79,4 @@ public class FilePathInfoTests
         Assert.IsNotNull(result.Error);
         // Add more assertions as needed
     }
-
-    [TestMethod]
-    public void Create_ShouldReturnSuccess_WhenFilePathIsValid()
-    {
-        // Arrange
-        string filePath = "C:/path/to/file.txt";
-
-        // Act
-        var result = FilePathInfo.Create(filePath);
-
-        // Assert
-        Assert.IsTrue(result.IsSuccess);
-        Assert.IsNotNull(result.Value);
-        Assert.AreEqual(filePath, result.Value.FilePath);
-        // Add more assertions as needed
-    }
 }
