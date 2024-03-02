@@ -52,4 +52,34 @@ public class CrossPlatformInvalidCharsHandler
         }
         return false;
     }
+
+    /// <summary>
+    /// Ersetzt ungültige Zeichen im gegebenen Namen durch das gegebene Zeichen.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="replacementChar"></param>
+    /// <returns></returns>
+    public static string ReplaceInvalidChars(string name, char replacementChar)
+    {
+        foreach (char c in InvalidChars)
+        {
+            name = name.Replace(c, replacementChar);
+        }
+        return name;
+    }
+
+    /// <summary>
+    /// Ersetzt ungültige Zeichen durch Leerzeichen, um den Namen für die Verwendung in einem Dateisystem zu bereinigen.
+    /// Wenn das ungültige Zeichen zu Beginn oder am Ende des Namens steht, wird es entfernt.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    public static string ReplaceInvalidCharsWithSpaces(string name)
+    {
+        foreach (char c in InvalidChars)
+        {
+            name = name.Replace(c, ' ');
+        }
+        return name.Trim();
+    }
 }
