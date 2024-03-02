@@ -45,7 +45,11 @@ public class MediaFileLibraryOrganizationInfo
 
         // Ermittle den Ziel-Dateinamen
         var targetFileName = GetTargetFileName(mediaFile);
+        if (targetFileName.IsFailure)
+            return Result.Failure<MediaFileLibraryOrganizationInfo>($"Error on creating target file name: {targetFileName.Error}");
         var targetSubDirectory = GetTargetSubDirectoryFromMetadata(mediaFile).GetValueOrDefault() ?? GetTargetSubDirectoryFromSourcePath(mediaFile, rootDirectory);
+        if (targetSubDirectory.IsFailure)
+            return Result.Failure<MediaFileLibraryOrganizationInfo>($"Error on creating target subdirectory: {targetSubDirectory.Error}");
 
         return Result.Success(new MediaFileLibraryOrganizationInfo(targetFileName.Value, targetSubDirectory.Value));
     }
