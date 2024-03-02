@@ -21,7 +21,7 @@ public class MoveFilesToInfuseMediaLibraryCommandTests
         var result = command.Execute();
 
         // Assert
-        Assert.IsTrue(result.IsSuccess, result.Error); 
+        Assert.IsTrue(result.IsSuccess); 
         Assert.IsTrue(Directory.Exists(InfuseMediaLibraryPath));
 
         // Verify that the files are moved
@@ -33,6 +33,11 @@ public class MoveFilesToInfuseMediaLibraryCommandTests
         }
 
         // Clean up
+        foreach (var file in mpeg4VideoFiles)
+        {
+            var targetPath = Path.Combine(InfuseMediaLibraryPath, Path.GetFileName(file));
+            File.Delete(targetPath);
+        }
     }
 
     [TestMethod]
