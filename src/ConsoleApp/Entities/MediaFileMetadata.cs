@@ -61,7 +61,7 @@ public class MediaFileMetadata
         ArtworkExtension = artworkExtension;
     }
 
-    public static Result<MediaFileMetadata> Create(string title, string titleSort, string description, uint year, string album, byte[]? artwork, string? artworkMimeType, string? artworkExtension)
+    public static Result<MediaFileMetadata> Create(string title, string? titleSort, string? description, uint? year, string? album, byte[]? artwork, string? artworkMimeType, string? artworkExtension)
     {
         // Prüfe, ob der Titel leer ist
         if (string.IsNullOrWhiteSpace(title))
