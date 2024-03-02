@@ -90,15 +90,18 @@ public class MediaLibraryQuery(string mediaLibraryPath) : IQueryService<List<IMe
     /// </remarks>
     static IEnumerable<string> SearchFiles(string startDirectory, string searchText)
     {
+        // Wir verwenden eine Queue, um die Verzeichnisse zu speichern, die wir noch durchsuchen müssen.
         Queue<string> directories = new Queue<string>();
         directories.Enqueue(startDirectory);
 
+        // Wir iterieren durch die Verzeichnisse, die wir noch durchsuchen müssen.
         while (directories.Count > 0)
         {
             string currentDirectory = directories.Dequeue();
             IEnumerable<string> files;
             try
             {
+                // Wir verwenden `EnumerateFiles` aus dem `System.IO`-Namespace, um die Dateien in einem Verzeichnis zu durchsuchen.
                 files = Directory.EnumerateFiles(currentDirectory, $"{searchText}*", SearchOption.TopDirectoryOnly);
             }
             catch (UnauthorizedAccessException)
@@ -117,6 +120,7 @@ public class MediaLibraryQuery(string mediaLibraryPath) : IQueryService<List<IMe
 
             try
             {
+                // Wir verwenden `EnumerateDirectories` aus dem `System.IO`-Namespace, um die Verzeichnisse in einem Verzeichnis zu durchsuchen.
                 var subdirectories = Directory.EnumerateDirectories(currentDirectory);
                 foreach (var subdir in subdirectories)
                 {
