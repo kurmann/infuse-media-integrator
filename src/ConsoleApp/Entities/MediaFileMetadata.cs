@@ -32,7 +32,7 @@ public class MediaFileMetadata
     /// <summary>
     /// Das Album des Videos.
     /// </summary>
-    public string Album { get; }
+    public string? Album { get; }
 
     /// <summary>
     /// Das Titelbild (Artwork) des Videos.
@@ -49,7 +49,7 @@ public class MediaFileMetadata
     /// </summary>
     public string? ArtworkExtension { get; }
 
-    private MediaFileMetadata(string title, string titleSort, string description, uint year, string album, byte[]? artwork, string? artworkMimeType, string? artworkExtension)
+    private MediaFileMetadata(string title, string? titleSort, string? description, uint? year, string? album, byte[]? artwork, string? artworkMimeType, string? artworkExtension)
     {
         Title = title;
         TitleSort = titleSort;
