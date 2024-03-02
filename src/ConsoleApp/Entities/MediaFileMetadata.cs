@@ -80,13 +80,29 @@ public class MediaFileMetadata
         return new MediaFileMetadata(title, titleSort, description, year, album, artwork, artworkMimeType, artworkExtension);
     }
 
-    public void WithDescription(string description) => Description = description;
-    public void WithYear(uint year) => Year = year;
-    public void WithAlbum(string album) => Album = album;
-    public void WithArtwork(byte[] artwork, string mimeType, string extension)
+    public MediaFileMetadataa WithDescription(string description)
+    {
+        Description = description;
+        return this;
+    }
+
+    public MediaFileMetadata WithYear(uint year)
+    {
+        Year = year;
+        return this;
+    }
+
+    public MediaFileMetadata WithAlbum(string album)
+    {
+        Album = album;
+        return this;
+    }
+
+    public MediaFileMetadata WithArtwork(byte[] artwork, string mimeType, string extension)
     {
         Artwork = artwork;
         ArtworkMimeType = mimeType;
         ArtworkExtension = extension;
+        return this;
     }
 }
