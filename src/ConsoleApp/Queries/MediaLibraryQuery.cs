@@ -1,5 +1,8 @@
+using System.Net;
 using CSharpFunctionalExtensions;
+using Kurmann.InfuseMediaIntegrator.Entities.Elementary;
 using Kurmann.InfuseMediaIntegrator.Entities.MediaFileTypes;
+using Kurmann.InfuseMediaIntegrator.Entities.MediaLibrary;
 
 namespace Kurmann.InfuseMediaIntegrator.Queries;
 
@@ -35,8 +38,21 @@ public class MediaLibraryQuery(string mediaLibraryPath) : IQueryService<List<IMe
     /// <returns></returns>
     public Result<List<IMediaFileType>> Execute()
     {
+        // Prüfen, ob das Medienverzeichnis angegeben ist.
         if (string.IsNullOrWhiteSpace(MediaLibraryPath))
             return Result.Failure<List<IMediaFileType>>("Media library path is empty.");
+
+        // Wenn eine ID angegeben ist, suche nach Medien-Dateien im Medienverzeichnis.
+        if (!string.IsNullOrWhiteSpace(Id))
+        {
+            // Prüfe, ob das Verzeichnis gültig ist
+            var mediaLibraryDirectory = DirectoryPathInfo.Create(MediaLibraryPath);
+            if (mediaLibraryDirectory.IsFailure)
+                return Result.Failure<List<IMediaFileType>>($"An error occurred while searching the media library: {mediaLibraryDirectory.Error}");
+
+            // Suche nach Medien-Dateien im Medienverzeichnis.
+            return SearchMediaLibrary(mediaLibraryDirectory.Value, Id);
+        }
 
         return new Result<List<IMediaFileType>>();
     }
@@ -76,6 +92,47 @@ public class MediaLibraryQuery(string mediaLibraryPath) : IQueryService<List<IMe
         return this;
     }
 
+    private static Result<List<IMediaFileType>> SearchMediaLibrary(DirectoryPathInfo? mediaLibraryDirectory, string? id)
+    {
+        // Prüfen, ob das Medienverzeichnis existiert.
+        if (mediaLibraryDirectory is null)
+            return Result.Failure<List<IMediaFileType>>("Media library directory does not exist.");
+
+        // Wenn keine ID angegeben ist, gib eine leere Liste zurück.
+        if (id is null)
+            return new List<IMediaFileType>();
+
+        // Suche nach Medien-Dateien im Medienverzeichnis.
+        try 
+        {
+            var iMediaFiles = SearchFiles(mediaLibraryDirectory, id);
+
+            // Erstelle eine Liste von Medien-Dateien.
+            var mediaFiles = new List<IMediaFileType>();
+
+            // Initialisiere die Medien-Dateien und füge sie als Ergebnis hinzu.
+            foreach (var iMediaFile in iMediaFiles)
+            {
+                var mediaFile = MediaFileTypeDetector.GetMediaFile(iMediaFile);
+                if (mediaFile.IsFailure)
+                {
+                    return Result.Failure<List<IMediaFileType>>($"An error occurred while searching the media library: {mediaFile.Error}");
+                }
+                else
+                {
+                    mediaFiles.Add(mediaFile.Value);
+                }
+            }
+
+            // Gib die Liste der Medien-Dateien zurück.
+            return mediaFiles;
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure<List<IMediaFileType>>($"An error occurred while searching the media library: {ex.Message}");
+        }
+    }
+
     /// <summary>
     /// Diese Klasse bietet eine Methode zur rekursiven Suche nach Dateien in einem Verzeichnisbaum.
     /// Die Suche basiert auf einem Startverzeichnis und einem Text, mit dem die Dateinamen beginnen sollen.
@@ -88,52 +145,27 @@ public class MediaLibraryQuery(string mediaLibraryPath) : IQueryService<List<IMe
     /// da es den Speicherverbrauch reduziert und die Performance verbessert, indem es die Verzeichnisse verzögert lädt.
     /// So kann die Anwendung mit Verzeichnisstrukturen arbeiten, ohne dass der Speicherbedarf stark ansteigt oder die Anwendung verlangsamt wird.
     /// </remarks>
+    /// <exception cref="ArgumentNullException">Das Startverzeichnis ist `null` oder leer.</exception>
+    /// <exception cref="ArgumentException">Das Startverzeichnis ist nicht vorhanden oder nicht zugänglich.</exception>
+    /// <exception cref="UnauthorizedAccessException">Der Zugriff auf das Startverzeichnis wurde verweigert.</exception>
+    /// <exception cref="DirectoryNotFoundException">Das Startverzeichnis wurde nicht gefunden.</exception>
     static IEnumerable<string> SearchFiles(string startDirectory, string searchText)
     {
-        // Wir verwenden eine Queue, um die Verzeichnisse zu speichern, die wir noch durchsuchen müssen.
-        Queue<string> directories = new Queue<string>();
+        Queue<string> directories = new();
         directories.Enqueue(startDirectory);
 
-        // Wir iterieren durch die Verzeichnisse, die wir noch durchsuchen müssen.
         while (directories.Count > 0)
         {
             string currentDirectory = directories.Dequeue();
-            IEnumerable<string> files;
-            try
-            {
-                // Wir verwenden `EnumerateFiles` aus dem `System.IO`-Namespace, um die Dateien in einem Verzeichnis zu durchsuchen.
-                files = Directory.EnumerateFiles(currentDirectory, $"{searchText}*", SearchOption.TopDirectoryOnly);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                continue;
-            }
-            catch (DirectoryNotFoundException)
-            {
-                continue;
-            }
 
-            foreach (var file in files)
+            foreach (var file in Directory.EnumerateFiles(currentDirectory, $"{searchText}*", SearchOption.TopDirectoryOnly))
             {
                 yield return file;
             }
 
-            try
+            foreach (var subdir in Directory.EnumerateDirectories(currentDirectory))
             {
-                // Wir verwenden `EnumerateDirectories` aus dem `System.IO`-Namespace, um die Verzeichnisse in einem Verzeichnis zu durchsuchen.
-                var subdirectories = Directory.EnumerateDirectories(currentDirectory);
-                foreach (var subdir in subdirectories)
-                {
-                    directories.Enqueue(subdir);
-                }
-            }
-            catch (UnauthorizedAccessException)
-            {
-                continue;
-            }
-            catch (DirectoryNotFoundException)
-            {
-                continue;
+                directories.Enqueue(subdir);
             }
         }
     }
