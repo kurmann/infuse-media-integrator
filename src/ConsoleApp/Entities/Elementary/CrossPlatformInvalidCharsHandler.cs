@@ -18,54 +18,36 @@ namespace Kurmann.InfuseMediaIntegrator.Entities.Elementary;
 /// </summary>
 public class CrossPlatformInvalidCharsHandler
 {
-    /// <summary>
-    /// Liste der ungültigen Zeichen für Datei- und Verzeichnisnamen.
-    /// </summary>
     public static readonly List<char> InvalidChars;
-
-    /// <summary>
-    /// Liste der ungültigen Zeichen für Datei- und Verzeichnisnamen, die druckbar sind.
-    /// </summary>
-    public static List<char> PrintableInvalidChars => InvalidChars.Where(c => c >= 32).ToList();
+    public static readonly List<char> InvalidCharsForWindowsPaths = ['\\', ':', '*', '?', '"', '<', '>', '|'];
+    public static readonly List<char> InvalidCharsForUnixPaths = ['/'];
 
     static CrossPlatformInvalidCharsHandler()
     {
-        // Windows-spezifische ungültige Zeichen
         InvalidChars =
         [
-            '<', '>', ':', '"', '/', '\\', '|', '?', '*' 
+            '<', '>', ':', '"', '|', '?', '*', // Gemeinsam für Datei- und Verzeichnisnamen
         ];
 
-        // Füge Steuerzeichen hinzu
-        for (int i = 0; i < 32; i++)
+        for (int i = 0; i < 32; i++) // Steuerzeichen
         {
             InvalidChars.Add((char)i);
         }
+
+        // '/' fügen wir nicht zu InvalidChars hinzu, da es in Unix-Pfaden gültig ist
     }
 
-    /// <summary>
-    /// Prüft, ob der gegebene Name ungültige Zeichen enthält.
-    /// </summary>
-    /// <param name="name"></param>
-    /// <returns></returns>
     public static bool ContainsInvalidChars(string name)
     {
-        foreach (char c in InvalidChars)
-        {
-            if (name.Contains(c))
-            {
-                return true;
-            }
-        }
-        return false;
+        return InvalidChars.Any(name.Contains);
     }
 
-    /// <summary>
-    /// Ersetzt ungültige Zeichen im gegebenen Namen durch das gegebene Zeichen.
-    /// </summary>
-    /// <param name="name"></param>
-    /// <param name="replacementChar"></param>
-    /// <returns></returns>
+    public static bool ContainsInvalidPathChars(string path, bool isWindowsPath)
+    {
+        var invalidChars = isWindowsPath ? InvalidCharsForWindowsPaths : InvalidCharsForUnixPaths;
+        return invalidChars.Any(path.Contains);
+    }
+
     public static string ReplaceInvalidChars(string name, char replacementChar)
     {
         foreach (char c in InvalidChars)
@@ -75,18 +57,13 @@ public class CrossPlatformInvalidCharsHandler
         return name;
     }
 
-    /// <summary>
-    /// Ersetzt ungültige Zeichen durch Leerzeichen, um den Namen für die Verwendung in einem Dateisystem zu bereinigen.
-    /// Wenn das ungültige Zeichen zu Beginn oder am Ende des Namens steht, wird es entfernt.
-    /// </summary>
-    /// <param name="name"></param>
-    /// <returns></returns>
-    public static string ReplaceInvalidCharsWithSpaces(string name)
+    public static string ReplaceInvalidPathChars(string path, char replacementChar, bool isWindowsPath)
     {
-        foreach (char c in InvalidChars)
+        var invalidChars = isWindowsPath ? InvalidCharsForWindowsPaths : InvalidCharsForUnixPaths;
+        foreach (char c in invalidChars)
         {
-            name = name.Replace(c, ' ');
+            path = path.Replace(c, replacementChar);
         }
-        return name.Trim();
+        return path;
     }
 }
