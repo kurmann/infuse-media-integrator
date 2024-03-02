@@ -18,7 +18,7 @@ public class SearchDirectoriesQuery
     /// <exception cref="ArgumentException">Das Startverzeichnis ist nicht vorhanden oder nicht zugänglich.</exception>
     /// <exception cref="UnauthorizedAccessException">Der Zugriff auf das Startverzeichnis wurde verweigert.</exception>
     /// <exception cref="DirectoryNotFoundException">Das Startverzeichnis wurde nicht gefunden.</exception>
-    public static IEnumerable<string> SearchFiles(string startDirectory, string searchText)
+    public static IEnumerable<string> SearchFiles(string startDirectory, string searchText, bool searchAtBeginningOnly = false)
     {
         // Überprüfe, ob das Startverzeichnis vorhanden und zugänglich ist.
         Queue<string> directories = new();
@@ -27,12 +27,16 @@ public class SearchDirectoriesQuery
         // Durchsuche das Verzeichnis rekursiv nach Dateien, die mit dem angegebenen Text beginnen.
         while (directories.Count > 0)
         {
+            // Entferne das erste Verzeichnis aus der Warteschlange.
             string currentDirectory = directories.Dequeue();
+
+            // Lege fest, ob die Datei mit dem angegebenen Text beginnen soll.
+            string searchPattern = searchAtBeginningOnly ? $"{searchText}*" : $"*{searchText}*";
 
             // Suche nach Dateien, die mit dem angegebenen Text beginnen
             // Hinweis: `EnumerateFiles` gibt den vollständigen Pfad der Datei zurück.
             // Hinweis: TopDirectoryOnly gibt an, dass nur das aktuelle Verzeichnis durchsucht wird, weil wir die rekursive Suche selbst steuern.
-            foreach (var file in Directory.EnumerateFiles(currentDirectory, $"{searchText}*", SearchOption.TopDirectoryOnly))
+            foreach (var file in Directory.EnumerateFiles(currentDirectory, searchPattern, SearchOption.TopDirectoryOnly))
             {
                 yield return file;
             }
