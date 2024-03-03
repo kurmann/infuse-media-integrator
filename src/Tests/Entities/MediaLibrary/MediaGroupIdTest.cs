@@ -81,6 +81,21 @@ public class MediaGroupIdTests
         // Add more assertions as needed
     }
 
+    [TestMethod] // Teste ob die ID von einem Dateinamen abgeleitet werden kann
+    public void CreateFromFileName_ShouldReturnSuccess_WhenFileNameIsValid()
+    {
+        // Arrange
+        var fileNameInfo = FileNameInfo.Create("2022-01-01 Title.jpg").Value;
+
+        // Act
+        var result = MediaGroupId.CreateFromFileName(fileNameInfo);
+
+        // Assert
+        Assert.IsTrue(result.IsSuccess);
+        Assert.IsNotNull(result.Value);
+        Assert.AreEqual("2022-01-01 Title", result.Value.Id);
+    }
+
     [TestMethod] // Teste ob typische Trennzeichen ignoriert werden
     public void CreateFromFileName_ShouldReturnSuccess_WhenFileNameContainsIgnoredSeparators()
     {
