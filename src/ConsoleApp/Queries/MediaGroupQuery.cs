@@ -17,7 +17,7 @@ public class MediaGroupQuery(string mediaLibraryPath)
     }
 }
 
-public interface ICanQueryMediaGroup : IQueryService<DirectoryPathInfo>
+public interface ICanQueryMediaGroup : IQueryService<DirectoryPathInfo?>
 {
     
 }
@@ -27,33 +27,43 @@ internal class CanQueryMediaGroup(string mediaLibraryPath, string id) : ICanQuer
     private readonly string _id = id;
     private readonly string _mediaLibraryPath = mediaLibraryPath;
 
-    public Result<DirectoryPathInfo> Execute()
+    public Result<DirectoryPathInfo?> Execute()
     {
         // Prüfe ob das Infuse Media Library-Verzeichnis existiert
         if (!Directory.Exists(_mediaLibraryPath))
         {
-            return Result.Failure<DirectoryPathInfo>($"Directory not found: {_mediaLibraryPath}");
+            return Result.Failure<DirectoryPathInfo?>($"Library directory not found: {_mediaLibraryPath}");
         }
 
         // Prüfe, ob die Mediengruppen-ID valide ist
         var mediaGroupId = MediaGroupId.Create(_id);
         if (mediaGroupId.IsFailure)
         {
-            return Result.Failure<DirectoryPathInfo>(mediaGroupId.Error);
+            return Result.Failure<DirectoryPathInfo?>(mediaGroupId.Error);
         }
 
         // Suche Dateien, die zur Mediengruppe gehören
         var mediaLibraryQuery = new MediaLibraryQuery(_mediaLibraryPath).ById(mediaGroupId.Value);
         var mediaFiles = mediaLibraryQuery.Execute();
+        if (mediaFiles.IsFailure)
+        {
+            return Result.Failure<DirectoryPathInfo?>(mediaFiles.Error);
+        }
+
+        // Gib leer zurück, wenn keine Mediendateien gefunden wurden
+        if (mediaFiles.Value.Count == 0)
+        {
+            return null;
+        }
 
         // Prüfe, ob die Mediendateien alle im gleichen Verzeichnis liegen
         var mediaFilesInSameDirectory = mediaFiles.Value.All(x => x.FilePath.DirectoryPathInfo.DirectoryPath == mediaFiles.Value.First().FilePath.DirectoryPathInfo.DirectoryPath);
         if (!mediaFilesInSameDirectory)
         {
-            return Result.Failure<DirectoryPathInfo>("Media group files are not in the same directory. The ID is ambiguous.");
+            return Result.Failure<DirectoryPathInfo?>("Media group files are not in the same directory. The ID is ambiguous.");
         }
 
         // Gebe das Verzeichnis zurück, in dem die Mediendateien liegen. Das ist das Verzeichnis der Mediengruppe.
-        return Result.Success(mediaFiles.Value.First().FilePath.DirectoryPathInfo);
+        return mediaFiles.Value.First().FilePath.DirectoryPathInfo;
     }
 }
