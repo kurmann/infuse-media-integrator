@@ -1,6 +1,7 @@
 using CSharpFunctionalExtensions;
 using Kurmann.InfuseMediaIntegrator.Entities.Elementary;
 using Kurmann.InfuseMediaIntegrator.Entities.MediaFileTypes;
+using Kurmann.InfuseMediaIntegrator.Entities.MediaLibrary;
 
 namespace Kurmann.InfuseMediaIntegrator.Queries;
 
@@ -16,15 +17,11 @@ public class MediaLibraryQuery(string mediaLibraryPath) : ICanDecideBetweenIdAnd
 
     private MediaLibraryQuery() : this(string.Empty) { }
 
-    public ICanQueryById ById(string id)
-    {
-        return new CanQueryById(MediaLibraryPath, id);
-    }
+    public ICanQueryById ById(string id) => new CanQueryById(MediaLibraryPath, id);
 
-    public ICanSetProperty ByProperties()
-    {
-        return new CanSetProperty(MediaLibraryPath);
-    }
+    public ICanQueryById ById(MediaGroupId id) => new CanQueryById(MediaLibraryPath, id.Id);
+
+    public ICanSetProperty ByProperties() => new CanSetProperty(MediaLibraryPath);
 }
 
 internal class CanDecideBetweenIdAndSpecificProperties(string mediaLibraryPath) : ICanDecideBetweenIdAndSpecificProperties
