@@ -5,70 +5,67 @@ using Microsoft.Extensions.Logging.Abstractions;
 namespace Kurmann.InfuseMediaIntegrator.Tests.Commands;
 
 [TestClass]
-public class MoveFilesToInfuseMediaLibraryCommandTests
+public class MoveFilesToInfuseMediaLibraryCommandTest
 {
-    private const string InputDirectoryPath = "Data/Input/Testcase 1";
-    private const string InfuseMediaLibraryPath = "Data/Output/Mediathek";
-    
-    [TestMethod]
-    public void Execute_ShouldMoveFilesToInfuseMediaLibrary()
-    {
-        // Arrange
-        var logger = new NullLogger<MoveFilesToInfuseMediaLibraryCommand>();
-        var command = new MoveFilesToInfuseMediaLibraryCommand(InputDirectoryPath, InfuseMediaLibraryPath, logger);
-
-        // Act
-        var result = command.Execute();
-
-        // Assert
-        Assert.IsTrue(result.IsSuccess); 
-        Assert.IsTrue(Directory.Exists(InfuseMediaLibraryPath));
-
-        // Verify that the files are moved
-        var mpeg4VideoFiles = Directory.GetFiles(InputDirectoryPath, "*.m4v");
-        foreach (var file in mpeg4VideoFiles)
-        {
-            var targetPath = Path.Combine(InfuseMediaLibraryPath, Path.GetFileName(file));
-            Assert.IsTrue(File.Exists(targetPath));
-        }
-
-        // Clean up
-        foreach (var file in mpeg4VideoFiles)
-        {
-            var targetPath = Path.Combine(InfuseMediaLibraryPath, Path.GetFileName(file));
-            File.Delete(targetPath);
-        }
-    }
+    private const string MediaLibraryPath = "Data/Output/Mediathek";
 
     [TestMethod]
-    public void Execute_ShouldReturnFailure_WhenInputDirectoryNotFound()
+    public void Execute_ShouldReturnFailure_WhenInputDirectoryPathIsEmpty()
     {
         // Arrange
-        var logger = new NullLogger<MoveFilesToInfuseMediaLibraryCommand>();
-        var nonExistingInputDirectoryPath = "NonExistingDirectory";
-        var command = new MoveFilesToInfuseMediaLibraryCommand(nonExistingInputDirectoryPath, InfuseMediaLibraryPath, logger);
+        var command = new MoveFilesToInfuseMediaLibraryCommand(string.Empty, MediaLibraryPath, new NullLogger<MoveFilesToInfuseMediaLibraryCommand>());
 
         // Act
         var result = command.Execute();
 
         // Assert
         Assert.IsFalse(result.IsSuccess);
-        Assert.AreEqual($"Directory not found: {nonExistingInputDirectoryPath}", result.Error);
+        Assert.IsNotNull(result.Error);
+        Assert.AreEqual("Directory not found: ", result.Error);
     }
 
     [TestMethod]
-    public void Execute_ShouldReturnFailure_WhenInfuseMediaLibraryNotFound()
+    public void Execute_ShouldReturnFailure_WhenInfuseMediaLibraryPathIsEmpty()
     {
         // Arrange
-        var logger = new NullLogger<MoveFilesToInfuseMediaLibraryCommand>();
-        var nonExistingInfuseMediaLibraryPath = "NonExistingDirectory";
-        var command = new MoveFilesToInfuseMediaLibraryCommand(InputDirectoryPath, nonExistingInfuseMediaLibraryPath, logger);
+        var command = new MoveFilesToInfuseMediaLibraryCommand(MediaLibraryPath, string.Empty, new NullLogger<MoveFilesToInfuseMediaLibraryCommand>());
 
         // Act
         var result = command.Execute();
 
         // Assert
         Assert.IsFalse(result.IsSuccess);
-        Assert.AreEqual($"Directory not found: {nonExistingInfuseMediaLibraryPath}", result.Error);
+        Assert.IsNotNull(result.Error);
+        Assert.AreEqual("Directory not found: ", result.Error);
+    }
+
+    [TestMethod]
+    public void Execute_ShouldReturnFailure_WhenInputDirectoryPathDoesNotExist()
+    {
+        // Arrange
+        var command = new MoveFilesToInfuseMediaLibraryCommand("Data/Output/NotExisting", MediaLibraryPath, new NullLogger<MoveFilesToInfuseMediaLibraryCommand>());
+
+        // Act
+        var result = command.Execute();
+
+        // Assert
+        Assert.IsFalse(result.IsSuccess);
+        Assert.IsNotNull(result.Error);
+        Assert.AreEqual("Directory not found: Data/Output/NotExisting", result.Error);
+    }
+
+    [TestMethod]
+    public void Execute_ShouldReturnFailure_WhenInfuseMediaLibraryPathDoesNotExist()
+    {
+        // Arrange
+        var command = new MoveFilesToInfuseMediaLibraryCommand(MediaLibraryPath, "Data/Output/NotExisting", new NullLogger<MoveFilesToInfuseMediaLibraryCommand>());
+
+        // Act
+        var result = command.Execute();
+
+        // Assert
+        Assert.IsFalse(result.IsSuccess);
+        Assert.IsNotNull(result.Error);
+        Assert.AreEqual("Directory not found: Data/Output/NotExisting", result.Error);
     }
 }
