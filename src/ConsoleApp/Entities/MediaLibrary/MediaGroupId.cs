@@ -16,6 +16,14 @@ public partial class MediaGroupId(string id)
     /// </summary>
     public string Id { get; private set;} = id;
 
+    /// <summary>
+    /// Liste aller Trennzeichen in einem Dateinamen, die bei der Ableitung einer ID aus dem Dateinamen ignoriert werden.
+    /// Beispiele:
+    /// - "2022-01-01 Neujahrskonzert-fanart.jpg" -> "2022-01-01 Neujahrskonzert" (ignoriert "-fanart.jpg", da Infuse-spezifisch)
+    /// - "2022-01-01 Neujahrskonzert - 1.m4v" -> "2022-01-01 Neujahrskonzert" (ignoriert " - 1.m4v", da spezifisch für Final Cut Pro-Export bei mehreren Teilen)
+    /// </summary>
+    public static string[] IgnoredSeparators = ["-fanart", " - 1.m4v"];
+
     public static Result<MediaGroupId> Create(string id)
     {
         // Prüfe ob die ID leer ist
@@ -32,6 +40,26 @@ public partial class MediaGroupId(string id)
         }
 
         return Result.Success(new MediaGroupId(id));
+    }
+
+    /// <summary>
+    /// Leitet die Erstellung einer MediaGroupId von einem Dateinamen ab.
+    /// Ignoriert Zeichenketten nach den in IgnoredSeparators enthaltenen Trennzeichen.
+    /// Beispiel: "2022-01-01 Neujahrskonzert-fanart.jpg" -> "2022-01-01 Neujahrskonzert"
+    /// Beispiel: "2022-01-01 Neujahrskonzert - 1.m4v" -> "2022-01-01 Neujahrskonzert"
+    /// </summary>
+    /// <param name="fileNameInfo"></param>
+    /// <returns></returns>
+    public static Result<MediaGroupId> CreateFromFileName(FileNameInfo fileNameInfo)
+    {
+        // Entferne alle Zeichen, die in IgnoredSeparators enthalten sind
+        var id = fileNameInfo.FileNameWithoutExtension;
+        foreach (var separator in IgnoredSeparators)
+        {
+            id = id.Replace(separator, "");
+        }
+
+        return Create(id);
     }
 
     /// <summary>

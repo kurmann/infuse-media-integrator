@@ -1,3 +1,4 @@
+using Kurmann.InfuseMediaIntegrator.Entities.Elementary;
 using Kurmann.InfuseMediaIntegrator.Entities.MediaLibrary;
 
 namespace Kurmann.InfuseMediaIntegrator.Tests.Entities.MediaLibrary;
@@ -78,5 +79,20 @@ public class MediaGroupIdTests
         Assert.IsFalse(result.IsSuccess);
         Assert.IsNotNull(result.Error);
         // Add more assertions as needed
+    }
+
+    [TestMethod] // Teste ob typische Trennzeichen ignoriert werden
+    public void CreateFromFileName_ShouldReturnSuccess_WhenFileNameContainsIgnoredSeparators()
+    {
+        // Arrange
+        var fileNameInfo = FileNameInfo.Create("2022-01-01 Title-fanart.jpg").Value;
+
+        // Act
+        var result = MediaGroupId.CreateFromFileName(fileNameInfo);
+
+        // Assert
+        Assert.IsTrue(result.IsSuccess);
+        Assert.IsNotNull(result.Value);
+        Assert.AreEqual("2022-01-01 Title", result.Value.Id);
     }
 }
