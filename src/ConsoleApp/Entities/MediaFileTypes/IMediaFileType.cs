@@ -8,4 +8,6 @@ public interface IMediaFileType
     FilePathInfo FilePath { get; }
 
     MediaFileMetadata? Metadata { get; }
+
+    string ToString();
 }
