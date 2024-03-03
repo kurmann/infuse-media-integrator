@@ -1,4 +1,5 @@
 using CSharpFunctionalExtensions;
+using Kurmann.InfuseMediaIntegrator.Entities.Elementary;
 using Kurmann.InfuseMediaIntegrator.Entities.MediaFileTypes;
 using Kurmann.InfuseMediaIntegrator.Entities.MediaLibrary;
 using Kurmann.InfuseMediaIntegrator.Queries;
@@ -6,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Kurmann.InfuseMediaIntegrator.Commands;
 
-public class MoveFilesToInfuseMediaLibraryCommand(ILogger logger)
+public class MoveFilesToMediaLibraryCommand(ILogger logger)
 {
     private readonly ILogger _logger = logger;
 
@@ -52,11 +53,18 @@ internal class CanExecuteCommandWithSingleFile(string filePath, string destinati
         {
             return Result.Failure($"File not found: {_filePath}");
         }
+        
+        // Prüfe ob der Zielpfad korrekt ist
+        var destinationPathInfo = DirectoryPathInfo.Create(_destinationPath);
+        if (destinationPathInfo.IsFailure)
+        {
+            return Result.Failure(destinationPathInfo.Error);
+        }
 
         // Prüfe ob das Infuse Media Library-Verzeichnis existiert
-        if (!Directory.Exists(_destinationPath))
+        if (!Directory.Exists(destinationPathInfo.Value.DirectoryPath))
         {
-            return Result.Failure($"Directory not found: {_destinationPath}");
+            return Result.Failure($"Directory not found: {destinationPathInfo.Value.DirectoryPath}");
         }
 
         // Sammle Informationen über die Datei
@@ -81,6 +89,11 @@ internal class CanExecuteCommandWithSingleFile(string filePath, string destinati
             // Warne, dass die Mediengruppe im Infuse Media Library-Verzeichnis nicht gesucht werden konnte
             _logger.LogWarning("Error on searching media group in Infuse Media Library: " + mediaGroup.Error);
             _logger.LogInformation("Moving file to Infuse Media Library ignoring existing media groups");
+
+            // Ermittle die Kategorien-Verzeichnisse anhand Metadaten (sofern vorhanden) oder dem relativen Pfad der Datei gegenüber dem Eingangsverzeichnis
+
+            // Verschiebe in eine neue Mediengruppe
+            return MoveFileToNewMediaGroup(mediaFile.Value, destinationPathInfo.Value);
         }
         else
         {
@@ -88,7 +101,7 @@ internal class CanExecuteCommandWithSingleFile(string filePath, string destinati
             if (mediaGroup.Value != null)
             {
                 // Bewege die Datei in das Infuse Media Library-Verzeichnis
-                return MoveFileToExistingMediaGroup(mediaFile.Value, mediaGroup.Value, _logger);
+                return MoveFileToExistingMediaGroup(mediaFile.Value, mediaGroup.Value);
             }
         }
 
@@ -96,7 +109,17 @@ internal class CanExecuteCommandWithSingleFile(string filePath, string destinati
         return Result.Success();
     }
 
-    private static Result MoveFileToExistingMediaGroup(IMediaFileType mediaFile, MediaGroupDirectory mediaGroupDirectory, ILogger logger)
+    private static Result MoveFileToNewMediaGroup(IMediaFileType mediaFile, DirectoryPathInfo directoryPathInfo)
+    {
+        // Ermittle die Mediengruppen-ID
+        var mediaGroupId = MediaGroupId.CreateFromFileName(mediaFile.FilePath.FileName);
+        if (mediaGroupId.IsFailure)
+        {
+            return Result.Failure(mediaGroupId.Error);
+        }
+    }
+
+    private static Result MoveFileToExistingMediaGroup(IMediaFileType mediaFile, MediaGroupDirectory mediaGroupDirectory)
     {
         // Bewege die Datei in das Infuse Media Library-Verzeichnis
         var destinationFilePath = Path.Combine(mediaGroupDirectory.DirectoryPath, mediaFile.FilePath);
@@ -107,7 +130,6 @@ internal class CanExecuteCommandWithSingleFile(string filePath, string destinati
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Error on moving file");
             return Result.Failure("Error on moving file: " + e.Message);
         }
     }
