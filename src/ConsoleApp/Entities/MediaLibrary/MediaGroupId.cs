@@ -94,27 +94,6 @@ public partial class MediaGroupId(string id)
         return Id;
     }
 
-    public override bool Equals(object obj)
-    {
-        return obj is MediaGroupId id &&
-               Id == id.Id;
-    }
-
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(Id);
-    }
-
-    public static bool operator ==(MediaGroupId left, MediaGroupId right)
-    {
-        return EqualityComparer<MediaGroupId>.Default.Equals(left, right);
-    }
-
-    public static bool operator !=(MediaGroupId left, MediaGroupId right)
-    {
-        return !(left == right);
-    }
-
     public static implicit operator string(MediaGroupId id)
     {
         return id.Id;
