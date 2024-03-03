@@ -1,5 +1,6 @@
 using CSharpFunctionalExtensions;
 using Kurmann.InfuseMediaIntegrator.Entities.MediaFileTypes;
+using Kurmann.InfuseMediaIntegrator.Entities.MediaLibrary;
 using Kurmann.InfuseMediaIntegrator.Queries;
 using Microsoft.Extensions.Logging;
 
@@ -65,29 +66,43 @@ internal class CanExecuteCommandWithSingleFile(string filePath, string destinati
             return Result.Failure(mediaFile.Error);
         }
 
-        // Prüfe, ob die Mediengruppe bereits in der Medienbibliothek vorhanden ist
-        var query = new MediaLibraryQuery(_destinationPath).ById(mediaFile.Value.FilePath.FileName);
-        var queryResult = query.Execute();
-        if (queryResult.IsFailure)
+        // Leite die Mediengruppen-ID vom Dateinamen ab
+        var mediaGroupId = MediaGroupId.Create(mediaFile.Value.FilePath);
+        if (mediaGroupId.IsFailure)
         {
-            // Bei einem Fehler wird angenommen, dass die Mediengruppe nicht vorhanden ist.
-            // Warne, dass die Abfrage fehlgeschlagen ist und fahre fort.
-            _logger.LogWarning("Error on querying media library: " + queryResult.Error);
-            _logger.LogInformation("File will be moved to media library.");
+            return Result.Failure("Error on deriving media group ID from file name: " + mediaGroupId.Error);
+        }
+
+        // Prüfe ob die Mediengruppe bereits im Infuse Media Library-Verzeichnis existiert
+        var mediaGroupQuery = new MediaGroupQuery(_destinationPath).ById(mediaGroupId.Value);
+        var mediaGroup = mediaGroupQuery.Execute();
+        if (mediaGroup.IsFailure)
+        {
+            // Warne, dass die Mediengruppe im Infuse Media Library-Verzeichnis nicht gesucht werden konnte
+            _logger.LogWarning("Error on searching media group in Infuse Media Library: " + mediaGroup.Error);
+            _logger.LogInformation("Moving file to Infuse Media Library ignoring existing media groups");
+        }
+        else
+        {
+            // Prüfe ob die Mediengruppe existiert
+            if (mediaGroup.Value != null)
+            {
+                // Bewege die Datei in das Infuse Media Library-Verzeichnis
+                return MoveFileToExistingMediaGroup(mediaFile.Value, mediaGroup.Value, _logger);
+            }
         }
 
         // todo: implementiere das Verschieben in eine bestehende Mediengruppe
         return Result.Success();
     }
 
-    private static Result MoveFileToExistingMediaGroup(string filePath, string destinationPath, ILogger logger)
+    private static Result MoveFileToExistingMediaGroup(IMediaFileType mediaFile, MediaGroupDirectory mediaGroupDirectory, ILogger logger)
     {
         // Bewege die Datei in das Infuse Media Library-Verzeichnis
-        var destinationFilePath = Path.Combine(destinationPath, Path.GetFileName(filePath));
+        var destinationFilePath = Path.Combine(mediaGroupDirectory.DirectoryPath, mediaFile.FilePath);
         try
         {
-            File.Move(filePath, destinationFilePath);
-            logger.LogInformation($"File moved to {destinationFilePath}");
+            File.Move(mediaFile.FilePath, destinationFilePath);
             return Result.Success();
         }
         catch (Exception e)
