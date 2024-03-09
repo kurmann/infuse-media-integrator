@@ -24,3 +24,6 @@ Für Unittesting mit Videodateien stehen Testdaten bereit: [Testdateien](docs/Te
 
 ## Dokumentation
 - [Dateistruktur Infuse](/docs/Dateistruktur.md)
+
+### Recherche
+- [Nachrichtensystem](/docs/research/Nachrichtensystem.md)
