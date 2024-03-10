@@ -4,6 +4,9 @@ using Kurmann.InfuseMediaIntegrator.Entities.MediaFileTypes;
 
 namespace Kurmann.InfuseMediaIntegrator.Entities.MediaLibrary;
 
+/// <summary>
+/// Ein Mapping zwischen einer Mediendatei und dem Zielverzeichnis in der Medienbibliothek.
+/// </summary>
 public class MediaFileLibraryDestinationMapping
 {
     public IMediaFileType Source { get; }
