@@ -1,22 +1,31 @@
 # Infuse Media Integrator
 
-## Überblick
-Der `kurmann/infuse-media-integrator` ist ein Microservice innerhalb der `kurmann/media-library`, der speziell dafür entwickelt wurde, Videodateien nahtlos in eine Infuse-kompatible Mediathek zu integrieren. 
+## Anforderungen und Prozess für das Verschieben von Dateien in die Mediathek
 
-### Hauptzweck
+### Eingangsverzeichnis und Kategorisierung
 
-Dieser Service optimiert die Strukturierung der Medieninhalte, sodass sie direkt mit dem Infuse Player auf Apple TV und anderen Geräten gestreamt werden können.
+- **Eingangsverzeichnis**: Das Hauptverzeichnis für neue Mediendateien wird über die Konfiguration festgelegt. Dieses Verzeichnis wird vom Modul kontinuierlich auf neue Dateien hin überwacht.
 
-## Funktionen
-- **Automatische Integration**: Verschiebt Videodateien mit bearbeiteten Metadaten in die Infuse-Mediathek, indem er eine spezifische Verzeichnis- und Dateistruktur verwendet, die von Infuse erkannt wird.
-- **Volume-Bindung**: Unterstützt das Einbinden von zwei Volumes – eines für die Quelldatei und eines für die Infuse-Mediathek –, um eine direkte und effiziente Dateiverarbeitung innerhalb des Docker-Containers zu ermöglichen.
-- **Metadatenbasierte Organisation**: Nutzt Metadaten, um Videodateien korrekt zu kategorisieren und in der Infuse-Mediathek einzuordnen, was eine intuitive Navigation und Wiedergabe ermöglicht.
+- **Kategorien**: Unterverzeichnisse innerhalb des Eingangsverzeichnisses repräsentieren Kategorien, die als erste Ebene der Organisation und Klassifizierung von Mediendateien dienen, bevor sie in die Mediathek verschoben werden.
 
-## Einsatz
-Der Service ist so konzipiert, dass er als Teil der `kurmann/media-library`-Architektur fungiert, wobei er die Kompatibilität mit lokalen Dateisystemen und die nahtlose Integration in bestehende Docker-basierte Workflows gewährleistet.
+- **Unterverzeichnisse**: Das Modul unterstützt auch die Erstellung und das Durchsuchen von Unterverzeichnissen von Unterverzeichnissen, um eine detaillierte und flexible Kategorisierung zu ermöglichen.
 
-## Ziel
-Ziel des `kurmann/infuse-media-integrator` ist es, die Verwaltung und das Teilen von Videomedien zu vereinfachen, indem er eine Brücke zwischen der `kurmann/media-library` und der Infuse-App schafft.
+### Verschiebungsprozess
+
+- **Durchsuchen des Eingangsverzeichnisses**: Das Modul durchsucht das gesamte konfigurierte Eingangsverzeichnis, einschließlich aller Unterverzeichnisse, um neue Dateien zu identifizieren.
+
+- **Kategorienzuweisung**: Das relative Unterverzeichnis, in dem eine Datei gefunden wird, bestimmt die Kategorie, der die Datei in der Mediathek zugeordnet wird.
+
+- **Erkennung und Zuordnung zu Mediengruppen**:
+    - Das Modul identifiziert vorhandene Mediengruppen innerhalb der entsprechenden Kategorie in der Mediathek oder erstellt eine neue Mediengruppe, falls erforderlich, basierend auf der eindeutigen ID (`{ISO-Datum} {Titel}`).
+    - Die Datei wird dann entsprechend in die existierende oder neu erstellte Mediengruppe verschoben.
+
+### Erweiterte Organisationsstruktur
+
+- **Flexibilität durch Unterverzeichnisse**: Die Unterstützung für Unterverzeichnisse ermöglicht eine detaillierte und flexible Organisation der Dateien im Eingangsverzeichnis.
+
+- **Strukturierte Mediathek**: Die Mediathek nutzt die Kategorisierung und Mediengruppenstruktur, um eine intuitive und zugängliche Ablage der Mediendateien zu gewährleisten.
+
 
 ## Testdaten
 
