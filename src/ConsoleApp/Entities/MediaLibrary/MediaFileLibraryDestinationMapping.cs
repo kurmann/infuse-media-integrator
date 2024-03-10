@@ -18,20 +18,20 @@ public class MediaFileLibraryDestinationMapping
         TargetDirectory = targetDirectory;
     }
 
-    public static Result Create(string mediaFilePath, string mediaLibraryPath, string? subDirectoryPath)
+    public static Result<MediaFileLibraryDestinationMapping> Create(string mediaFilePath, string mediaLibraryPath, string? subDirectoryPath)
     {
         // Prüfe ob es eine gültige Mediendatei ist
         var mediaFile = MediaFileTypeDetector.GetMediaFile(mediaFilePath);
         if (mediaFile.IsFailure)
         {
-            return Result.Failure(mediaFile.Error);
+            return Result.Failure<MediaFileLibraryDestinationMapping>(mediaFile.Error);
         }
 
         // Prüfe ob der Pfad zur Medienbibliothek gültig ist
         var mediaLibrary = DirectoryPathInfo.Create(mediaLibraryPath);
         if (mediaLibrary.IsFailure)
         {
-            return Result.Failure(mediaLibrary.Error);
+            return Result.Failure<MediaFileLibraryDestinationMapping>(mediaLibrary.Error);
         }
 
         // Prüfe, ob das Unterverzeichnis gültig ist, wenn es angegeben wurde
@@ -40,7 +40,7 @@ public class MediaFileLibraryDestinationMapping
             var subDirectory = DirectoryPathInfo.Create(subDirectoryPath);
             if (subDirectory.IsFailure)
             {
-                return Result.Failure(subDirectory.Error);
+                return Result.Failure<MediaFileLibraryDestinationMapping>(subDirectory.Error);
             }
         }
 
@@ -48,7 +48,7 @@ public class MediaFileLibraryDestinationMapping
         var mediaGroupId = MediaGroupId.CreateFromFileName(mediaFile.Value.FilePath.FileName);
         if (mediaGroupId.IsFailure)
         {
-            return Result.Failure("Error on deriving media group ID from file name: " + mediaGroupId.Error);
+            return Result.Failure<MediaFileLibraryDestinationMapping>("Error while creating media group ID from file name");
         }
 
         // Ermittle das Zielverzeichnis anhand der Kombination von Medienbibliothek-Verzeichnis, Unterverzeichnis und Mediengruppen-Verzeichnis (ID)
@@ -60,7 +60,7 @@ public class MediaFileLibraryDestinationMapping
         var destinationDirectory = DirectoryPathInfo.Create(destinationDirectoryPath);
         if (destinationDirectory.IsFailure)
         {
-            return Result.Failure(destinationDirectory.Error);
+            return Result.Failure<MediaFileLibraryDestinationMapping>(destinationDirectory.Error);
         }
 
         // Retourniere das Mapping
