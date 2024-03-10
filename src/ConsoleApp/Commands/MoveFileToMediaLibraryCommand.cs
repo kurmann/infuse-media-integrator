@@ -77,9 +77,8 @@ public class CanExecuteOrAddCategoryCommand(string filePath, string mediaLibrary
             _logger?.LogWarning("Error on searching media group in Infuse Media Library: " + mediaGroup.Error);
             _logger?.LogInformation("Moving file to Infuse Media Library ignoring existing media groups");
 
-
             // Verschiebe in eine neue Mediengruppe
-            // return MoveFileToNewMediaGroup(mediaFile.Value, mediaLibraryPathInfo.Value);
+            
         }
         else
         {
@@ -95,34 +94,40 @@ public class CanExecuteOrAddCategoryCommand(string filePath, string mediaLibrary
         return Result.Success();
     }
 
+    private static Result MoveFileToExistingMediaGroup(IMediaFileType mediaFile, MediaGroupDirectory mediaGroupDirectory)
+    {
+        // Bewege die Datei in das Infuse Media Library-Verzeichnis
+        var destinationFilePath = Path.Combine(mediaGroupDirectory.DirectoryPath, mediaFile.FilePath);
+        try
+        {
+            File.Move(mediaFile.FilePath, destinationFilePath);
+            return Result.Success();
+        }
+        catch (Exception e)
+        {
+            return Result.Failure("Error on moving file: " + e.Message);
+        }
+    }
+
+    private static Result MoveFileToNewMediaGroup(IMediaFileType mediaFile, MediaGroupDirectory mediaGroupDirectory, DirectoryPathInfo subDirectory)
+    {
+        // Bewege die Datei in das Infuse Media Library-Verzeichnis
+        var destinationFilePath = Path.Combine(mediaGroupDirectory.DirectoryPath, subDirectory.DirectoryPath, mediaFile.FilePath);
+        try
+        {
+            File.Move(mediaFile.FilePath, destinationFilePath);
+            return Result.Success();
+        }
+        catch (Exception e)
+        {
+            return Result.Failure("Error on moving file: " + e.Message);
+        }
+    }
+
     public ICanExecuteOrAddCategoryCommand ToSubDirectory(string categoryPath)
     {
         _subDirectory = categoryPath;
         return this;
     }
 
-    // private static Result MoveFileToNewMediaGroup(IMediaFileType mediaFile, DirectoryPathInfo directoryPathInfo)
-    // {
-    //     // Ermittle die Mediengruppen-ID
-    //     var mediaGroupId = MediaGroupId.CreateFromFileName(mediaFile.FilePath.FileName);
-    //     if (mediaGroupId.IsFailure)
-    //     {
-    //         return Result.Failure(mediaGroupId.Error);
-    //     }
-    // }
-
-    // private static Result MoveFileToExistingMediaGroup(IMediaFileType mediaFile, MediaGroupDirectory mediaGroupDirectory)
-    // {
-    //     // Bewege die Datei in das Infuse Media Library-Verzeichnis
-    //     var destinationFilePath = Path.Combine(mediaGroupDirectory.DirectoryPath, mediaFile.FilePath);
-    //     try
-    //     {
-    //         File.Move(mediaFile.FilePath, destinationFilePath);
-    //         return Result.Success();
-    //     }
-    //     catch (Exception e)
-    //     {
-    //         return Result.Failure("Error on moving file: " + e.Message);
-    //     }
-    // }
 }
