@@ -10,6 +10,7 @@ namespace Kurmann.InfuseMediaIntegrator.Entities.MediaLibrary;
 /// Die Mediendatei hat Informationen über den Dateityp und die Metadaten.
 /// Bei der Organisation wird der Dateityp und die Metadaten berücksichtigt, wobei die Metadaten bevorzugt werden.
 /// </summary>
+[Obsolete("Not used anymore. Too complex and not needed. Category info should not taken from metadata anymore.")]
 public class MediaFileLibraryOrganizationInfo
 {
     /// <summary>
