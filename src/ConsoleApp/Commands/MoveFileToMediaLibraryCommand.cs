@@ -1,8 +1,4 @@
 using CSharpFunctionalExtensions;
-using Kurmann.InfuseMediaIntegrator.Entities.Elementary;
-using Kurmann.InfuseMediaIntegrator.Entities.MediaFileTypes;
-using Kurmann.InfuseMediaIntegrator.Entities.MediaLibrary;
-using Kurmann.InfuseMediaIntegrator.Queries;
 using Microsoft.Extensions.Logging;
 
 namespace Kurmann.InfuseMediaIntegrator.Commands;
@@ -12,9 +8,9 @@ public class MoveFileToMediaLibraryCommand(string filePath, ILogger? logger = nu
     private readonly string _filePath = filePath;
     private readonly ILogger? _logger = logger;
 
-    public ICanExecuteOrAddCategoryCommand ToMediaLibrary(string filePath, string mediaLibraryPath, ILogger? logger = null)
+    public ICanExecuteOrAddCategoryCommand ToMediaLibrary(string mediaLibraryPath)
     {
-        return new CanExecuteOrAddCategoryCommand(filePath, mediaLibraryPath, logger);
+        return new CanExecuteOrAddCategoryCommand(_filePath, mediaLibraryPath, _logger);
     }   
 }
 
@@ -23,11 +19,11 @@ public interface ICanExecuteOrAddCategoryCommand : ICommand
     ICanExecuteOrAddCategoryCommand WithCategory(string category);
 }
 
-public class CanExecuteOrAddCategoryCommand(string mediaLibraryPath, string mediaLibraryPath1, ILogger? logger = null)
+public class CanExecuteOrAddCategoryCommand(string filePath, string mediaLibraryPath, ILogger? logger = null)
     : ICanExecuteOrAddCategoryCommand
 {
+    private readonly string _filePath = filePath;
     private readonly string _mediaLibraryPath = mediaLibraryPath;
-    private readonly string _filePath = mediaLibraryPath1;
     private readonly ILogger? _logger = logger;
     private string? _categoryPath;
 

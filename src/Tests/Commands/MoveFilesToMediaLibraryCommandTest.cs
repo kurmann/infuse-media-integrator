@@ -15,8 +15,8 @@ public class MoveFilesToMediaLibraryCommandTest
         // Arrange
         var file = Path.Combine(InputDirectoryPath, "Zwillinge Testvideo.m4v");
         var mediaLibraryPath = "Data/Output/Mediathek";
-        var logger = new NullLogger<MoveFilesToMediaLibraryCommand>();
-        var command = new MoveFilesToMediaLibraryCommand(logger).File(file).To(mediaLibraryPath);
+        var logger = new NullLogger<MoveFileToMediaLibraryCommand>();
+        var command = new MoveFileToMediaLibraryCommand(file, logger).ToMediaLibrary(mediaLibraryPath);
 
         // Act
         var result = command.Execute();
