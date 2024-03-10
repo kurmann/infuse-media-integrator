@@ -1,5 +1,4 @@
 using CSharpFunctionalExtensions;
-using Kurmann.InfuseMediaIntegrator.Entities;
 
 namespace Kurmann.InfuseMediaIntegrator.Commands;
 

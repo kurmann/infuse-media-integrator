@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using CSharpFunctionalExtensions;
 
 namespace Kurmann.InfuseMediaIntegrator.Entities.Elementary;
