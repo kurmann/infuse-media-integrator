@@ -68,6 +68,23 @@ public class CanExecuteOrAddCategoryCommand(string filePath, string mediaLibrary
             return Result.Failure("Error on deriving media group ID from file name: " + mediaGroupId.Error);
         }
 
+        // Prüfe, ob das Unterverzeichnis gültig ist, falls es definiert ist
+        DirectoryPathInfo? subDirectoryPathInfo = null;
+        if (_subDirectory != null)
+        {
+            var subDirectoryPathInfoResult = DirectoryPathInfo.Create(_subDirectory);
+            if (subDirectoryPathInfoResult.IsFailure)
+            {
+                // Logge eine Warnung, dass das Unterverzeichnis nicht gültig ist und informiere, dass es ignoriert wird
+                _logger?.LogWarning("Subdirectory is not valid: " + subDirectoryPathInfoResult.Error);
+                _logger?.LogInformation("Moving file to Infuse Media Library ignoring subdirectory");
+            }
+            else
+            {
+                subDirectoryPathInfo = subDirectoryPathInfoResult.Value;
+            }
+        }
+
         // Prüfe ob die Mediengruppe bereits im Infuse Media Library-Verzeichnis existiert
         var mediaGroupQuery = new MediaGroupQuery(mediaLibraryPathInfo.Value).ById(mediaGroupId.Value);
         var mediaGroup = mediaGroupQuery.Execute();
@@ -78,20 +95,17 @@ public class CanExecuteOrAddCategoryCommand(string filePath, string mediaLibrary
             _logger?.LogInformation("Moving file to Infuse Media Library ignoring existing media groups");
 
             // Verschiebe in eine neue Mediengruppe
-            
-        }
-        else
-        {
-            // Prüfe ob die Mediengruppe existiert
-            if (mediaGroup.Value != null)
-            {
-                // Bewege die Datei in das Infuse Media Library-Verzeichnis
-                // return MoveFileToExistingMediaGroup(mediaFile.Value, mediaGroup.Value);
-            }
+            return MoveFileToNewMediaGroup(mediaFile.Value, mediaGroupId.Value, subDirectoryPathInfo, mediaLibraryPathInfo.Value);       
         }
 
-        // todo: implementiere das Verschieben in eine bestehende Mediengruppe
-        return Result.Success();
+        // Falls die Mediengruppe gefunden wurde, verschiebe die Datei in die Mediengruppe
+        if (mediaGroup.Value != null)
+        {
+            return MoveFileToExistingMediaGroup(mediaFile.Value, mediaGroup.Value);
+        }
+
+        // Verschiebe in eine neue Mediengruppe
+        return MoveFileToNewMediaGroup(mediaFile.Value, mediaGroupId.Value, subDirectoryPathInfo, mediaLibraryPathInfo.Value);
     }
 
     private static Result MoveFileToExistingMediaGroup(IMediaFileType mediaFile, MediaGroupDirectory mediaGroupDirectory)
@@ -109,10 +123,30 @@ public class CanExecuteOrAddCategoryCommand(string filePath, string mediaLibrary
         }
     }
 
-    private static Result MoveFileToNewMediaGroup(IMediaFileType mediaFile, MediaGroupDirectory mediaGroupDirectory, DirectoryPathInfo subDirectory)
+    /// <summary>
+    /// Verschiebt die Datei in eine neue Mediengruppe
+    /// Die Mediengruppe ist Teil des Unterverzeichnisses, das wiederum Teil des Infuse Media Library-Verzeichnisses ist
+    /// </summary>
+    /// <param name="mediaFile"></param>
+    /// <param name="mediaGroupDirectory"></param>
+    /// <param name="subDirectory"></param>
+    /// <param name="mediaLibraryPathInfo"></param>
+    /// <returns></returns>
+    private static Result MoveFileToNewMediaGroup(IMediaFileType mediaFile, MediaGroupId mediaGroupId, DirectoryPathInfo? subDirectory, DirectoryPathInfo mediaLibraryPathInfo)
     {
+        // Ermittle das Zielverzeichnis anhand der Kombination von Medienbibliothek-Verzeichnis, Unterverzeichnis und Mediengruppen-Verzeichnis (ID)
+        var destinationDirectoryPath = subDirectory != null
+            ? Path.Combine(mediaLibraryPathInfo.DirectoryPath, subDirectory.DirectoryPath, mediaGroupId)
+            : Path.Combine(mediaLibraryPathInfo.DirectoryPath, mediaGroupId);
+
+        // Erstelle das Zielverzeichnis falls es nicht existiert
+        if (!Directory.Exists(destinationDirectoryPath))
+        {
+            Directory.CreateDirectory(destinationDirectoryPath);
+        }
+
         // Bewege die Datei in das Infuse Media Library-Verzeichnis
-        var destinationFilePath = Path.Combine(mediaGroupDirectory.DirectoryPath, subDirectory.DirectoryPath, mediaFile.FilePath);
+        var destinationFilePath = Path.Combine(destinationDirectoryPath, mediaFile.FilePath);
         try
         {
             File.Move(mediaFile.FilePath, destinationFilePath);
