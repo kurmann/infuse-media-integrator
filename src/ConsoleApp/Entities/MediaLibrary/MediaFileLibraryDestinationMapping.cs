@@ -6,6 +6,8 @@ namespace Kurmann.InfuseMediaIntegrator.Entities.MediaLibrary;
 
 /// <summary>
 /// Ein Mapping zwischen einer Mediendatei und dem Zielverzeichnis in der Medienbibliothek.
+/// Arbeitet unabhängig von der tatsächlichen Existenz der Datei oder des Verzeichnisses.
+/// Das <see cref="TargetDirectory"/> ist als Verzeichnis definiert, in das die Datei verschoben werden soll.
 /// </summary>
 public class MediaFileLibraryDestinationMapping
 {
@@ -24,14 +26,14 @@ public class MediaFileLibraryDestinationMapping
         var mediaFile = MediaFileTypeDetector.GetMediaFile(mediaFilePath);
         if (mediaFile.IsFailure)
         {
-            return Result.Failure<MediaFileLibraryDestinationMapping>(mediaFile.Error);
+            return Result.Failure<MediaFileLibraryDestinationMapping>("Error on media fila path: " + mediaFile.Error);
         }
 
         // Prüfe ob der Pfad zur Medienbibliothek gültig ist
         var mediaLibrary = DirectoryPathInfo.Create(mediaLibraryPath);
         if (mediaLibrary.IsFailure)
         {
-            return Result.Failure<MediaFileLibraryDestinationMapping>(mediaLibrary.Error);
+            return Result.Failure<MediaFileLibraryDestinationMapping>("Error on media library path: " + mediaLibrary.Error);
         }
 
         // Prüfe, ob das Unterverzeichnis gültig ist, wenn es angegeben wurde
@@ -40,7 +42,7 @@ public class MediaFileLibraryDestinationMapping
             var subDirectory = DirectoryPathInfo.Create(subDirectoryPath);
             if (subDirectory.IsFailure)
             {
-                return Result.Failure<MediaFileLibraryDestinationMapping>(subDirectory.Error);
+                return Result.Failure<MediaFileLibraryDestinationMapping>("Error on sub directory path: " + subDirectory.Error);
             }
         }
 

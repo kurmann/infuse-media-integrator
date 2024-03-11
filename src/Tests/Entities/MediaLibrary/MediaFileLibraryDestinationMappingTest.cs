@@ -93,4 +93,20 @@ public class MediaFileLibraryDestinationMappingTests
         Assert.AreEqual(mediaFilePath, result.Value.Source.FilePath);
         Assert.AreEqual(expectedTargetDirectory, result.Value.TargetDirectory);
     }
+
+    [TestMethod] // Fehlermeldung wenn Verzeichnis für Medienbibliothek nicht angegeben ist
+    public void Create_ShouldReturnFailure_WhenNoMediaLibraryPath()
+    {
+        // Arrange
+        string mediaFilePath = "Local/Video-Export/2024-03-10 Regenbogenfeuer.m4v";
+        string mediaLibraryPath = "";
+        string subDirectoryPath = "Familie";
+
+        // Act
+        var result = MediaFileLibraryDestinationMapping.Create(mediaFilePath, mediaLibraryPath, subDirectoryPath);
+
+        // Assert
+        Assert.IsTrue(result.IsFailure);
+        Assert.AreEqual("Error on media library path: Path is null or empty", result.Error);
+    }
 }
