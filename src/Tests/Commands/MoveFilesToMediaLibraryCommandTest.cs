@@ -6,14 +6,11 @@ namespace Kurmann.InfuseMediaIntegrator.Tests.Commands;
 [TestClass]
 public class MoveFilesToMediaLibraryCommandTest
 {
-    private const string MediaLibraryPath = "Data/Output/Mediathek";
-    private const string InputDirectoryPath = "Data/Input/Testcase 3";
-
     [TestMethod] // Wird korrekt in eine neue Mediengruppe verschoben wenn die Ausgangsdatei keiner bestehenden Mediengruppe zugeordnet ist
     public void Execute_ShouldMoveFileToNewMediaGroup_WhenFileIsNotAssignedToExistingMediaGroup()
     {
         // Arrange
-        var file = Path.Combine(InputDirectoryPath, "Zwillinge Testvideo.m4v");
+        var file = "Data/Input/Testcase 1/Zwillinge Testvideo.m4v";
         var mediaLibraryPath = "Data/Output/Mediathek";
         var logger = new NullLogger<MoveFileToMediaLibraryCommand>();
         var command = new MoveFileToMediaLibraryCommand(file, logger).ToMediaLibrary(mediaLibraryPath);
