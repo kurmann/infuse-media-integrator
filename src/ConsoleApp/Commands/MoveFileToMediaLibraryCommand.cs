@@ -70,9 +70,20 @@ public class MoveFileToMediaLibraryCommand
 
             try
             {
+                // Ermittle die Quelldatei und das Zielverzeichnis
                 var sourceFile = new FileInfo(FilePath);
                 var targetDirectory = new DirectoryInfo(mediaFileLibraryDestinationMapping.Value.TargetDirectory);
-                File.Move(FilePath, Path.Combine(targetDirectory.FullName, sourceFile.Name));
+
+                // Erstellen des Zielverzeichnisses, falls es nicht existiert
+                if (!targetDirectory.Exists)
+                {
+                    targetDirectory.Create();
+                }
+
+                var targetFilePath = Path.Combine(targetDirectory.FullName, sourceFile.Name);
+
+                // Verschiebe die Datei und gib den Erfolg zurück
+                File.Move(FilePath, targetFilePath);
                 OnFileMovedToNewMediaGroup(sourceFile);
                 return Result.Success(sourceFile);
             }
@@ -97,7 +108,7 @@ public class MoveFileToMediaLibraryCommand
         }
 
         // Leite die Mediengruppen-ID aus dem Dateinamen ab (ignoriert Dateiendung oder definierte Suffixe wie -fanart)
-        var mediaGroupId = MediaGroupId.Create(FilePath);
+        var mediaGroupId = MediaGroupId.Create(Path.GetFileNameWithoutExtension(FilePath));
         if (mediaGroupId.IsFailure)
         {
             return Result.Failure<DirectoryPathInfo?>("Error on creating media group ID: " + mediaGroupId.Error);

@@ -10,16 +10,26 @@ public class MoveFilesToMediaLibraryCommandTest
     public void Execute_ShouldMoveFileToNewMediaGroup_WhenFileIsNotAssignedToExistingMediaGroup()
     {
         // Arrange
-        var file = "Data/Input/Testcase 1/Zwillinge Testvideo.m4v";
-        var mediaLibraryPath = "Data/Output/Mediathek";
-        var logger = new NullLogger<MoveFileToMediaLibraryCommand>();
-        var command = new MoveFileToMediaLibraryCommand(file, logger).ToMediaLibrary(mediaLibraryPath);
+        var command = new MoveFileToMediaLibraryCommand
+        {
+            FilePath = "Data/Input/Testcase 4/2023-03-14 Primeli Kurzaufnahme.m4v",
+            MediaLibraryPath = "Data/Output/Mediathek",
+            Logger = new NullLogger<MoveFileToMediaLibraryCommand>()
+        };
+        FileInfo? capturedEventFileInfo = null; // Hilfsvariable für das Erfassen der Event-Informationen
+        command.FileMovedToNewMediaGroup += (sender, e) => capturedEventFileInfo = e;
+        var expectedNewMediaGroupPath = Path.Combine(command.MediaLibraryPath, "2023-03-14 Primeli Kurzaufnahme/2023-03-14 Primeli Kurzaufnahme.m4v");
 
         // Act
         var result = command.Execute();
 
         // Assert
         Assert.IsTrue(result.IsSuccess);
-        Assert.IsTrue(File.Exists(Path.Combine(mediaLibraryPath, "TestFile.mp4")));
+        Assert.IsNotNull(capturedEventFileInfo);
+        Assert.AreEqual(expectedNewMediaGroupPath, capturedEventFileInfo.FullName);
+        Assert.IsTrue(File.Exists(expectedNewMediaGroupPath));
+        
+        // Clean up
+        File.Delete(expectedNewMediaGroupPath);
     }
 }
