@@ -15,6 +15,25 @@ public class MoveFileToMediaLibraryCommand(string filePath, ILogger? logger = nu
     {
         return new CanExecuteOrAddCategoryCommand(_filePath, mediaLibraryPath, _logger);
     }
+
+    // Ereignis um mitzuteilen, wann welche Datei in eine bestehende Mediengruppe verschoben wurde
+    public event EventHandler<FileInfo>? FileMovedToExistingMediaGroup;
+
+    // Ereignis um mitzuteilen, wann welche Datei in eine neue Mediengruppe verschoben wurde
+    public event EventHandler<FileInfo>? FileMovedToNewMediaGroup;
+
+    // Ereignisauslöser für das Ereignis FileMovedToExistingMediaGroup
+    protected virtual void OnFileMovedToExistingMediaGroup(FileInfo e)
+    {
+        FileMovedToExistingMediaGroup?.Invoke(this, e);
+    }
+
+    // Ereignisauslöser für das Ereignis FileMovedToNewMediaGroup
+    protected virtual void OnFileMovedToNewMediaGroup(FileInfo e)
+    {
+        FileMovedToNewMediaGroup?.Invoke(this, e);
+    }
+
 }
 
 public interface ICanExecuteOrAddCategoryCommand : ICommand
@@ -88,7 +107,7 @@ public class CanExecuteOrAddCategoryCommand(string filePath, string mediaLibrary
     /// und die Mediengruppe im Infuse Media Library-Verzeichnis existiert.
     /// </summary>
     /// <returns></returns>
-    private static Result<DirectoryPathInfo?> TryMovingToExistingMediaGroup(string filePath, string mediaLibraryPath)
+    private Result<DirectoryPathInfo?> TryMovingToExistingMediaGroup(string filePath, string mediaLibraryPath)
     {
         // Prüfe, ob der Dateipfad existiert
         if (!File.Exists(filePath))
