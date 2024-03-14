@@ -18,21 +18,11 @@ public class MoveFileToMediaLibraryCommand(string filePath, ILogger? logger = nu
 
     // Ereignis um mitzuteilen, wann welche Datei in eine bestehende Mediengruppe verschoben wurde
     public event EventHandler<FileInfo>? FileMovedToExistingMediaGroup;
+    protected virtual void OnFileMovedToExistingMediaGroup(FileInfo e) => FileMovedToExistingMediaGroup?.Invoke(this, e);
 
     // Ereignis um mitzuteilen, wann welche Datei in eine neue Mediengruppe verschoben wurde
     public event EventHandler<FileInfo>? FileMovedToNewMediaGroup;
-
-    // Ereignisauslöser für das Ereignis FileMovedToExistingMediaGroup
-    protected virtual void OnFileMovedToExistingMediaGroup(FileInfo e)
-    {
-        FileMovedToExistingMediaGroup?.Invoke(this, e);
-    }
-
-    // Ereignisauslöser für das Ereignis FileMovedToNewMediaGroup
-    protected virtual void OnFileMovedToNewMediaGroup(FileInfo e)
-    {
-        FileMovedToNewMediaGroup?.Invoke(this, e);
-    }
+    protected virtual void OnFileMovedToNewMediaGroup(FileInfo e) => FileMovedToNewMediaGroup?.Invoke(this, e);
 
 }
 
