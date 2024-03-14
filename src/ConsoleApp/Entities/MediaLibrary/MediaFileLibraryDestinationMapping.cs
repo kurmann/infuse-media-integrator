@@ -26,7 +26,7 @@ public class MediaFileLibraryDestinationMapping
         var mediaFile = MediaFileTypeDetector.GetMediaFile(mediaFilePath);
         if (mediaFile.IsFailure)
         {
-            return Result.Failure<MediaFileLibraryDestinationMapping>("Error on media fila path: " + mediaFile.Error);
+            return Result.Failure<MediaFileLibraryDestinationMapping>("Error on media file path: " + mediaFile.Error);
         }
 
         // Prüfe ob der Pfad zur Medienbibliothek gültig ist
