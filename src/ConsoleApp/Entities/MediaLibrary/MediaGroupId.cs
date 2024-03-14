@@ -1,6 +1,5 @@
 using CSharpFunctionalExtensions;
 using Kurmann.InfuseMediaIntegrator.Entities.Elementary;
-using Kurmann.InfuseMediaIntegrator.Entities.MediaFileTypes;
 
 namespace Kurmann.InfuseMediaIntegrator.Entities.MediaLibrary;
 
