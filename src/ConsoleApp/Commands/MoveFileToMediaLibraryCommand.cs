@@ -25,62 +25,55 @@ public interface ICanExecuteOrAddCategoryCommand : ICommand
 public class CanExecuteOrAddCategoryCommand(string filePath, string mediaLibraryPath, ILogger? logger = null)
     : ICanExecuteOrAddCategoryCommand
 {
-    private readonly string _filePath = filePath;
-    private readonly string _mediaLibraryPath = mediaLibraryPath;
     private readonly ILogger? _logger = logger;
     private string? _subDirectory;
 
     public Result Execute()
     {
-        _logger?.LogInformation($"Moving file from {_filePath} to media library {_mediaLibraryPath}");
+        _logger?.LogInformation($"Moving file from {filePath} to media library {mediaLibraryPath}");
 
         // Verschiebe die Datei in ein bestehendes Mediengruppen-Verzeichnis sofern vorhanden
-        var existingMediaGroupDirectory = TryMovingToExistingMediaGroup(_filePath, _mediaLibraryPath);
+        var existingMediaGroupDirectory = TryMovingToExistingMediaGroup(filePath, mediaLibraryPath);
 
         // Wenn die Datei nicht Teil einer bestehenden Mediengruppe ist, dann verschiebe die Datei in eine neue Mediengruppe
         if (existingMediaGroupDirectory.IsFailure)
         {
             // Logge eine Warnung, dass die Abfrage nach einer bestehenden Mediengruppe fehlgeschlagen ist
             _logger?.LogWarning("Error on querying existing media group: " + existingMediaGroupDirectory.Error);
+            _logger?.LogInformation("Moving file to new media group.");
 
-            // Prüfe, ob die Datei bereits verschoben wurde in eine existierende Mediengruppe
-            if (existingMediaGroupDirectory.Value != null)
+            return MoveToNewMediaGroup();
+        }
+
+        // Prüfe, ob die Datei bereits in eine existierende Mediengruppe verschoben wurde (mit der Methode TryMovingToExistingMediaGroup) und gib den Erfolg zurück
+        if (existingMediaGroupDirectory.Value != null)
+        {
+            _logger?.LogInformation($"File {filePath} was successfully moved to media group {existingMediaGroupDirectory.Value}");
+            return Result.Success();
+        }
+
+        // Sonst verschiebe die Datei in eine neue Mediengruppe
+        return MoveToNewMediaGroup();
+
+        Result MoveToNewMediaGroup()
+        {
+            var mediaFileLibraryDestinationMapping = MediaFileLibraryDestinationMapping.Create(filePath, mediaLibraryPath, _subDirectory);
+            if (mediaFileLibraryDestinationMapping.IsFailure)
             {
-                _logger?.LogInformation($"File {_filePath} was successfully moved to media group {existingMediaGroupDirectory.Value}");
-                return Result.Success();
+                return Result.Failure<FileInfo>("Error on creating media file library destination mapping: " + mediaFileLibraryDestinationMapping.Error);
             }
-        }
 
-        // Verschiebe die Datei in eine neue Mediengruppe
-        var targetFilePath = MoveToNewMediaGroup(_filePath, _mediaLibraryPath, _subDirectory);
-        if (targetFilePath.IsFailure)
-        {
-            _logger?.LogError("Error on moving file to media library: " + targetFilePath.Error);
-            return Result.Failure(targetFilePath.Error);
-        }
-
-        _logger?.LogInformation($"File {_filePath} was successfully moved to media group {targetFilePath.Value.Directory.FullName}");
-        return Result.Success();
-    }
-
-    private static Result<FileInfo> MoveToNewMediaGroup(string filePath, string mediaLibraryPath, string? subDirectory)
-    {
-        var mediaFileLibraryDestinationMapping = MediaFileLibraryDestinationMapping.Create(filePath, mediaLibraryPath, subDirectory);
-        if (mediaFileLibraryDestinationMapping.IsFailure)
-        {
-            return Result.Failure<FileInfo>("Error on creating media file library destination mapping: " + mediaFileLibraryDestinationMapping.Error);
-        }
-
-        try
-        {
-            var sourceFile = new FileInfo(filePath);
-            var targetDirectory = new DirectoryInfo(mediaFileLibraryDestinationMapping.Value.TargetDirectory);
-            File.Move(filePath, Path.Combine(targetDirectory.FullName, sourceFile.Name));
-            return Result.Success(sourceFile);
-        }
-        catch (Exception e)
-        {
-            return Result.Failure<FileInfo>("Error on moving file: " + e.Message);
+            try
+            {
+                var sourceFile = new FileInfo(filePath);
+                var targetDirectory = new DirectoryInfo(mediaFileLibraryDestinationMapping.Value.TargetDirectory);
+                File.Move(filePath, Path.Combine(targetDirectory.FullName, sourceFile.Name));
+                return Result.Success(sourceFile);
+            }
+            catch (Exception e)
+            {
+                return Result.Failure<FileInfo>("Error on moving file: " + e.Message);
+            }
         }
     }
 
