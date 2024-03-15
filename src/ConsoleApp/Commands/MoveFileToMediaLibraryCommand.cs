@@ -84,7 +84,7 @@ public class MoveFileToMediaLibraryCommand
 
                 // Verschiebe die Datei und gib den Erfolg zurück
                 File.Move(FilePath, targetFilePath);
-                OnFileMovedToNewMediaGroup(sourceFile);
+                OnFileMovedToNewMediaGroup(new FileInfo(targetFilePath));
                 return Result.Success(sourceFile);
             }
             catch (Exception e)
