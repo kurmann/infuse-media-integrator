@@ -135,7 +135,7 @@ public class MoveFileToMediaLibraryCommand
             var targetFileAlreadyExists = targetFile.Exists;
 
             File.Move(FilePath, targetFile.FullName, true);
-            OnFileMovedToMediaLibrary(new FileMovedToMediaLibraryEventArgs(new FileInfo(FilePath), true, targetFileAlreadyExists));
+            OnFileMovedToMediaLibrary(new FileMovedToMediaLibraryEventArgs(targetFile, true, targetFileAlreadyExists));
             return Result.Success<DirectoryPathInfo?>(mediaGroup.Value.DirectoryPath);
         }
         catch (Exception e)
