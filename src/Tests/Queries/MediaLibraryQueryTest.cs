@@ -5,7 +5,7 @@ namespace Kurmann.InfuseMediaIntegrator.Tests.Queries;
 [TestClass]
 public class MediaLibraryQueryTests
 {
-    public const string MediaLibraryPath = "Data/Output/Mediathek";
+    public const string MediaLibraryPath = "Data/Input/Testcase 6";
 
     [TestMethod]
     public void Execute_ShouldReturnFailure_WhenMediaLibraryPathIsEmpty()
