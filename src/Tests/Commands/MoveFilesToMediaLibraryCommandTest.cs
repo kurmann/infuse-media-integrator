@@ -18,7 +18,8 @@ public class MoveFilesToMediaLibraryCommandTest
         };
         FileInfo? capturedEventFileInfo = null; // Hilfsvariable für das Erfassen der Event-Informationen
         command.FileMovedToNewMediaGroup += (sender, e) => capturedEventFileInfo = e;
-        var expectedNewMediaGroupPath = Path.Combine(command.MediaLibraryPath, "2023-03-14 Primeli Kurzaufnahme/2023-03-14 Primeli Kurzaufnahme.m4v");
+        var expectedNewMediaGroupPath = new FileInfo(Path.Combine(command.MediaLibraryPath, "2023-03-14 Primeli Kurzaufnahme/2023-03-14 Primeli Kurzaufnahme.m4v"));
+        File.Delete(expectedNewMediaGroupPath.FullName); // Sicherstellen, dass die Datei gelöscht ist
 
         // Act
         var result = command.Execute();
@@ -26,10 +27,10 @@ public class MoveFilesToMediaLibraryCommandTest
         // Assert
         Assert.IsTrue(result.IsSuccess);
         Assert.IsNotNull(capturedEventFileInfo);
-        Assert.AreEqual(expectedNewMediaGroupPath, capturedEventFileInfo.FullName);
-        Assert.IsTrue(File.Exists(expectedNewMediaGroupPath));
+        Assert.AreEqual(expectedNewMediaGroupPath.FullName, capturedEventFileInfo.FullName);
+        Assert.IsTrue(File.Exists(expectedNewMediaGroupPath.FullName));
         
         // Clean up
-        File.Delete(expectedNewMediaGroupPath);
+        File.Delete(expectedNewMediaGroupPath.FullName);
     }
 }
