@@ -5,8 +5,8 @@ namespace Kurmann.InfuseMediaIntegrator.Tests.Entities;
 [TestClass]
 public class VideoIntegrationDirectoryTests
 {
-    private const string InputPathTestCase1 = "Data/Input/Testcase 1";
-    private const string InputPathTestCase2 = "Data/Input/Testcase 2";
+    private const string InputPathTestCase1 = "Data/Testcase 1";
+    private const string InputPathTestCase2 = "Data/Testcase 2";
 
     /// <summary>
     /// Testet die Methode <see cref="VideoIntegrationDirectory.Create(string)"/>.

@@ -12,7 +12,7 @@ public class MoveFilesToMediaLibraryCommandTest
         // Arrange
         var command = new MoveFileToMediaLibraryCommand
         {
-            FilePath = "Data/Input/Testcase 4/2023-03-14 Primeli Kurzaufnahme.m4v",
+            FilePath = "Data/Testcase 4/2023-03-14 Primeli Kurzaufnahme.m4v",
             MediaLibraryPath = "Data/Output/Mediathek",
             Logger = new NullLogger<MoveFileToMediaLibraryCommand>()
         };
@@ -41,7 +41,7 @@ public class MoveFilesToMediaLibraryCommandTest
     public void Execute_ShouldMoveFileToExistingMediaGroup_WhenFileIsAssignedToExistingMediaGroup()
     {
         // Arrange
-        var sourceFile = new FileInfo("Data/Input/Testcase 5/2023-06-15 Balkenmäher.m4v");
+        var sourceFile = new FileInfo("Data/Testcase 5/2023-06-15 Balkenmäher.m4v");
         var mediaLibraryDirectory = new DirectoryInfo("Data/Output/Mediathek");
         var existingMediaGroupDirectory = new DirectoryInfo(Path.Combine(mediaLibraryDirectory.FullName, "Familie/2023/"));
         var fileInExistingMediaGroupDirectory = new FileInfo(Path.Combine(existingMediaGroupDirectory.FullName, sourceFile.Name));

@@ -5,7 +5,7 @@ namespace Kurmann.InfuseMediaIntegrator.Tests.Queries;
 [TestClass]
 public class MediaGroupQueryTests
 {
-    public const string MediaLibraryPath = "Data/Input/Testcase 6";
+    public const string MediaLibraryPath = "Data/Testcase 6";
 
     [TestMethod] // Testet, ob die Suche nach einer ID korrekt funktioniert
     public void WithId_ShouldReturnCorrectResult_WhenIdIsSet()
@@ -19,7 +19,7 @@ public class MediaGroupQueryTests
         // Assert
         Assert.IsTrue(result.IsSuccess);
         Assert.IsNotNull(result.Value);
-        Assert.AreEqual("Data/Input/Testcase 6/Garten/2024", result.Value.DirectoryPath);
+        Assert.AreEqual("Data/Testcase 6/Garten/2024", result.Value.DirectoryPath);
     }
 
     [TestMethod] // Nicht-existierende ID ergibt leeres Result

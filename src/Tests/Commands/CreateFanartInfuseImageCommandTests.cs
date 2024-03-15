@@ -5,8 +5,8 @@ namespace Kurmann.InfuseMediaIntegrator.Tests.Commands;
 [TestClass]
 public class CreateFanartInfuseImageCommandTests
 {
-    private const string PathTestcase1 = "Data/Input/Testcase 1";
-    private const string PathTestcase2 = "Data/Input/Testcase 2";
+    private const string PathTestcase1 = "Data/Testcase 1";
+    private const string PathTestcase2 = "Data/Testcase 2";
 
     /// <summary>
     /// Testet die Methode <see cref="CreateFanartInfuseImageCommand.Execute()"/>.

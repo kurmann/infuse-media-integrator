@@ -5,7 +5,7 @@ namespace Kurmann.InfuseMediaIntegrator.Tests.Queries;
 [TestClass]
 public class MetadataFromFileQueryTests
 {
-    private const string InputPathTestCase1 = "Data/Input/Testcase 1";
+    private const string InputPathTestCase1 = "Data/Testcase 1";
 
     [TestMethod]
     public void Execute_ShouldReturnMetadata_WhenFilePathIsValid()
