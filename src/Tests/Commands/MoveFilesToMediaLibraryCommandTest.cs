@@ -16,8 +16,8 @@ public class MoveFilesToMediaLibraryCommandTest
             MediaLibraryPath = "Data/Output/Mediathek",
             Logger = new NullLogger<MoveFileToMediaLibraryCommand>()
         };
-        FileInfo? capturedEventFileInfo = null; // Hilfsvariable für das Erfassen der Event-Informationen
-        command.FileMovedToNewMediaGroup += (sender, e) => capturedEventFileInfo = e;
+        FileMovedToMediaLibraryEventArgs? commandEventArgs = null; // Hilfsvariable für das Erfassen der Event-Informationen
+        command.FileMovedToMediaLibrary += (sender, e) => commandEventArgs = e;
         var expectedNewMediaGroupPath = new FileInfo(Path.Combine(command.MediaLibraryPath, "2023-03-14 Primeli Kurzaufnahme/2023-03-14 Primeli Kurzaufnahme.m4v"));
         File.Delete(expectedNewMediaGroupPath.FullName); // Sicherstellen, dass die Datei gelöscht ist
 
@@ -26,8 +26,11 @@ public class MoveFilesToMediaLibraryCommandTest
 
         // Assert
         Assert.IsTrue(result.IsSuccess);
-        Assert.IsNotNull(capturedEventFileInfo);
-        Assert.AreEqual(expectedNewMediaGroupPath.FullName, capturedEventFileInfo.FullName);
+        Assert.IsNotNull(commandEventArgs);
+        Assert.AreEqual(expectedNewMediaGroupPath.FullName, commandEventArgs.FileInfo.FullName); // Die Datei ist im erwarteten Verzeichnis vorhanden
+        Assert.IsTrue(commandEventArgs.FileInfo.Exists);
+        Assert.IsFalse(commandEventArgs.HasMovedToExistingMediaGroup); // Die Datei wurde nicht in eine bestehende Mediengruppe verschoben
+        Assert.IsFalse(commandEventArgs.HasTargetFileBeenOverwritten); // Die Datei wurde nicht überschrieben
         Assert.IsTrue(File.Exists(expectedNewMediaGroupPath.FullName));
         
         // Clean up

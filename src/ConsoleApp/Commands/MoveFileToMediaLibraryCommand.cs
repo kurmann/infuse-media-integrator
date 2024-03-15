@@ -33,6 +33,10 @@ public class MoveFileToMediaLibraryCommand
     public event EventHandler<FileInfo>? FileMovedToNewMediaGroup;
     protected virtual void OnFileMovedToNewMediaGroup(FileInfo e) => FileMovedToNewMediaGroup?.Invoke(this, e);
 
+    // Allgemeines Ereignis um mitzuteilen, dass eine Datei in die Mediathek verschoben wurde.
+    public event EventHandler<FileMovedToMediaLibraryEventArgs>? FileMovedToMediaLibrary;
+    protected virtual void OnFileMovedToMediaLibrary(FileMovedToMediaLibraryEventArgs e) => FileMovedToMediaLibrary?.Invoke(this, e);
+
     public Result Execute()
     {
         Logger?.LogInformation($"Moving file from {FilePath} to media library {MediaLibraryPath}");
@@ -84,7 +88,8 @@ public class MoveFileToMediaLibraryCommand
 
                 // Verschiebe die Datei und gib den Erfolg zurück
                 File.Move(FilePath, targetFilePath);
-                OnFileMovedToNewMediaGroup(new FileInfo(targetFilePath));
+                OnFileMovedToMediaLibrary(new FileMovedToMediaLibraryEventArgs(new FileInfo(targetFilePath)));
+
                 return Result.Success(sourceFile);
             }
             catch (Exception e)
@@ -141,3 +146,5 @@ public class MoveFileToMediaLibraryCommand
     }
 
 }
+
+public record FileMovedToMediaLibraryEventArgs(FileInfo FileInfo, bool HasMovedToExistingMediaGroup = false, bool HasTargetFileBeenOverwritten = false);
