@@ -78,9 +78,12 @@ public class MoveFileToMediaLibraryCommand
 
                 var targetFilePath = Path.Combine(targetDirectory.FullName, sourceFile.Name);
 
+                // Prüfe, ob die Datei bereits im Zielverzeichnis existiert
+                var targetFileAlreadyExists = File.Exists(targetFilePath);
+
                 // Verschiebe die Datei und gib den Erfolg zurück
-                File.Move(FilePath, targetFilePath);
-                OnFileMovedToMediaLibrary(new FileMovedToMediaLibraryEventArgs(new FileInfo(targetFilePath)));
+                File.Move(FilePath, targetFilePath, true);
+                OnFileMovedToMediaLibrary(new FileMovedToMediaLibraryEventArgs(new FileInfo(targetFilePath), false, targetFileAlreadyExists));
 
                 return Result.Success(sourceFile);
             }
@@ -127,8 +130,12 @@ public class MoveFileToMediaLibraryCommand
         // Wenn die Mediengruppe existiert, dann verschiebe die Datei in die Mediengruppe
         try
         {
-            File.Move(FilePath, Path.Combine(mediaGroup.Value.DirectoryPath, Path.GetFileName(FilePath)));
-            OnFileMovedToMediaLibrary(new FileMovedToMediaLibraryEventArgs(new FileInfo(FilePath), true));
+            // Prüfe, ob die Datei bereits im Zielverzeichnis existiert
+            var targetFile = new FileInfo(Path.Combine(mediaGroup.Value.DirectoryPath, Path.GetFileName(FilePath)));
+            var targetFileAlreadyExists = targetFile.Exists;
+
+            File.Move(FilePath, targetFile.FullName, true);
+            OnFileMovedToMediaLibrary(new FileMovedToMediaLibraryEventArgs(new FileInfo(FilePath), true, targetFileAlreadyExists));
             return Result.Success<DirectoryPathInfo?>(mediaGroup.Value.DirectoryPath);
         }
         catch (Exception e)
