@@ -11,6 +11,7 @@ public class FileWatcherService : IHostedService, IDisposable
     private FileSystemWatcher? _fileWatcher;
     private readonly string _watchPath;
     private readonly IMessageService _messageService;
+    private readonly List<string> _watchedFileExtensions;
 
     public FileWatcherService(ILogger<FileWatcherService> logger, IOptions<ModuleOptions> options, IMessageService messageService)
     {
@@ -21,16 +22,30 @@ public class FileWatcherService : IHostedService, IDisposable
         _logger = logger;
         _watchPath = options.Value.LocalFileSystem.WatchPath;
         _messageService = messageService;
+        _watchedFileExtensions = options.Value.LocalFileSystem.WatchedFileExtensions;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
         _fileWatcher = new FileSystemWatcher(_watchPath)
         {
-            NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite,
-            Filter = "*.*" // Überwacht alle Dateitypen, dies kann nach Bedarf angepasst werden.
+            // Überwacht nur Dateinamen und Änderungen an Dateien.
+            NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite | NotifyFilters.DirectoryName,
+
+            // Filter für Dateiendungen, die nicht überwacht werden sollen.
+            IncludeSubdirectories = true,
         };
 
+        // Fügt die Dateiendungen hinzu, die überwacht werden sollen.
+        foreach (var fileExtension in _watchedFileExtensions)
+        {
+            _fileWatcher.Filters.Add(fileExtension);
+        }
+
+        // Logge, die Dateiendungen, die überwacht werden.
+        _logger.LogInformation("FileWatcherService is watching for file extensions: {WatchedFileExtensions}", string.Join(", ", _watchedFileExtensions));
+
+        // Event-Handler für die verschiedenen Ereignisse.
         _fileWatcher.Created += OnCreated;
         _fileWatcher.Deleted += OnDeleted;
         _fileWatcher.Changed += OnChanged;
