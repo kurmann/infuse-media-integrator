@@ -6,9 +6,17 @@ public interface IEventMessage { }
 
 public abstract class EventMessageBase : IEventMessage
 {
-    public string Id { get; }
+    protected Ulid Ulid { get; }
 
-    protected EventMessageBase() => Id = Ulid.NewUlid().ToString();
+    public string Id => Ulid.ToString();
+
+    public DateTimeOffset Timestamp { get; }
+
+    protected EventMessageBase()
+    {
+        Ulid = Ulid.NewUlid();
+        Timestamp = Ulid.Time;
+    }
 }
 
 public interface IMessageService
