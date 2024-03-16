@@ -42,19 +42,19 @@ public class FileWatcherService : IHostedService, IDisposable
     private void OnCreated(object sender, FileSystemEventArgs e)
     {
         _logger.LogInformation("New file: {FileName}", e.FullPath);
-        _messageService.Send(new MessageServiceEventArgs(e.FullPath));
+        _messageService.Send(new FileAddedEventMessage(e.FullPath));
     }
 
     private void OnDeleted(object sender, FileSystemEventArgs e)
     {
         _logger.LogInformation("File deleted: {FileName}", e.FullPath);
-        _messageService.Send(new MessageServiceEventArgs(e.FullPath));
+        _messageService.Send(new FileChangedEventMessage(e.FullPath));
     }
 
     private void OnChanged(object sender, FileSystemEventArgs e)
     {
         _logger.LogInformation("File changed: {FileName}", e.FullPath);
-        _messageService.Send(new MessageServiceEventArgs(e.FullPath));
+        _messageService.Send(new FileDeletedEventMessage(e.FullPath));
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
@@ -71,4 +71,6 @@ public class FileWatcherService : IHostedService, IDisposable
     }
 }
 
-public record MessageServiceEventArgs(string? FilePath);
+public record FileAddedEventMessage(string? FilePath);
+public record FileChangedEventMessage(string? FilePath);
+public record FileDeletedEventMessage(string? FilePath);
