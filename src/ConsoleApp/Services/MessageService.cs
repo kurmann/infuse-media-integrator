@@ -18,6 +18,9 @@ public interface IMessageService
 
     // Abonniert eine Nachricht eines beliebigen Typs mit einem Handler.
     void Subscribe<TMessage>(Action<TMessage> handler) where TMessage : IEventMessage;
+
+    // Deabonniert eine Nachricht eines beliebigen Typs mit einem Handler.
+    void Unsubscribe<TMessage>(Action<TMessage> handler) where TMessage : IEventMessage;
 }
 
 /// <summary>
