@@ -1,12 +1,9 @@
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace Kurmann.InfuseMediaIntegrator.Services;
 
-public interface IMediaLibraryIntegrationService
-{
-}
-
-public class MediaLibraryIntegrationService : IMediaLibraryIntegrationService
+public class MediaLibraryIntegrationService : IHostedService, IDisposable
 {
     private readonly ILogger<MediaLibraryIntegrationService> _logger;
     private readonly IMessageService _messageService;
@@ -18,6 +15,23 @@ public class MediaLibraryIntegrationService : IMediaLibraryIntegrationService
 
         // Abonnieren von Nachrichten, um Dateien zu verschieben, wenn die entsprechende Nachricht empfangen wird.
         _messageService.Subscribe<FileAddedEventMessage>(MoveFileToLibrary);
+    }
+
+    public void Dispose()
+    {
+        GC.SuppressFinalize(this);
+    }
+
+    public Task StartAsync(CancellationToken cancellationToken)
+    {
+        _logger.LogInformation("MediaLibraryIntegrationService has started");
+        return Task.CompletedTask;
+    }
+
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        _logger.LogInformation("MediaLibraryIntegrationService has stopped");
+        return Task.CompletedTask;
     }
 
     private void MoveFileToLibrary(FileAddedEventMessage fileAddedEventMessage)
