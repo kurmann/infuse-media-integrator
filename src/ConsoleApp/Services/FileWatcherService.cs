@@ -14,8 +14,12 @@ public class FileWatcherService : IHostedService, IDisposable
 
     public FileWatcherService(ILogger<FileWatcherService> logger, IOptions<ModuleOptions> options, IMessageService messageService)
     {
-        ArgumentNullException.ThrowIfNull(options.Value.LocalFileSystem, nameof(options.Value.LocalFileSystem));
-        ArgumentNullException.ThrowIfNull(options.Value.LocalFileSystem.WatchPath, nameof(options.Value.LocalFileSystem.WatchPath));
+        if (options is null)
+            throw new ArgumentNullException(nameof(options));
+        if (options.Value.LocalFileSystem is null)
+            throw new ArgumentNullException(nameof(options.Value.LocalFileSystem));
+        if (options.Value.LocalFileSystem.WatchPath is null)
+            throw new ArgumentNullException(nameof(options.Value.LocalFileSystem.WatchPath));
 
         _logger = logger;
         _watchPath = options.Value.LocalFileSystem.WatchPath;
