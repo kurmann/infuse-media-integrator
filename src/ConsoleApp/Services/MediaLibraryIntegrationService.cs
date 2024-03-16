@@ -1,4 +1,3 @@
-using Kurmann.InfuseMediaIntegrator.Services;
 using Microsoft.Extensions.Logging;
 
 namespace Kurmann.InfuseMediaIntegrator.Services;

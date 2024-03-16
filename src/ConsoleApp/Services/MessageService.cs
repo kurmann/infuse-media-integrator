@@ -57,8 +57,10 @@ public class MessageService : IMessageService
         // Diese Umsetzung stellt sicher, dass das Hinzufügen von Handlern threadsicher ist, indem es eine neue Liste von 
         // Handlern erstellt und diese dann ersetzt, anstatt die bestehende Liste direkt zu ändern.
         _handlers.AddOrUpdate(key,
+
             // Hinzufügen, wenn der Key noch nicht existiert
             addValueFactory: _ => [handler],
+            
             // Update der vorhandenen Liste, wenn der Key existiert
             updateValueFactory: (type, existingHandlers) =>
             {
