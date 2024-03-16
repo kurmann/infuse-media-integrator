@@ -17,11 +17,6 @@ public class MediaLibraryIntegrationService : IHostedService, IDisposable
         _messageService.Subscribe<FileAddedEventMessage>(MoveFileToLibrary);
     }
 
-    public void Dispose()
-    {
-        GC.SuppressFinalize(this);
-    }
-
     public Task StartAsync(CancellationToken cancellationToken)
     {
         _logger.LogInformation("MediaLibraryIntegrationService has started");
@@ -40,6 +35,12 @@ public class MediaLibraryIntegrationService : IHostedService, IDisposable
         // Implementiere hier die Logik zum Verschieben der Datei.
         // Verwende den Inhalt von 'MoveFileToMediaLibraryCommand' als Referenz für die Implementierung.
 
+    }
+
+    public void Dispose()
+    {
+        GC.SuppressFinalize(this);
+        _messageService.Unsubscribe<FileAddedEventMessage>(MoveFileToLibrary);
     }
 
 }
