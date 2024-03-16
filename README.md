@@ -124,3 +124,4 @@ Für Unittesting mit Videodateien stehen Testdaten bereit: [Testdateien](docs/Te
 
 ### Recherche
 - [Nachrichtensystem](/docs/research/Nachrichtensystem.md)
+- [Konfiguration](/docs/research/Konfiguration.md)
