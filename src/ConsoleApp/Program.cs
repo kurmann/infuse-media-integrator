@@ -14,7 +14,7 @@ internal class Program
         .ConfigureServices((hostContext, services) =>
         {
             var configuration = hostContext.Configuration;
-            services.Configure<ModuleOptions>(configuration.GetSection("LocalFileSystem"));
+            services.Configure<ModuleOptions>(configuration);
 
             services.AddHostedService<FileWatcherService>();
             services.AddSingleton<IMessageService, MessageService>();

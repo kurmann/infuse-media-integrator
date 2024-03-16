@@ -3,6 +3,14 @@ namespace Kurmann.InfuseMediaIntegratior;
 public class ModuleOptions
 {
     /// <summary>
+    /// Die Konfiguration für das lokale Dateisystem
+    /// </summary>
+    public LocalFileSystemOptions? LocalFileSystem { get; init; }
+}
+
+public class LocalFileSystemOptions
+{
+    /// <summary>
     /// Der Pfad zur Infuse Media Library
     /// </summary>
     public string? MediaLibraryPath { get; init; }

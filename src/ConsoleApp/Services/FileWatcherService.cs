@@ -14,10 +14,11 @@ public class FileWatcherService : IHostedService, IDisposable
 
     public FileWatcherService(ILogger<FileWatcherService> logger, IOptions<ModuleOptions> options, IMessageService messageService)
     {
-        ArgumentNullException.ThrowIfNull(options?.Value.WatchPath);
+        ArgumentNullException.ThrowIfNull(options.Value.LocalFileSystem, nameof(options.Value.LocalFileSystem));
+        ArgumentNullException.ThrowIfNull(options.Value.LocalFileSystem.WatchPath, nameof(options.Value.LocalFileSystem.WatchPath));
 
         _logger = logger;
-        _watchPath = options.Value.WatchPath;
+        _watchPath = options.Value.LocalFileSystem.WatchPath;
         _messageService = messageService;
     }
 
