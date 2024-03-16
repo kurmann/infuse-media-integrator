@@ -1,3 +1,7 @@
+# Konfiguration
+
+Gespräch mit ChatGPT am 16. März 2024.
+
 > (...). Kannst du mir schnell etwas über das Options-Pattern sagen, das ein Teil des Konfigurationsmusters von .NET ist? Ich habe verschiedene Module. Kann ich für jedes Module ein eigenes Options-Set erstellen, das dann mit den Daten gemappt wird, die von Umgebungsvariablen untergleichen stammen? Ist das auf diese Weise möglich? Oder ist die Gefahr, dass bei mehreren Modulen, die alle ein Options-Pattern verwenden, gewisse Konfigurationen überschrieben werden? Natürlich schaue ich, dass die Konfigurationswerte nicht die gleiche sind, ab die Stelle dieser Grundsatzfrage.
 
 Ja, das Options-Pattern in .NET Core und .NET 5/6/7 ist eine empfohlene Methode, um Konfigurationseinstellungen in Ihre Anwendung zu laden und zu verwenden. Es ist besonders nützlich, weil es eine starke Typisierung für Konfigurationseinstellungen bietet, die aus verschiedenen Quellen stammen können, wie z.B. Konfigurationsdateien (`appsettings.json`), Umgebungsvariablen, Befehlszeilenargumenten und anderen. Das Options-Pattern ermöglicht es Ihnen, Konfigurationen klar und strukturiert zu verwalten und stellt sicher, dass Ihre Anwendung leicht konfigurierbar bleibt.
