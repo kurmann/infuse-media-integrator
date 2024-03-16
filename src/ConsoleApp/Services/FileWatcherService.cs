@@ -10,13 +10,15 @@ public class FileWatcherService : IHostedService, IDisposable
     private readonly ILogger<FileWatcherService> _logger;
     private FileSystemWatcher? _fileWatcher;
     private readonly string _watchPath;
+    private readonly IMessageService _messageService;
 
-    public FileWatcherService(ILogger<FileWatcherService> logger, IOptions<ModuleOptions> options)
+    public FileWatcherService(ILogger<FileWatcherService> logger, IOptions<ModuleOptions> options, IMessageService messageService)
     {
         ArgumentNullException.ThrowIfNull(options?.Value.WatchPath);
 
         _logger = logger;
         _watchPath = options.Value.WatchPath;
+        _messageService = messageService;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -39,26 +41,20 @@ public class FileWatcherService : IHostedService, IDisposable
 
     private void OnCreated(object sender, FileSystemEventArgs e)
     {
-        // Hinweis: Hier können Sie Ihren internen Nachrichtenkanal integrieren, um eine Nachricht zu versenden.
         _logger.LogInformation("New file: {FileName}", e.FullPath);
-
-        // Beispiel: NachrichtenkanalEvent?.Invoke(this, new NachrichtenkanalEventArgs(e.FullPath));
+        _messageService.Send(new MessageServiceEventArgs(e.FullPath));
     }
 
     private void OnDeleted(object sender, FileSystemEventArgs e)
     {
-        // Hinweis: Hier können Sie Ihren internen Nachrichtenkanal integrieren, um eine Nachricht zu versenden.
         _logger.LogInformation("File deleted: {FileName}", e.FullPath);
-
-        // Beispiel: NachrichtenkanalEvent?.Invoke(this, new NachrichtenkanalEventArgs(e.FullPath));
+        _messageService.Send(new MessageServiceEventArgs(e.FullPath));
     }
 
     private void OnChanged(object sender, FileSystemEventArgs e)
     {
-        // Hinweis: Hier können Sie Ihren internen Nachrichtenkanal integrieren, um eine Nachricht zu versenden.
         _logger.LogInformation("File changed: {FileName}", e.FullPath);
-
-        // Beispiel: NachrichtenkanalEvent?.Invoke(this, new NachrichtenkanalEventArgs(e.FullPath));
+        _messageService.Send(new MessageServiceEventArgs(e.FullPath));
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
@@ -74,3 +70,5 @@ public class FileWatcherService : IHostedService, IDisposable
         GC.SuppressFinalize(this);
     }
 }
+
+public record MessageServiceEventArgs(string? FilePath);
