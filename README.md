@@ -123,6 +123,6 @@ Für Unittesting mit Videodateien stehen Testdaten bereit: [Testdateien](docs/Te
 - [Dateistruktur Infuse](/docs/Dateistruktur.md)
 
 ### Recherche
-- [Nachrichtensystem](/docs/research/Nachrichtensystem.md)
+- [Nachrichtensystem in einem modularen Monolithen](/docs/research/Nachrichtensystem.md)
 - [Konfiguration](/docs/research/Konfiguration.md)
 - [Hosting](/docs/research/Hosting.md)
