@@ -2,6 +2,7 @@
 using Kurmann.InfuseMediaIntegrator.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace Kurmann.InfuseMediaIntegrator;
 
@@ -13,11 +14,17 @@ internal class Program
     Host.CreateDefaultBuilder(args)
         .ConfigureServices((hostContext, services) =>
         {
-            var configuration = hostContext.Configuration;
-            services.Configure<ModuleOptions>(configuration);
+            services.Configure<ModuleOptions>(hostContext.Configuration);
+
+            services.AddLogging(builder =>
+            {
+                builder.ClearProviders();
+                builder.AddConsole();
+            });
 
             services.AddHostedService<FileWatcherService>();
-            services.AddSingleton<IMessageService, MessageService>();
             services.AddHostedService<MediaLibraryIntegrationService>();
+
+            services.AddSingleton<IMessageService, MessageService>();
         });
 }
