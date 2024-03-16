@@ -28,6 +28,8 @@ public class FileWatcherService : IHostedService, IDisposable
         };
 
         _fileWatcher.Created += OnCreated;
+        _fileWatcher.Deleted += OnDeleted;
+        _fileWatcher.Changed += OnChanged;
         _fileWatcher.EnableRaisingEvents = true;
 
         _logger.LogInformation("FileWatcherService has started on directory: {WatchPath}", _watchPath);
@@ -39,6 +41,22 @@ public class FileWatcherService : IHostedService, IDisposable
     {
         // Hinweis: Hier können Sie Ihren internen Nachrichtenkanal integrieren, um eine Nachricht zu versenden.
         _logger.LogInformation("New file: {FileName}", e.FullPath);
+
+        // Beispiel: NachrichtenkanalEvent?.Invoke(this, new NachrichtenkanalEventArgs(e.FullPath));
+    }
+
+    private void OnDeleted(object sender, FileSystemEventArgs e)
+    {
+        // Hinweis: Hier können Sie Ihren internen Nachrichtenkanal integrieren, um eine Nachricht zu versenden.
+        _logger.LogInformation("File deleted: {FileName}", e.FullPath);
+
+        // Beispiel: NachrichtenkanalEvent?.Invoke(this, new NachrichtenkanalEventArgs(e.FullPath));
+    }
+
+    private void OnChanged(object sender, FileSystemEventArgs e)
+    {
+        // Hinweis: Hier können Sie Ihren internen Nachrichtenkanal integrieren, um eine Nachricht zu versenden.
+        _logger.LogInformation("File changed: {FileName}", e.FullPath);
 
         // Beispiel: NachrichtenkanalEvent?.Invoke(this, new NachrichtenkanalEventArgs(e.FullPath));
     }
