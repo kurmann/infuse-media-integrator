@@ -31,7 +31,7 @@ public class MoveFileToMediaLibraryCommand
 
     public Result Execute()
     {
-        Logger?.LogInformation($"Moving file from {FilePath} to media library {MediaLibraryPath}");
+        Logger?.LogInformation("Moving file from {FilePath} to media library {MediaLibraryPath}", FilePath, MediaLibraryPath);
 
         // Verschiebe die Datei in ein bestehendes Mediengruppen-Verzeichnis sofern vorhanden
         var existingMediaGroupDirectory = TryMovingToExistingMediaGroup(FilePath, MediaLibraryPath);
@@ -40,7 +40,7 @@ public class MoveFileToMediaLibraryCommand
         if (existingMediaGroupDirectory.IsFailure)
         {
             // Logge eine Warnung, dass die Abfrage nach einer bestehenden Mediengruppe fehlgeschlagen ist
-            Logger?.LogWarning("Error on querying existing media group: " + existingMediaGroupDirectory.Error);
+            Logger?.LogWarning("Error on querying existing media group: {Error}", existingMediaGroupDirectory.Error);
             Logger?.LogInformation("Moving file to new media group.");
 
             return MoveToNewMediaGroup();
@@ -49,7 +49,7 @@ public class MoveFileToMediaLibraryCommand
         // Prüfe, ob die Datei bereits in eine existierende Mediengruppe verschoben wurde (mit der Methode TryMovingToExistingMediaGroup) und gib den Erfolg zurück
         if (existingMediaGroupDirectory.Value != null)
         {
-            Logger?.LogInformation($"File {FilePath} was successfully moved to media group {existingMediaGroupDirectory.Value}");
+            Logger?.LogInformation("File {FilePath} was successfully moved to media group {existingMediaGroupDirectory}", FilePath, existingMediaGroupDirectory.Value);
             return Result.Success();
         }
 
