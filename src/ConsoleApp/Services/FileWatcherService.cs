@@ -71,6 +71,17 @@ public class FileWatcherService : IHostedService, IDisposable
     }
 }
 
-public record FileAddedEventMessage(string? FilePath);
-public record FileChangedEventMessage(string? FilePath);
-public record FileDeletedEventMessage(string? FilePath);
+public class FileAddedEventMessage(string? filePath) : EventMessageBase
+{
+    public string? FilePath { get; } = filePath;
+}
+
+public class FileChangedEventMessage(string? filePath) : EventMessageBase
+{
+    public string? FilePath { get; } = filePath;
+}
+
+public class FileDeletedEventMessage(string? filePath) : EventMessageBase
+{
+    public string? FilePath { get; } = filePath;
+}
