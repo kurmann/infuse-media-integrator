@@ -2,6 +2,15 @@ using System.Collections.Concurrent;
 
 namespace Kurmann.InfuseMediaIntegrator.Services;
 
+public interface IEventMessage { }
+
+public abstract class EventMessageBase : IEventMessage
+{
+    public string Id { get; }
+
+    protected EventMessageBase() => Id = Ulid.NewUlid().ToString();
+}
+
 public interface IMessageService
 {
     // Sendet eine Nachricht eines beliebigen Typs.
