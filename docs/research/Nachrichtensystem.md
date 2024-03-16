@@ -1,4 +1,6 @@
-# Interner Nachrichtenaustausch von einem modularen Monolithen: Gespräch mit GPT-4
+# Nachrichtensystem in einem modularen Monolithen
+
+Nachrichtenaustausch von einem modularen Monolithen: Gespräch mit GPT-4
 
 Patrick Kurmann:
 > Wie könnte ich ein Messaging-System implementieren, das speicher-intern zwischen verschiedenen .NET Modulen Nachrichten austauscht?
