@@ -7,10 +7,7 @@ namespace Kurmann.InfuseMediaIntegrator;
 
 internal class Program
 {
-    static void Main(string[] args)
-    {
-        CreateHostBuilder(args).Build().Run();
-    }
+    static void Main(string[] args) => CreateHostBuilder(args).Build().Run();
 
     public static IHostBuilder CreateHostBuilder(string[] args) =>
     Host.CreateDefaultBuilder(args)
@@ -20,5 +17,6 @@ internal class Program
             services.Configure<ModuleOptions>(configuration.GetSection("LocalFileSystem"));
 
             services.AddHostedService<FileWatcherService>();
+            services.AddSingleton<IMessageService, MessageService>();
         });
 }
