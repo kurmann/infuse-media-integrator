@@ -18,5 +18,6 @@ internal class Program
 
             services.AddHostedService<FileWatcherService>();
             services.AddSingleton<IMessageService, MessageService>();
+            services.AddSingleton<IMediaLibraryIntegrationService, MediaLibraryIntegrationService>();
         });
 }

@@ -47,15 +47,15 @@ public class FileWatcherService : IHostedService, IDisposable
         _messageService.Send(new FileAddedEventMessage(e.FullPath));
     }
 
-    private void OnDeleted(object sender, FileSystemEventArgs e)
-    {
-        _logger.LogInformation("File deleted: {FileName}", e.FullPath);
-        _messageService.Send(new FileChangedEventMessage(e.FullPath));
-    }
-
     private void OnChanged(object sender, FileSystemEventArgs e)
     {
         _logger.LogInformation("File changed: {FileName}", e.FullPath);
+        _messageService.Send(new FileChangedEventMessage(e.FullPath));
+    }
+
+    private void OnDeleted(object sender, FileSystemEventArgs e)
+    {
+        _logger.LogInformation("File deleted: {FileName}", e.FullPath);
         _messageService.Send(new FileDeletedEventMessage(e.FullPath));
     }
 

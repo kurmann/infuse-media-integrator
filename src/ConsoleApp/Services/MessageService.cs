@@ -14,10 +14,10 @@ public abstract class EventMessageBase : IEventMessage
 public interface IMessageService
 {
     // Sendet eine Nachricht eines beliebigen Typs.
-    void Send<TMessage>(TMessage message);
+    void Send<TMessage>(TMessage message) where TMessage : IEventMessage;
 
     // Abonniert eine Nachricht eines beliebigen Typs mit einem Handler.
-    void Subscribe<TMessage>(Action<TMessage> handler);
+    void Subscribe<TMessage>(Action<TMessage> handler) where TMessage : IEventMessage;
 }
 
 public class MessageService : IMessageService
@@ -31,7 +31,7 @@ public class MessageService : IMessageService
     /// </summary>
     /// <typeparam name="TMessage"></typeparam>
     /// <param name="message"></param>
-    public void Send<TMessage>(TMessage message)
+    public void Send<TMessage>(TMessage message) where TMessage : IEventMessage
     {
         // Wenn Abonnenten für den Nachrichtentyp vorhanden sind, rufe deren Handler auf.
         if (_handlers.TryGetValue(typeof(TMessage), out var subscribers))
@@ -49,7 +49,7 @@ public class MessageService : IMessageService
     /// </summary>
     /// <typeparam name="TMessage"></typeparam>
     /// <param name="handler"></param>
-    public void Subscribe<TMessage>(Action<TMessage> handler)
+    public void Subscribe<TMessage>(Action<TMessage> handler) where TMessage : IEventMessage
     {
         var key = typeof(TMessage);
         var newHandlersList = new List<Delegate>();
@@ -68,6 +68,7 @@ public class MessageService : IMessageService
                 {
                     handler
                 };
+
                 return newHandlersList;
             }
         );
