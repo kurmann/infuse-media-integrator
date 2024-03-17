@@ -58,7 +58,7 @@ public class MediaLibraryIntegrationService : IHostedService, IDisposable
         {
             // Ermitte das Unterverzeichnis in das die Datei verschoben werden soll,
             // indem der relative Pfad der Datei zum Eingangsverzeichnis ermittelt wird
-            subDirectory = eventMessage.File.FilePath.FilePath.Replace(_inputDirectory, string.Empty).TrimStart('\\');
+            subDirectory = Path.GetRelativePath(_inputDirectory, eventMessage.File.FilePath.DirectoryPathInfo);
             _logger.LogInformation("Subdirectory of file {FilePath} is {SubDirectory}. This will be represented in the media library.", eventMessage.File, subDirectory);
         }
 
