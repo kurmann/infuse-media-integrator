@@ -26,10 +26,6 @@ public class MoveFileToMediaLibraryCommand : ICommand<FileMovedToMediaLibraryRes
     /// </summary>
     public string? SubDirectory { get; init; }
 
-    // Allgemeines Ereignis um mitzuteilen, dass eine Datei in die Mediathek verschoben wurde.
-    public event EventHandler<FileMovedToMediaLibraryResultArgs>? FileMovedToMediaLibrary;
-    protected virtual void OnFileMovedToMediaLibrary(FileMovedToMediaLibraryResultArgs e) => FileMovedToMediaLibrary?.Invoke(this, e);
-
     public Result<FileMovedToMediaLibraryResultArgs> Execute()
     {
         Logger?.LogInformation("Moving file from {FilePath} to media library {MediaLibraryPath}", FilePath, MediaLibraryPath);

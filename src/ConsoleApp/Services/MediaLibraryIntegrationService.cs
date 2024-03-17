@@ -69,11 +69,6 @@ public class MediaLibraryIntegrationService : IHostedService, IDisposable
             SubDirectory = subDirectory
         };
 
-        command.FileMovedToMediaLibrary += (sender, args) =>
-        {
-            // todo: refactor the command event away
-        };
-
         var result = command.Execute();
         if (result.IsFailure)
         {
