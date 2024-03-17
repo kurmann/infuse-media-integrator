@@ -71,7 +71,7 @@ public class FileWatcherService : IHostedService, IDisposable
             return;
         }
 
-        _messageService.Send(new InputDirectoryFileChangedEventMessage(mediaFile.Value, e.ChangeType.ToString()));
+        _messageService.Publish(new InputDirectoryFileChangedEventMessage(mediaFile.Value, e.ChangeType.ToString()));
     }
 
     public Task StopAsync(CancellationToken cancellationToken)

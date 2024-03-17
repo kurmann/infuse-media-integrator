@@ -22,7 +22,7 @@ public abstract class EventMessageBase : IEventMessage
 public interface IMessageService
 {
     // Sendet eine Nachricht eines beliebigen Typs.
-    void Send<TMessage>(TMessage message) where TMessage : IEventMessage;
+    void Publish<TMessage>(TMessage message) where TMessage : IEventMessage;
 
     // Abonniert eine Nachricht eines beliebigen Typs mit einem Handler.
     void Subscribe<TMessage>(Action<TMessage> handler) where TMessage : IEventMessage;
@@ -62,7 +62,7 @@ public class MessageService : IMessageService
 {
     private readonly ConcurrentDictionary<Type, List<Delegate>> _handlers = new();
 
-    public void Send<TMessage>(TMessage message) where TMessage : IEventMessage
+    public void Publish<TMessage>(TMessage message) where TMessage : IEventMessage
     {
         if (_handlers.TryGetValue(typeof(TMessage), out var subscribers))
         {
