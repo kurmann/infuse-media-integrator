@@ -117,29 +117,36 @@ Zusammenfassend bieten Hosted Services in .NET eine strukturierte und skalierbar
 Die Standardkonfiguration des Generic Host (`Microsoft.Extensions.Hosting.HostBuilder`) in .NET-Anwendungen stellt eine Reihe von Basisdiensten und Konfigurationsoptionen bereit, die für viele Anwendungsszenarien sinnvoll und hilfreich sind. Wenn Sie den `HostBuilder` nutzen, um Ihre Anwendung zu konfigurieren, werden automatisch verschiedene Aspekte der Anwendungsumgebung eingerichtet, die Sie dann nach Bedarf anpassen können. Hier sind einige Schlüsselelemente der Standardkonfiguration:
 
 ### 1. **Konfigurationssystem:**
+
 - Lädt Konfigurationseinstellungen aus mehreren Quellen, einschließlich Umgebungsvariablen, Befehlszeilenargumenten und Konfigurationsdateien (wie `appsettings.json` und `appsettings.{Environment}.json`).
 - Erlaubt es, Konfigurationseinstellungen leicht zu lesen und in die Anwendung zu injizieren.
 
 ### 2. **Logging:**
+
 - Einrichtung eines umfassenden Logging-Systems, das mit verschiedenen Providern wie Console, Debug, EventSource und EventLog arbeitet.
 - Unterstützt die Konfiguration von Logging-Levels und anderen Optionen durch das Konfigurationssystem.
 
 ### 3. **Dependency Injection (DI):**
+
 - Einrichtung eines DI-Containers, der es ermöglicht, Abhängigkeiten durch Konstruktoren zu injizieren und so die lose Kopplung von Komponenten und die Testbarkeit zu fördern.
 - DI wird für das Einbinden von Services wie Hintergrunddiensten (`IHostedService`), Optionsmustern und eigenen Services genutzt.
 
 ### 4. **Hosted Services:**
+
 - Unterstützung für die Registrierung und Verwaltung von Hintergrunddiensten (`IHostedService`), die beim Start der Anwendung ausgeführt werden und beim Herunterfahren sauber beendet werden.
 - Ermöglicht es, langlaufende Hintergrundaufgaben oder Initialisierungslogik als Teil des Anwendungslebenszyklus zu integrieren.
 
 ### 5. **Umweltinformationen:**
+
 - Bereitstellung von Informationen über die Laufzeitumgebung, wie z.B. Entwicklung, Staging oder Produktion, die über Umgebungsvariablen oder Konfigurationseinstellungen gesteuert werden können.
 - Ermöglicht es, die Anwendung unterschiedlich zu konfigurieren, je nachdem, in welcher Umgebung sie ausgeführt wird.
 
 ### 6. **Anwendungslebenszyklus-Management:**
+
 - Ein Interface (`IHostApplicationLifetime`), über das man auf Ereignisse wie `ApplicationStarted`, `ApplicationStopping` und `ApplicationStopped` reagieren kann, um benutzerdefinierte Start- und Shutdown-Logik zu implementieren.
 
 ### 7. **Weitere integrierte Services:**
+
 - Je nach Anwendungstyp (z.B. Webanwendung mit ASP.NET Core) können zusätzliche Grunddienste wie HTTP-Serverkonfigurationen, Routing, MVC und mehr automatisch eingerichtet werden.
 
 Diese Standardkonfigurationen und Services bieten eine solide Grundlage für die Entwicklung von .NET-Anwendungen, da sie viele Gemeinsamkeiten und Grundanforderungen moderner Softwareanwendungen abdecken. Natürlich können Entwickler diese Standardkonfigurationen anpassen und erweitern, um spezifische Anforderungen und Szenarien ihrer Projekte zu unterstützen.

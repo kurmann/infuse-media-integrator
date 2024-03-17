@@ -72,19 +72,19 @@ Das Options-Pattern in .NET ist somit eine mächtige und flexible Methode, um Ko
 
 Ihre Annahme ist korrekt und reflektiert einen sehr pragmatischen Ansatz zur Konfiguration modularer Systeme in .NET. Indem jedes Modul die Möglichkeit hat, mit eigenen `appsettings.json` konfiguriert zu werden, können Sie die Unabhängigkeit und Isolation der Module während der Entwicklung und beim Testen sicherstellen. Bei der Integration der Module in die Host-Anwendung können dann alle Konfigurationen zentral über die `appsettings.json` der Host-Anwendung gesteuert werden. Hier sind einige Punkte, die Sie beachten sollten:
 
-### Entwicklung und Tests von Modulen:
+### Entwicklung und Tests von Modulen
 
 - **Isolierte Konfiguration:** Für die Entwicklung und Tests jedes Moduls können spezifische `appsettings.json`-Dateien verwendet werden. Dies erleichtert das Testen der Module in Isolation, da jedes Modul mit seinen eigenen Einstellungen arbeiten kann, ohne von der Konfiguration anderer Module oder der Host-Anwendung abhängig zu sein.
 
 - **Modultests:** Wenn Sie Unit-Tests oder Integrationstests für Ihre Module schreiben, können Sie das Options-Pattern nutzen, um Testkonfigurationen zu injizieren, was die Testbarkeit verbessert.
 
-### Integration in die Host-Anwendung:
+### Integration in die Host-Anwendung
 
 - **Zentrale Konfiguration:** Bei der Integration der Module in die Host-Anwendung werden alle Modul-spezifischen Konfigurationen in die zentrale `appsettings.json` der Host-Anwendung aufgenommen. Dies vereinfacht die Verwaltung der Konfigurationen im Produktivbetrieb, da alle Einstellungen an einem Ort zusammengefasst sind.
 
 - **Namenskonventionen:** Achten Sie auf eindeutige und konsistente Namenskonventionen für die Konfigurationsabschnitte in der `appsettings.json`. So stellen Sie sicher, dass jede Modulkonfiguration korrekt zugeordnet wird und vermeiden Namenskonflikte.
 
-### Zu beachtende Punkte:
+### Zu beachtende Punkte
 
 - **Umgebungsvariablen:** Nutzen Sie Umgebungsvariablen, um umgebungsspezifische Konfigurationen (wie Datenbankverbindungen oder API-Schlüssel) zu überschreiben. .NET Core’s Konfigurationssystem liest standardmäßig Umgebungsvariablen, was diese leicht überschreibbar macht.
 

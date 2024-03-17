@@ -1,6 +1,7 @@
 # Dateistruktur Infuse
 
 ## Allgemein
+
 ```
 root
 -- Category
