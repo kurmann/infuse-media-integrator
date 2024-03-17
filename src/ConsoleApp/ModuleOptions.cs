@@ -23,5 +23,5 @@ public class LocalFileSystemOptions
     /// <summary>
     /// Die Dateiendungen, die überwacht werden sollen
     /// </summary>
-    public List<string> WatchedFileExtensions { get; set; } = [".m4v", "mp4v", "mov", ".jpg", ".jpeg", ".png"];
+    public List<string> WatchedFileExtensions { get; set; } = [".m4v", ".mp4v", ".mov", ".jpg", ".jpeg", ".png"];
 }
