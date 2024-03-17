@@ -1,5 +1,6 @@
 using CSharpFunctionalExtensions;
 using Kurmann.InfuseMediaIntegrator.Entities.Elementary;
+using Kurmann.InfuseMediaIntegrator.Entities.MediaFileTypes;
 using Kurmann.InfuseMediaIntegrator.Entities.MediaLibrary;
 using Kurmann.InfuseMediaIntegrator.Queries;
 using Microsoft.Extensions.Logging;
@@ -26,42 +27,56 @@ public class MoveFileToMediaLibraryCommand
     public string? SubDirectory { get; init; }
 
     // Allgemeines Ereignis um mitzuteilen, dass eine Datei in die Mediathek verschoben wurde.
-    public event EventHandler<FileMovedToMediaLibraryEventArgs>? FileMovedToMediaLibrary;
-    protected virtual void OnFileMovedToMediaLibrary(FileMovedToMediaLibraryEventArgs e) => FileMovedToMediaLibrary?.Invoke(this, e);
+    public event EventHandler<FileMovedToMediaLibraryResultArgs>? FileMovedToMediaLibrary;
+    protected virtual void OnFileMovedToMediaLibrary(FileMovedToMediaLibraryResultArgs e) => FileMovedToMediaLibrary?.Invoke(this, e);
 
-    public Result Execute()
+    public Result<FileMovedToMediaLibraryResultArgs> Execute()
     {
         Logger?.LogInformation("Moving file from {FilePath} to media library {MediaLibraryPath}", FilePath, MediaLibraryPath);
 
+        // Sammle Informationen über die Datei
+        var mediaFile = MediaFileTypeDetector.GetMediaFile(FilePath);
+        if (mediaFile.IsFailure)
+        {
+            return Result.Failure<FileMovedToMediaLibraryResultArgs>("Error on detecting media file type: " + mediaFile.Error);
+        }
+
+        // Sammle Informationen über das Zielverzeichnis
+        var mediaLibrary = DirectoryPathInfo.Create(MediaLibraryPath);
+        if (mediaLibrary.IsFailure)
+        {
+            return Result.Failure<FileMovedToMediaLibraryResultArgs>("Error on creating media library directory path: " + mediaLibrary.Error);
+        }
+
         // Verschiebe die Datei in ein bestehendes Mediengruppen-Verzeichnis sofern vorhanden
-        var existingMediaGroupDirectory = TryMovingToExistingMediaGroup(FilePath, MediaLibraryPath);
+        var resultArgs = TryMovingToExistingMediaGroup(mediaFile.Value, mediaLibrary.Value);
 
         // Wenn die Datei nicht Teil einer bestehenden Mediengruppe ist, dann verschiebe die Datei in eine neue Mediengruppe
-        if (existingMediaGroupDirectory.IsFailure)
+        if (resultArgs.IsFailure)
         {
             // Logge eine Warnung, dass die Abfrage nach einer bestehenden Mediengruppe fehlgeschlagen ist
-            Logger?.LogWarning("Error on querying existing media group: {Error}", existingMediaGroupDirectory.Error);
+            Logger?.LogWarning("Error on querying existing media group: {Error}", resultArgs.Error);
             Logger?.LogInformation("Moving file to new media group.");
 
             return MoveToNewMediaGroup();
         }
 
         // Prüfe, ob die Datei bereits in eine existierende Mediengruppe verschoben wurde (mit der Methode TryMovingToExistingMediaGroup) und gib den Erfolg zurück
-        if (existingMediaGroupDirectory.Value != null)
+        if (resultArgs.Value != null)
         {
-            Logger?.LogInformation("File {FilePath} was successfully moved to media group {existingMediaGroupDirectory}", FilePath, existingMediaGroupDirectory.Value);
-            return Result.Success();
+            Logger?.LogInformation("File {FilePath} was successfully moved to media group {existingMediaGroupDirectory}", FilePath, resultArgs.Value);
+            return Result.Success(resultArgs.Value);
         }
 
         // Sonst verschiebe die Datei in eine neue Mediengruppe
         return MoveToNewMediaGroup();
 
-        Result MoveToNewMediaGroup()
+        Result<FileMovedToMediaLibraryResultArgs> MoveToNewMediaGroup()
         {
-            var mediaFileLibraryDestinationMapping = MediaFileLibraryDestinationMapping.Create(FilePath, MediaLibraryPath, SubDirectory);
+            var mediaFileLibraryDestinationMapping = MediaFileLibraryDestinationMapping.Create(FilePath, mediaLibrary.Value, SubDirectory);
             if (mediaFileLibraryDestinationMapping.IsFailure)
             {
-                return Result.Failure<FileInfo>("Error on creating media file library destination mapping: " + mediaFileLibraryDestinationMapping.Error);
+                return Result.Failure<FileMovedToMediaLibraryResultArgs>("Error on creating media file library destination mapping: " + mediaFileLibraryDestinationMapping.Error);
             }
 
             try
@@ -83,13 +98,13 @@ public class MoveFileToMediaLibraryCommand
 
                 // Verschiebe die Datei und gib den Erfolg zurück
                 File.Move(FilePath, targetFilePath, true);
-                OnFileMovedToMediaLibrary(new FileMovedToMediaLibraryEventArgs(new FileInfo(targetFilePath), false, targetFileAlreadyExists));
+                var resultArgs = new FileMovedToMediaLibraryResultArgs(new FileInfo(targetFilePath), false, targetFileAlreadyExists);
 
-                return Result.Success(sourceFile);
+                return Result.Success(resultArgs);
             }
             catch (Exception e)
             {
-                return Result.Failure<FileInfo>("Error on moving file: " + e.Message);
+                return Result.Failure<FileMovedToMediaLibraryResultArgs>("Error on moving file to new media group: " + e.Message);
             }
         }
     }
@@ -99,51 +114,65 @@ public class MoveFileToMediaLibraryCommand
     /// und die Mediengruppe im Infuse Media Library-Verzeichnis existiert.
     /// </summary>
     /// <returns></returns>
-    private Result<DirectoryPathInfo?> TryMovingToExistingMediaGroup(string FilePath, string MediaLibraryPath)
+    private Result<FileMovedToMediaLibraryResultArgs?> TryMovingToExistingMediaGroup(IMediaFileType mediaFile, DirectoryPathInfo mediaLibrary)
     {
         // Prüfe, ob der Dateipfad existiert
-        if (!File.Exists(FilePath))
+        if (!File.Exists(mediaFile.FilePath))
         {
-            return Result.Failure<DirectoryPathInfo?>("File does not exist: " + FilePath);
+            return Result.Failure<FileMovedToMediaLibraryResultArgs?>("Media file does not exist: " + mediaFile.FilePath);
+        }
+
+        // Prüfe, ob der Medienbibliothekspfad angegeben ist
+        if (string.IsNullOrWhiteSpace(mediaLibrary))
+        {
+            return Result.Failure<FileMovedToMediaLibraryResultArgs?>("Media library path is not set.");
+        }
+
+        // Prüfe, ob der Medienbibliothekspfad existiert
+        if (!Directory.Exists(mediaLibrary))
+        {
+            return Result.Failure<FileMovedToMediaLibraryResultArgs?>("Media library does not exist: " + mediaLibrary);
         }
 
         // Leite die Mediengruppen-ID aus dem Dateinamen ab (ignoriert Dateiendung oder definierte Suffixe wie -fanart)
-        var mediaGroupId = MediaGroupId.Create(Path.GetFileNameWithoutExtension(FilePath));
+        var mediaGroupId = MediaGroupId.Create(mediaFile.FilePath.FileName.FileNameWithoutExtension);
         if (mediaGroupId.IsFailure)
         {
-            return Result.Failure<DirectoryPathInfo?>("Error on creating media group ID: " + mediaGroupId.Error);
+            return Result.Failure<FileMovedToMediaLibraryResultArgs?>("Error on creating media group ID: " + mediaGroupId.Error);
         }
+
         // Prüfe anhand der ID ob die Mediengruppe bereits im Infuse Media Library-Verzeichnis existiert
-        var mediaGroupQuery = new MediaGroupQuery(MediaLibraryPath).ById(mediaGroupId.Value);
+        var mediaGroupQuery = new MediaGroupQuery(mediaLibrary).ById(mediaGroupId.Value);
         var mediaGroup = mediaGroupQuery.Execute();
         if (mediaGroup.IsFailure)
         {
-            return Result.Failure<DirectoryPathInfo?>("Error on querying media group: " + mediaGroup.Error);
+            return Result.Failure<FileMovedToMediaLibraryResultArgs?>("Error on querying media group: " + mediaGroup.Error);
         }
 
         // Wenn Mediengruppe nicht existiert, dann gib einen leeren Wert zurück
         if (mediaGroup.Value?.DirectoryPath == null)
         {
-            return Result.Success<DirectoryPathInfo?>(null);
+            return Result.Success<FileMovedToMediaLibraryResultArgs?>(null);
         }
 
         // Wenn die Mediengruppe existiert, dann verschiebe die Datei in die Mediengruppe
         try
         {
             // Prüfe, ob die Datei bereits im Zielverzeichnis existiert
-            var targetFile = new FileInfo(Path.Combine(mediaGroup.Value.DirectoryPath, Path.GetFileName(FilePath)));
+            var targetFile = new FileInfo(Path.Combine(mediaGroup.Value.DirectoryPath, mediaFile.FilePath.FileName));
             var targetFileAlreadyExists = targetFile.Exists;
 
-            File.Move(FilePath, targetFile.FullName, true);
-            OnFileMovedToMediaLibrary(new FileMovedToMediaLibraryEventArgs(targetFile, true, targetFileAlreadyExists));
-            return Result.Success<DirectoryPathInfo?>(mediaGroup.Value.DirectoryPath);
+            File.Move(mediaFile.FilePath, targetFile.FullName, true);
+            var resultArgs = new FileMovedToMediaLibraryResultArgs(targetFile, true, targetFileAlreadyExists);
+
+            return Result.Success<FileMovedToMediaLibraryResultArgs?>(resultArgs);
         }
         catch (Exception e)
         {
-            return Result.Failure<DirectoryPathInfo?>("Error on moving file: " + e.Message);
+            return Result.Failure<FileMovedToMediaLibraryResultArgs?>("Error on moving file to existing media group: " + e.Message);
         }
     }
 
 }
 
-public record FileMovedToMediaLibraryEventArgs(FileInfo FileInfo, bool HasMovedToExistingMediaGroup = false, bool HasTargetFileBeenOverwritten = false);
+public record FileMovedToMediaLibraryResultArgs(FileInfo FileInfo, bool HasMovedToExistingMediaGroup = false, bool HasTargetFileBeenOverwritten = false);

@@ -16,7 +16,7 @@ public class MoveFilesToMediaLibraryCommandTest
             MediaLibraryPath = "Data/Output/Mediathek",
             Logger = new NullLogger<MoveFileToMediaLibraryCommand>()
         };
-        FileMovedToMediaLibraryEventArgs? commandEventArgs = null; // Hilfsvariable für das Erfassen der Event-Informationen
+        FileMovedToMediaLibraryResultArgs? commandEventArgs = null; // Hilfsvariable für das Erfassen der Event-Informationen
         command.FileMovedToMediaLibrary += (sender, e) => commandEventArgs = e;
         var expectedNewMediaGroupPath = new FileInfo(Path.Combine(command.MediaLibraryPath, "2023-03-14 Primeli Kurzaufnahme/2023-03-14 Primeli Kurzaufnahme.m4v"));
 
@@ -62,7 +62,7 @@ public class MoveFilesToMediaLibraryCommandTest
             Logger = new NullLogger<MoveFileToMediaLibraryCommand>()
         };
 
-        FileMovedToMediaLibraryEventArgs? commandEventArgs = null; // Hilfsvariable für das Erfassen der Event-Informationen
+        FileMovedToMediaLibraryResultArgs? commandEventArgs = null; // Hilfsvariable für das Erfassen der Event-Informationen
         command.FileMovedToMediaLibrary += (sender, e) => commandEventArgs = e;
 
         // Act
