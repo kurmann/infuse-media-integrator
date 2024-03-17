@@ -61,7 +61,7 @@ public class FileWatcherService : IHostedService, IDisposable
     private void OnFileChanged(object sender, FileSystemEventArgs e)
     {
         _logger.LogInformation("File {filePath} {changeType}", e.FullPath, e.ChangeType.ToString());
-        _messageService.Send(new FileChangedEventMessage(e.FullPath, e.ChangeType.ToString()));
+        _messageService.Send(new InputDirectoryFileChangedEventMessage(e.FullPath, e.ChangeType.ToString()));
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
@@ -79,10 +79,11 @@ public class FileWatcherService : IHostedService, IDisposable
 }
 
 /// <summary>
-/// Eine Nachricht, die anzeigt, dass eine Datei hinzugefügt, geändert, umbenannt oder gelöscht wurde.
+/// Nachricht, die gesendet wird, wenn eine Datei im Überwachungsverzeichnis geändert wird.
+/// Hinweis: Diese Nachricht wird von 'FileWatcherService' gesendet.
 /// </summary>
 /// <param name="filePath"></param>
-public class FileChangedEventMessage(string filePath, string? changeType = null) : EventMessageBase
+public class InputDirectoryFileChangedEventMessage(string filePath, string? changeType = null) : EventMessageBase
 {
     public string FilePath { get; } = filePath;
 
