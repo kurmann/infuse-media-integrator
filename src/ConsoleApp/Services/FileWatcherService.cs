@@ -61,7 +61,7 @@ public class FileWatcherService : IHostedService, IDisposable
 
     private void OnFileChanged(object sender, FileSystemEventArgs e)
     {
-        _logger.LogInformation("File {filePath} {changeType}", e.FullPath, e.ChangeType.ToString());
+        _logger.LogInformation("File {filePath} {changeType}", e.FullPath, e.ChangeType);
 
         // Lese Informationen über die Datei
         var mediaFile = MediaFileTypeDetector.GetMediaFile(e.FullPath);
@@ -71,7 +71,7 @@ public class FileWatcherService : IHostedService, IDisposable
             return;
         }
 
-        _messageService.Publish(new InputDirectoryFileChangedEventMessage(mediaFile.Value, e.ChangeType.ToString()));
+        _messageService.Publish(new InputDirectoryFileChangedEventMessage(mediaFile.Value, e.ChangeType));
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
@@ -93,7 +93,7 @@ public class FileWatcherService : IHostedService, IDisposable
 /// Hinweis: Diese Nachricht wird von 'FileWatcherService' gesendet.
 /// </summary>
 /// <param name="file"></param>
-public class InputDirectoryFileChangedEventMessage(IMediaFileType file, string? changeType = null) : EventMessageBase
+public class InputDirectoryFileChangedEventMessage(IMediaFileType file, WatcherChangeTypes? changeType = null) : EventMessageBase
 {
     /// <summary>
     /// Der Pfad der geänderten Datei.
@@ -104,5 +104,5 @@ public class InputDirectoryFileChangedEventMessage(IMediaFileType file, string? 
     /// Der Typ der Änderung.
     /// Erwartete Werte: 'Created', 'Changed', 'Renamed' oder 'Deleted'.
     /// </summary>
-    public string? ChangeType { get; } = changeType;
+    public WatcherChangeTypes? ChangeType { get; } = changeType;
 }

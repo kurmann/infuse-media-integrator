@@ -1,6 +1,7 @@
 using Kurmann.InfuseMediaIntegratior;
 using Kurmann.InfuseMediaIntegrator.Commands;
 using Kurmann.InfuseMediaIntegrator.Entities.Elementary;
+using Kurmann.InfuseMediaIntegrator.Entities.MediaFileTypes;
 using Kurmann.InfuseMediaIntegrator.Entities.MediaLibrary;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -40,10 +41,10 @@ public class MediaLibraryIntegrationService : IHostedService, IDisposable
 
     private void MoveFileToLibrary(InputDirectoryFileChangedEventMessage eventMessage)
     {
-        // Überprüfen, ob der Dateipfad in der Nachricht leer ist
-        if (string.IsNullOrWhiteSpace(eventMessage.FilePath))
+        // Überprüfen, ob überhaupt eine Datei verschoben werden soll
+        if (eventMessage.ChangeType == WatcherChangeTypes.Deleted)
         {
-            _logger.LogWarning("Received empty file path from event message. Ignoring this message.");
+            _logger.LogInformation("File {FilePath} has been deleted. Ignoring the file.", eventMessage.File.FilePath);
             return;
         }
 
@@ -57,14 +58,14 @@ public class MediaLibraryIntegrationService : IHostedService, IDisposable
         {
             // Ermitte das Unterverzeichnis in das die Datei verschoben werden soll,
             // indem der relative Pfad der Datei zum Eingangsverzeichnis ermittelt wird
-            subDirectory = eventMessage.FilePath.Replace(_inputDirectory, string.Empty).TrimStart('\\');
-            _logger.LogInformation("Subdirectory of file {FilePath} is {SubDirectory}. This will be represented in the media library.", eventMessage.FilePath, subDirectory);
+            subDirectory = eventMessage.File.FilePath.FilePath.Replace(_inputDirectory, string.Empty).TrimStart('\\');
+            _logger.LogInformation("Subdirectory of file {FilePath} is {SubDirectory}. This will be represented in the media library.", eventMessage.File, subDirectory);
         }
 
         var command = new MoveFileToMediaLibraryCommand
         {
             Logger = _logger,
-            FilePath = eventMessage.FilePath,
+            FilePath = eventMessage.File.FilePath,
             MediaLibraryPath = _mediaLibraryPath,
             SubDirectory = subDirectory
         };
@@ -72,8 +73,17 @@ public class MediaLibraryIntegrationService : IHostedService, IDisposable
         var result = command.Execute();
         if (result.IsFailure)
         {
-            // todo: refactor the command event away
+            _logger.LogError("Error while moving file {FilePath} to media library. Error: {Error}", eventMessage.File.FilePath, result.Error);
+            return;
         }
+
+        _logger.LogInformation("File {FilePath} has been moved to media library.", eventMessage.File.FilePath);
+        _messageService.Publish(new FileMovedToMediaLibraryEventMessage
+        {
+            SourceFilePath = eventMessage.File,
+            TargetFilePath = result.Value.MediaFile,
+            HasTargetFileBeenOverwritten = result.Value.HasTargetFileBeenOverwritten
+        });
     }
 
     public void Dispose()
@@ -86,10 +96,10 @@ public class MediaLibraryIntegrationService : IHostedService, IDisposable
 
 public class FileMovedToMediaLibraryEventMessage : EventMessageBase
 {
-    public required FileInfo SourceFilePath { get; init; }
-    public required FileInfo TargetFilePath { get; init; }
-    bool HasTargetFileBeenOverwritten { get; init; }
-    public required MediaGroupInformation MediaGroup { get; init; }
+    public required IMediaFileType SourceFilePath { get; init; }
+    public required IMediaFileType TargetFilePath { get; init; }
+    public bool HasTargetFileBeenOverwritten { get; init; }
+    public MediaGroupInformation MediaGroup { get; init; }
 }
 
 public class MediaGroupInformation
@@ -97,6 +107,6 @@ public class MediaGroupInformation
     public required MediaGroupId Id { get; init; }
     public required DirectoryPathInfo RelativeMediaGroupDirectory { get; init; }
     public required DirectoryPathInfo RelativeSubDirectory { get; init; }
-    bool HasMovedToExistingMediaGroup { get; init; }
+    public bool HasMovedToExistingMediaGroup { get; init; }
 }
     
