@@ -9,7 +9,7 @@ namespace Kurmann.InfuseMediaIntegrator.Commands;
 
 public class MoveFileToMediaLibraryCommand : ICommand<FileMovedToMediaLibraryResultArgs>
 {
-    public ILogger? Logger { get; init; }
+    public required ILogger Logger { get; init; }
 
     /// <summary>
     /// Der Pfad zur Datei, die in die Mediengruppe verschoben werden soll
@@ -28,7 +28,7 @@ public class MoveFileToMediaLibraryCommand : ICommand<FileMovedToMediaLibraryRes
 
     public Result<FileMovedToMediaLibraryResultArgs> Execute()
     {
-        Logger?.LogInformation("Moving file from {FilePath} to media library {MediaLibraryPath}", FilePath, MediaLibraryPath);
+        Logger.LogInformation("Moving file from {FilePath} to media library {MediaLibraryPath}", FilePath, MediaLibraryPath);
 
         // Sammle Informationen über die Datei
         var mediaFile = MediaFileTypeDetector.GetMediaFile(FilePath);
@@ -51,8 +51,8 @@ public class MoveFileToMediaLibraryCommand : ICommand<FileMovedToMediaLibraryRes
         if (resultArgs.IsFailure)
         {
             // Logge eine Warnung, dass die Abfrage nach einer bestehenden Mediengruppe fehlgeschlagen ist
-            Logger?.LogWarning("Error on querying existing media group: {Error}", resultArgs.Error);
-            Logger?.LogInformation("Moving file to new media group.");
+            Logger.LogWarning("Error on querying existing media group: {Error}", resultArgs.Error);
+            Logger.LogInformation("Moving file to new media group.");
 
             return MoveToNewMediaGroup();
         }
@@ -60,7 +60,7 @@ public class MoveFileToMediaLibraryCommand : ICommand<FileMovedToMediaLibraryRes
         // Prüfe, ob die Datei bereits in eine existierende Mediengruppe verschoben wurde (mit der Methode TryMovingToExistingMediaGroup) und gib den Erfolg zurück
         if (resultArgs.Value != null)
         {
-            Logger?.LogInformation("File {FilePath} was successfully moved to media group {existingMediaGroupDirectory}", FilePath, resultArgs.Value);
+            Logger.LogInformation("File {FilePath} was successfully moved to media group {existingMediaGroupDirectory}", FilePath, resultArgs.Value);
             return Result.Success(resultArgs.Value);
         }
 
