@@ -110,7 +110,7 @@ public class MoveFileToMediaLibraryCommand : ICommand<FileMovedToMediaLibraryRes
     /// und die Mediengruppe im Infuse Media Library-Verzeichnis existiert.
     /// </summary>
     /// <returns></returns>
-    private Result<FileMovedToMediaLibraryResultArgs?> TryMovingToExistingMediaGroup(IMediaFileType mediaFile, DirectoryPathInfo mediaLibrary)
+    private static Result<FileMovedToMediaLibraryResultArgs?> TryMovingToExistingMediaGroup(IMediaFileType mediaFile, DirectoryPathInfo mediaLibrary)
     {
         // Prüfe, ob der Dateipfad existiert
         if (!File.Exists(mediaFile.FilePath))
