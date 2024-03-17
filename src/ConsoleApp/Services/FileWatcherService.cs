@@ -85,7 +85,14 @@ public class FileWatcherService : IHostedService, IDisposable
 /// <param name="filePath"></param>
 public class InputDirectoryFileChangedEventMessage(string filePath, string? changeType = null) : EventMessageBase
 {
+    /// <summary>
+    /// Der Pfad der geänderten Datei.
+    /// </summary>
     public string FilePath { get; } = filePath;
 
+    /// <summary>
+    /// Der Typ der Änderung.
+    /// Erwartete Werte: 'Created', 'Changed', 'Renamed' oder 'Deleted'.
+    /// </summary>
     public string? ChangeType { get; } = changeType;
 }
