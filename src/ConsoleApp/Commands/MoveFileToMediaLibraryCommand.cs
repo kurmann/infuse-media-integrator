@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Kurmann.InfuseMediaIntegrator.Commands;
 
-public class MoveFileToMediaLibraryCommand
+public class MoveFileToMediaLibraryCommand : ICommand<FileMovedToMediaLibraryResultArgs>
 {
     public ILogger? Logger { get; init; }
 

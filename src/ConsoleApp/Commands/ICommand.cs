@@ -2,8 +2,8 @@ using CSharpFunctionalExtensions;
 
 namespace Kurmann.InfuseMediaIntegrator.Commands
 {
-    public interface ICommand
+    public interface ICommand<T>
     {
-        Result Execute();
+        Result<T> Execute();
     }
 }
