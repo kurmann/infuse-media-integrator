@@ -18,7 +18,7 @@ public class MoveFileToMediaLibraryCommand
     /// <summary>
     /// Der Pfad zum Infuse Media Library-Verzeichnis
     /// </summary>
-    public required string MediaLibraryPath { get; init; }
+    public required string? MediaLibraryPath { get; init; }
 
     /// <summary>
     /// Der optionale Unterverzeichnisname, in das die Datei verschoben werden soll
