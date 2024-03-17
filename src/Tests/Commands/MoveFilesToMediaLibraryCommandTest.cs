@@ -29,8 +29,8 @@ public class MoveFilesToMediaLibraryCommandTest
         // Assert
         Assert.IsTrue(result.IsSuccess);
         Assert.IsNotNull(result.Value);
-        Assert.AreEqual(expectedNewMediaGroupPath.FullName, result.Value.FileInfo.FullName); // Die Datei ist im erwarteten Verzeichnis vorhanden
-        Assert.IsTrue(result.Value.FileInfo.Exists);
+        Assert.AreEqual(expectedNewMediaGroupPath.FullName, result.Value.MediaFile.FilePath); // Die Datei ist im erwarteten Verzeichnis vorhanden
+        Assert.IsTrue(Path.Exists(result.Value.MediaFile.FilePath));
         Assert.IsFalse(result.Value.HasMovedToExistingMediaGroup); // Die Datei wurde nicht in eine bestehende Mediengruppe verschoben
         Assert.IsFalse(result.Value.HasTargetFileBeenOverwritten); // Die Datei wurde nicht überschrieben
     }
@@ -66,8 +66,8 @@ public class MoveFilesToMediaLibraryCommandTest
         // Assert
         Assert.IsTrue(result.IsSuccess);
         Assert.IsTrue(result.Value != null);
-        Assert.AreEqual(expectedTargetFile.FullName, result.Value.FileInfo.FullName);
-        Assert.IsTrue(result.Value.FileInfo.Exists);
+        Assert.AreEqual(expectedTargetFile.FullName, result.Value.MediaFile.FilePath);
+        Assert.IsTrue(Path.Exists(result.Value.MediaFile.FilePath));
         Assert.IsTrue(result.Value.HasMovedToExistingMediaGroup); // Die Datei wurde in eine bestehende Mediengruppe verschoben
         Assert.IsTrue(result.Value.HasTargetFileBeenOverwritten); // Die Datei wurde überschrieben
     }

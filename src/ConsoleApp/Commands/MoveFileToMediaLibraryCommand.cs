@@ -88,13 +88,18 @@ public class MoveFileToMediaLibraryCommand : ICommand<FileMovedToMediaLibraryRes
                 }
 
                 var targetFilePath = Path.Combine(targetDirectory.FullName, sourceFile.Name);
+                var targetMediaFile = MediaFileTypeDetector.GetMediaFile(targetFilePath);
+                if (targetMediaFile.IsFailure)
+                {
+                    return Result.Failure<FileMovedToMediaLibraryResultArgs>("Error on detecting media file type for the target file: " + targetMediaFile.Error);
+                }
 
                 // Prüfe, ob die Datei bereits im Zielverzeichnis existiert
                 var targetFileAlreadyExists = File.Exists(targetFilePath);
 
                 // Verschiebe die Datei und gib den Erfolg zurück
                 File.Move(FilePath, targetFilePath, true);
-                var resultArgs = new FileMovedToMediaLibraryResultArgs(new FileInfo(targetFilePath), false, targetFileAlreadyExists);
+                var resultArgs = new FileMovedToMediaLibraryResultArgs(targetMediaFile.Value, false, targetFileAlreadyExists);
 
                 return Result.Success(resultArgs);
             }
@@ -156,10 +161,16 @@ public class MoveFileToMediaLibraryCommand : ICommand<FileMovedToMediaLibraryRes
         {
             // Prüfe, ob die Datei bereits im Zielverzeichnis existiert
             var targetFile = new FileInfo(Path.Combine(mediaGroup.Value.DirectoryPath, mediaFile.FilePath.FileName));
+            var targetMediaFile = MediaFileTypeDetector.GetMediaFile(targetFile.FullName);
+            if (targetMediaFile.IsFailure)
+            {
+                return Result.Failure<FileMovedToMediaLibraryResultArgs?>("Error on detecting media file type for the target file: " + targetMediaFile.Error);
+            }
+
             var targetFileAlreadyExists = targetFile.Exists;
 
             File.Move(mediaFile.FilePath, targetFile.FullName, true);
-            var resultArgs = new FileMovedToMediaLibraryResultArgs(targetFile, true, targetFileAlreadyExists);
+            var resultArgs = new FileMovedToMediaLibraryResultArgs(targetMediaFile.Value, true, targetFileAlreadyExists);
 
             return Result.Success<FileMovedToMediaLibraryResultArgs?>(resultArgs);
         }
@@ -171,4 +182,4 @@ public class MoveFileToMediaLibraryCommand : ICommand<FileMovedToMediaLibraryRes
 
 }
 
-public record FileMovedToMediaLibraryResultArgs(FileInfo FileInfo, bool HasMovedToExistingMediaGroup = false, bool HasTargetFileBeenOverwritten = false);
+public record FileMovedToMediaLibraryResultArgs(IMediaFileType MediaFile, bool HasMovedToExistingMediaGroup = false, bool HasTargetFileBeenOverwritten = false);
