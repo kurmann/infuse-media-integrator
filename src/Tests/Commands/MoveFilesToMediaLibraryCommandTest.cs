@@ -16,8 +16,6 @@ public class MoveFilesToMediaLibraryCommandTest
             MediaLibraryPath = "Data/Output/Mediathek",
             Logger = new NullLogger<MoveFileToMediaLibraryCommand>()
         };
-        FileMovedToMediaLibraryResultArgs? commandEventArgs = null; // Hilfsvariable für das Erfassen der Event-Informationen
-        command.FileMovedToMediaLibrary += (sender, e) => commandEventArgs = e;
         var expectedNewMediaGroupPath = new FileInfo(Path.Combine(command.MediaLibraryPath, "2023-03-14 Primeli Kurzaufnahme/2023-03-14 Primeli Kurzaufnahme.m4v"));
 
         if (File.Exists(expectedNewMediaGroupPath.FullName))
@@ -30,11 +28,11 @@ public class MoveFilesToMediaLibraryCommandTest
 
         // Assert
         Assert.IsTrue(result.IsSuccess);
-        Assert.IsNotNull(commandEventArgs);
-        Assert.AreEqual(expectedNewMediaGroupPath.FullName, commandEventArgs.FileInfo.FullName); // Die Datei ist im erwarteten Verzeichnis vorhanden
-        Assert.IsTrue(commandEventArgs.FileInfo.Exists);
-        Assert.IsFalse(commandEventArgs.HasMovedToExistingMediaGroup); // Die Datei wurde nicht in eine bestehende Mediengruppe verschoben
-        Assert.IsFalse(commandEventArgs.HasTargetFileBeenOverwritten); // Die Datei wurde nicht überschrieben
+        Assert.IsNotNull(result.Value);
+        Assert.AreEqual(expectedNewMediaGroupPath.FullName, result.Value.FileInfo.FullName); // Die Datei ist im erwarteten Verzeichnis vorhanden
+        Assert.IsTrue(result.Value.FileInfo.Exists);
+        Assert.IsFalse(result.Value.HasMovedToExistingMediaGroup); // Die Datei wurde nicht in eine bestehende Mediengruppe verschoben
+        Assert.IsFalse(result.Value.HasTargetFileBeenOverwritten); // Die Datei wurde nicht überschrieben
     }
 
     [TestMethod] // Wird korrekt in eine bestehende Mediengruppe verschoben 
@@ -62,18 +60,15 @@ public class MoveFilesToMediaLibraryCommandTest
             Logger = new NullLogger<MoveFileToMediaLibraryCommand>()
         };
 
-        FileMovedToMediaLibraryResultArgs? commandEventArgs = null; // Hilfsvariable für das Erfassen der Event-Informationen
-        command.FileMovedToMediaLibrary += (sender, e) => commandEventArgs = e;
-
         // Act
         var result = command.Execute(); // Verschiebe die Datei erneut (in die gerade erstellte Mediengruppe)
 
         // Assert
         Assert.IsTrue(result.IsSuccess);
-        Assert.IsTrue(commandEventArgs != null);
-        Assert.AreEqual(expectedTargetFile.FullName, commandEventArgs?.FileInfo.FullName);
-        Assert.IsTrue(commandEventArgs?.FileInfo.Exists);
-        Assert.IsTrue(commandEventArgs?.HasMovedToExistingMediaGroup); // Die Datei wurde in eine bestehende Mediengruppe verschoben
-        Assert.IsTrue(commandEventArgs?.HasTargetFileBeenOverwritten); // Die Datei wurde überschrieben
+        Assert.IsTrue(result.Value != null);
+        Assert.AreEqual(expectedTargetFile.FullName, result.Value.FileInfo.FullName);
+        Assert.IsTrue(result.Value.FileInfo.Exists);
+        Assert.IsTrue(result.Value.HasMovedToExistingMediaGroup); // Die Datei wurde in eine bestehende Mediengruppe verschoben
+        Assert.IsTrue(result.Value.HasTargetFileBeenOverwritten); // Die Datei wurde überschrieben
     }
 }

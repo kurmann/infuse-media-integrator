@@ -24,6 +24,7 @@ public class CreateFanartInfuseImageCommandTests
 
         // Assert
         Assert.IsTrue(result.IsSuccess);
+        Assert.IsTrue(result.Value != null);
         Assert.IsTrue(File.Exists(Path.Combine(PathTestcase1, "Zwillinge Testvideo-fanart.jpg"))); // Das Fanart-Infuse-Image sollte erstellt worden sein
         Assert.IsTrue(new FileInfo(Path.Combine(PathTestcase1, "Zwillinge Testvideo-fanart.jpg")).Length > 0); // Das Fanart-Infuse-Image sollte nicht leer sein
 
@@ -43,7 +44,7 @@ public class CreateFanartInfuseImageCommandTests
 
         // Assert
         Assert.IsTrue(result.IsFailure);
-        StringAssert.Contains(result.Error, "The MP4 video does not exist.");
+        StringAssert.Contains(result.Error, "The MP4 video path is empty.");
     }
 
     [TestMethod] // Test ob bei der Datei "Zwillinge Testvideo (ohne Artwork).m4v" ein Fehler zurückgegeben wird, weil kein Artwork vorhanden ist
