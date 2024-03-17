@@ -1,4 +1,5 @@
 using Kurmann.InfuseMediaIntegratior;
+using Kurmann.InfuseMediaIntegrator.Entities.MediaFileTypes;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -61,7 +62,16 @@ public class FileWatcherService : IHostedService, IDisposable
     private void OnFileChanged(object sender, FileSystemEventArgs e)
     {
         _logger.LogInformation("File {filePath} {changeType}", e.FullPath, e.ChangeType.ToString());
-        _messageService.Send(new InputDirectoryFileChangedEventMessage(e.FullPath, e.ChangeType.ToString()));
+
+        // Lese Informationen über die Datei
+        var mediaFile = MediaFileTypeDetector.GetMediaFile(e.FullPath);
+        if (mediaFile.IsFailure)
+        {
+            _logger.LogWarning("Error on detecting media file type: {Error}", mediaFile.Error);
+            return;
+        }
+
+        _messageService.Send(new InputDirectoryFileChangedEventMessage(mediaFile.Value, e.ChangeType.ToString()));
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
@@ -82,13 +92,13 @@ public class FileWatcherService : IHostedService, IDisposable
 /// Nachricht, die gesendet wird, wenn eine Datei im Überwachungsverzeichnis geändert wird.
 /// Hinweis: Diese Nachricht wird von 'FileWatcherService' gesendet.
 /// </summary>
-/// <param name="filePath"></param>
-public class InputDirectoryFileChangedEventMessage(string filePath, string? changeType = null) : EventMessageBase
+/// <param name="file"></param>
+public class InputDirectoryFileChangedEventMessage(IMediaFileType file, string? changeType = null) : EventMessageBase
 {
     /// <summary>
     /// Der Pfad der geänderten Datei.
     /// </summary>
-    public string FilePath { get; } = filePath;
+    public IMediaFileType File { get; } = file;
 
     /// <summary>
     /// Der Typ der Änderung.
