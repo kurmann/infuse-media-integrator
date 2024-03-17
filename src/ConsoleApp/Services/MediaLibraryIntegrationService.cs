@@ -14,7 +14,7 @@ public class MediaLibraryIntegrationService : IHostedService, IDisposable
         _messageService = messageService;
 
         // Abonnieren von Nachrichten, um Dateien zu verschieben, wenn die entsprechende Nachricht empfangen wird.
-        _messageService.Subscribe<FileAddedEventMessage>(MoveFileToLibrary);
+        _messageService.Subscribe<FileChangedEventMessage>(MoveFileToLibrary);
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -29,9 +29,9 @@ public class MediaLibraryIntegrationService : IHostedService, IDisposable
         return Task.CompletedTask;
     }
 
-    private void MoveFileToLibrary(FileAddedEventMessage fileAddedEventMessage)
+    private void MoveFileToLibrary(FileChangedEventMessage message)
     {
-        _logger.LogInformation("Move {FileName} in media library", fileAddedEventMessage.FilePath);
+        _logger.LogInformation("Move {FileName} in media library", message.FilePath);
         // Implementiere hier die Logik zum Verschieben der Datei.
         // Verwende den Inhalt von 'MoveFileToMediaLibraryCommand' als Referenz für die Implementierung.
 
@@ -40,7 +40,7 @@ public class MediaLibraryIntegrationService : IHostedService, IDisposable
     public void Dispose()
     {
         GC.SuppressFinalize(this);
-        _messageService.Unsubscribe<FileAddedEventMessage>(MoveFileToLibrary);
+        _messageService.Unsubscribe<FileChangedEventMessage>(MoveFileToLibrary);
     }
 
 }

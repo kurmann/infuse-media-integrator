@@ -39,16 +39,18 @@ public class FileWatcherService : IHostedService, IDisposable
         // Fügt die Dateiendungen hinzu, die überwacht werden sollen.
         foreach (var fileExtension in _watchedFileExtensions)
         {
-            _fileWatcher.Filters.Add(fileExtension);
+            _fileWatcher.Filters.Add($"*{fileExtension}");
         }
 
         // Logge, die Dateiendungen, die überwacht werden.
         _logger.LogInformation("FileWatcherService is watching for file extensions: {WatchedFileExtensions}", string.Join(", ", _watchedFileExtensions));
 
         // Event-Handler für die verschiedenen Ereignisse.
-        _fileWatcher.Created += OnCreated;
-        _fileWatcher.Deleted += OnDeleted;
-        _fileWatcher.Changed += OnChanged;
+        // Hinweis: Die Ereignisse 'Created', 'Changed', 'Renamed' und 'Deleted' werden alle in 'OnFileChanged' behandelt.
+        _fileWatcher.Created += OnFileChanged;
+        _fileWatcher.Changed += OnFileChanged;
+        _fileWatcher.Renamed += OnFileChanged;
+        _fileWatcher.Deleted += OnFileChanged;
         _fileWatcher.EnableRaisingEvents = true;
 
         _logger.LogInformation("FileWatcherService has started on directory: {WatchPath}", _watchPath);
@@ -56,22 +58,10 @@ public class FileWatcherService : IHostedService, IDisposable
         return Task.CompletedTask;
     }
 
-    private void OnCreated(object sender, FileSystemEventArgs e)
+    private void OnFileChanged(object sender, FileSystemEventArgs e)
     {
-        _logger.LogInformation("New file: {FileName}", e.FullPath);
-        _messageService.Send(new FileAddedEventMessage(e.FullPath));
-    }
-
-    private void OnChanged(object sender, FileSystemEventArgs e)
-    {
-        _logger.LogInformation("File changed: {FileName}", e.FullPath);
-        _messageService.Send(new FileChangedEventMessage(e.FullPath));
-    }
-
-    private void OnDeleted(object sender, FileSystemEventArgs e)
-    {
-        _logger.LogInformation("File deleted: {FileName}", e.FullPath);
-        _messageService.Send(new FileDeletedEventMessage(e.FullPath));
+        _logger.LogInformation("File {filePath} {changeType}", e.FullPath, e.ChangeType.ToString());
+        _messageService.Send(new FileChangedEventMessage(e.FullPath, e.ChangeType.ToString()));
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
@@ -88,17 +78,13 @@ public class FileWatcherService : IHostedService, IDisposable
     }
 }
 
-public class FileAddedEventMessage(string? filePath) : EventMessageBase
+/// <summary>
+/// Eine Nachricht, die anzeigt, dass eine Datei hinzugefügt, geändert, umbenannt oder gelöscht wurde.
+/// </summary>
+/// <param name="filePath"></param>
+public class FileChangedEventMessage(string filePath, string? changeType = null) : EventMessageBase
 {
-    public string? FilePath { get; } = filePath;
-}
+    public string FilePath { get; } = filePath;
 
-public class FileChangedEventMessage(string? filePath) : EventMessageBase
-{
-    public string? FilePath { get; } = filePath;
-}
-
-public class FileDeletedEventMessage(string? filePath) : EventMessageBase
-{
-    public string? FilePath { get; } = filePath;
+    public string? ChangeType { get; } = changeType;
 }
