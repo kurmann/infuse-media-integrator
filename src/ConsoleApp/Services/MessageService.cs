@@ -15,7 +15,7 @@ public abstract class EventMessageBase : IEventMessage
     protected EventMessageBase()
     {
         Ulid = Ulid.NewUlid();
-        Timestamp = Ulid.Time;
+        Timestamp = Ulid.Time.ToLocalTime();
     }
 }
 
