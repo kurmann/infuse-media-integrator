@@ -14,7 +14,7 @@ internal class Program
     Host.CreateDefaultBuilder(args)
         .ConfigureServices((hostContext, services) =>
         {
-            services.Configure<ModuleOptions>(hostContext.Configuration);
+            services.Configure<AppSettings>(hostContext.Configuration);
 
             services.AddLogging(builder =>
             {

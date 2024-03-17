@@ -13,16 +13,16 @@ public class FileWatcherService : IHostedService, IDisposable
     private readonly IMessageService _messageService;
     private readonly List<string> _watchedFileExtensions;
 
-    public FileWatcherService(ILogger<FileWatcherService> logger, IOptions<ModuleOptions> options, IMessageService messageService)
+    public FileWatcherService(ILogger<FileWatcherService> logger, IOptions<AppSettings> options, IMessageService messageService)
     {
         ArgumentNullException.ThrowIfNull(options);
-        ArgumentNullException.ThrowIfNull(options.Value.LocalFileSystem);
-        ArgumentNullException.ThrowIfNull(options.Value.LocalFileSystem.WatchPath);
+        ArgumentNullException.ThrowIfNull(options.Value.InputDirectory);
+        ArgumentNullException.ThrowIfNull(options.Value.InputDirectory.Path);
 
         _logger = logger;
-        _watchPath = options.Value.LocalFileSystem.WatchPath;
+        _watchPath = options.Value.InputDirectory.Path;
         _messageService = messageService;
-        _watchedFileExtensions = options.Value.LocalFileSystem.WatchedFileExtensions;
+        _watchedFileExtensions = options.Value.InputDirectory.ExtensionsToWatch;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
