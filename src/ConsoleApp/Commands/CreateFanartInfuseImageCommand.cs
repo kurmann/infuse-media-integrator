@@ -13,8 +13,14 @@ public class CreateFanartInfuseImageCommand(string? mpeg4VideoPath) : ICommand<F
 
     public Result<FileInfo> Execute()
     {
+        // Prüfe ob ein Pfad zum MP4-Video angegeben wurde
+        if (string.IsNullOrWhiteSpace(Mpeg4VideoPath))
+        {
+            return Result.Failure<FileInfo>("The MP4 video path is empty.");
+        }
+
         // Prüfe ob das MP4-Video existiert
-        if (string.IsNullOrWhiteSpace(Mpeg4VideoPath) || !File.Exists(Mpeg4VideoPath))
+        if (!File.Exists(Mpeg4VideoPath))
         {
             return Result.Failure<FileInfo>("The MP4 video does not exist: " + Mpeg4VideoPath);
         }
