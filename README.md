@@ -115,14 +115,8 @@ Diese Struktur bietet eine klare und kohärente Methode, um Module dynamisch in 
 
 Das Hauptziel dieser Integrationsmethode ist es, eine konsistente, wartbare und erweiterbare Basis für die Entwicklung von Software zu bieten, die aus mehreren Modulen besteht. Durch die Verwendung der `IServiceCollection` zur Registrierung von Modulabhängigkeiten halten wir unsere Anwendung flexibel und offen für Erweiterungen, während wir gleichzeitig die Vorteile der Dependency Injection und der losen Kopplung voll ausschöpfen.
 
-## Testdaten
+## Weiteere Infos
 
-Für Unittesting mit Videodateien stehen Testdaten bereit: [Testdateien](docs/Tests.md)
-
-## Dokumentation
+- [Testdateien](docs/Tests.md)
 - [Dateistruktur Infuse](/docs/Dateistruktur.md)
-
-### Recherche
-- [Nachrichtensystem in einem modularen Monolithen](/docs/research/Nachrichtensystem.md)
-- [Konfiguration](/docs/research/Konfiguration.md)
-- [Hosting](/docs/research/Hosting.md)
+- [Recherche](/https://github.com/kurmann/infuse-media-integrator/tree/main/docs/research)
