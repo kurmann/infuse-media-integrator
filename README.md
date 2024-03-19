@@ -119,4 +119,4 @@ Das Hauptziel dieser Integrationsmethode ist es, eine konsistente, wartbare und 
 
 - [Testdateien](docs/Tests.md)
 - [Dateistruktur Infuse](/docs/Dateistruktur.md)
-- [Recherche](/https://github.com/kurmann/infuse-media-integrator/tree/main/docs/research)
+- [Recherche](https://github.com/kurmann/infuse-media-integrator/tree/main/docs/research)
