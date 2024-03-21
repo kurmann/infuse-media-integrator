@@ -1,6 +1,6 @@
 namespace Kurmann.InfuseMediaIntegrator;
 
-public class Settings
+public class ModuleSettings
 {
     /// <summary>
     /// Der Pfad zur Mediathek
