@@ -6,12 +6,12 @@ namespace Kurmann.InfuseMediaIntegrator.Module;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddInfuseMediaIntegrator(this IServiceCollection services, Action<ModuleSettings> configure)
+    public static IServiceCollection AddInfuseMediaIntegrator(this IServiceCollection services, ModuleSettings? moduleSettings)
     {
         // Konfigurationseinstellungen anwenden
-        if (configure != null)
+        if (moduleSettings != null)
         {
-            services.Configure(configure);
+            services.AddSingleton(moduleSettings);
         }
         
         services.AddHostedService<FileWatcherService>();
