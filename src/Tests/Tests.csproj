@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ConsoleApp\ConsoleApp.csproj" />
+    <ProjectReference Include="..\Core\Core.csproj" />
   </ItemGroup>
   
   <!-- Kopiert die Test-Dateien ins Ausgabeverzeichnis damit diese beim Testen zuverlässig gefunden werden -->

@@ -21,7 +21,7 @@ public class InputDirectorySettings
     public string? Path { get; init; }
 
     /// <summary>
-    /// Die Dateiendungen, die überwacht werden sollen
+    /// Die Dateiendungen, die überwacht werden sollenÍ
     /// </summary>
     public List<string> ExtensionsToWatch { get; set; } = [".m4v", ".mp4v", ".mov", ".jpg", ".jpeg", ".png"];
 }
