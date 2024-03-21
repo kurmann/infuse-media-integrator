@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Kurmann.InfuseMediaIntegrator.Module;
 
-public static class ServiceCollectionExtensions
+public static class ServiceCollection
 {
     public static IServiceCollection AddInfuseMediaIntegrator(this IServiceCollection services, ModuleSettings? moduleSettings)
     {
