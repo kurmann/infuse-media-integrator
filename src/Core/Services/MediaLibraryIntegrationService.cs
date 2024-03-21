@@ -15,7 +15,7 @@ public class MediaLibraryIntegrationService : IHostedService, IDisposable
     private readonly string? _mediaLibraryPath;
     private readonly string? _inputDirectory;
 
-    public MediaLibraryIntegrationService(ILogger<MediaLibraryIntegrationService> logger, IOptions<AppSettings> options, IMessageService messageService)
+    public MediaLibraryIntegrationService(ILogger<MediaLibraryIntegrationService> logger, IOptions<Settings> options, IMessageService messageService)
     {
         _logger = logger;
         _messageService = messageService;

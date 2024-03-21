@@ -13,7 +13,7 @@ public class FileWatcherService : IHostedService, IDisposable
     private readonly IMessageService _messageService;
     private readonly List<string> _watchedFileExtensions;
 
-    public FileWatcherService(ILogger<FileWatcherService> logger, IOptions<AppSettings> options, IMessageService messageService)
+    public FileWatcherService(ILogger<FileWatcherService> logger, IOptions<Settings> options, IMessageService messageService)
     {
         ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(options.Value.InputDirectory);

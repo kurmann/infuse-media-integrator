@@ -13,7 +13,7 @@ internal class Program
     Host.CreateDefaultBuilder(args)
         .ConfigureServices((hostContext, services) =>
         {
-            services.Configure<AppSettings>(hostContext.Configuration);
+            services.Configure<Settings>(hostContext.Configuration);
 
             services.AddLogging(builder =>
             {
