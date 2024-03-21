@@ -6,6 +6,11 @@
     <Nullable>enable</Nullable>
     <RootNamespace>Kurmann.InfuseMediaIntegrator.Entities</RootNamespace>
     <AssemblyName>Kurmann.InfuseMediaIntegrator.Entities</AssemblyName>
+    <PackageId>Kurmann.InfuseMediaIntegrator.Entities</PackageId>
+    <Version>1.0.0</Version>
+    <Author>Patrick Kurmann</Author>
+    <Product>InfuseMediaIntegrator</Product>
+    
   </PropertyGroup>
 
   <ItemGroup>
