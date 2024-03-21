@@ -1,4 +1,3 @@
-using Kurmann.InfuseMediaIntegratior;
 using Kurmann.InfuseMediaIntegrator.Commands;
 using Kurmann.InfuseMediaIntegrator.Entities.Elementary;
 using Kurmann.InfuseMediaIntegrator.Entities.MediaFileTypes;

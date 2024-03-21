@@ -1,5 +1,4 @@
-﻿using Kurmann.InfuseMediaIntegratior;
-using Kurmann.InfuseMediaIntegrator.Services;
+﻿using Kurmann.InfuseMediaIntegrator.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;

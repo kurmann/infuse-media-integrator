@@ -1,4 +1,3 @@
-using Kurmann.InfuseMediaIntegratior;
 using Kurmann.InfuseMediaIntegrator.Entities.MediaFileTypes;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;

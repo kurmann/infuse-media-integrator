@@ -1,4 +1,4 @@
-namespace Kurmann.InfuseMediaIntegratior;
+namespace Kurmann.InfuseMediaIntegrator;
 
 public class AppSettings
 {
