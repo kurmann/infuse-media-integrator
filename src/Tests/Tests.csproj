@@ -7,6 +7,7 @@
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
     <RootNamespace>Kurmann.InfuseMediaIntegrator.Tests</RootNamespace>
+    <AssemblyName>Kurmann.InfuseMediaIntegrator.Tests</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

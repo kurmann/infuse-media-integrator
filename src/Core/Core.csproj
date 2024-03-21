@@ -5,6 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>Kurmann.InfuseMediaIntegrator</RootNamespace>
+    <AssemblyName>Kurmann.InfuseMediaIntegrator</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
