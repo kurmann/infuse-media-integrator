@@ -19,10 +19,8 @@ internal class Program
                 var moduleSettingsSection = hostContext.Configuration;
                 services.Configure<ModuleSettings>(moduleSettingsSection);
 
-                // Erstelle eine Instanz von ModuleSettings basierend auf der Konfiguration
+                // Übergebe die ModuleSettings an den InfuseMediaIntegrator
                 var moduleSettings = moduleSettingsSection.Get<ModuleSettings>();
-
-                // Übergebe das konfigurierte ModuleSettings-Objekt an die Erweiterungsmethode
                 services.AddInfuseMediaIntegrator(moduleSettings);
 
                 // Konfiguriere das Logging
