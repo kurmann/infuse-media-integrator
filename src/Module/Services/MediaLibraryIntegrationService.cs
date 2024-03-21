@@ -98,7 +98,7 @@ public class FileMovedToMediaLibraryEventMessage : EventMessageBase
     public required IMediaFileType SourceFilePath { get; init; }
     public required IMediaFileType TargetFilePath { get; init; }
     public bool HasTargetFileBeenOverwritten { get; init; }
-    public MediaGroupInformation MediaGroup { get; init; }
+    public MediaGroupInformation? MediaGroup { get; init; }
 }
 
 public class MediaGroupInformation
