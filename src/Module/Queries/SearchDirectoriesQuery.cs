@@ -1,4 +1,4 @@
-namespace Kurmann.InfuseMediaIntegrator.Queries;
+namespace Kurmann.InfuseMediaIntegrator.Module.Queries;
 
 public class SearchDirectoriesQuery
 {

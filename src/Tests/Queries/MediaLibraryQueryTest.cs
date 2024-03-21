@@ -1,6 +1,6 @@
-using Kurmann.InfuseMediaIntegrator.Queries;
+using Kurmann.InfuseMediaIntegrator.Module.Queries;
 
-namespace Kurmann.InfuseMediaIntegrator.Tests.Queries;
+namespace Kurmann.InfuseMediaIntegrator.Tests.Module.Queries;
 
 [TestClass]
 public class MediaLibraryQueryTests

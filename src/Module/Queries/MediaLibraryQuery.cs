@@ -3,7 +3,7 @@ using Kurmann.InfuseMediaIntegrator.Entities.Elementary;
 using Kurmann.InfuseMediaIntegrator.Entities.MediaFileTypes;
 using Kurmann.InfuseMediaIntegrator.Entities.MediaLibrary;
 
-namespace Kurmann.InfuseMediaIntegrator.Queries;
+namespace Kurmann.InfuseMediaIntegrator.Module.Queries;
 
 public interface ICanDecideBetweenIdAndSpecificProperties
 {

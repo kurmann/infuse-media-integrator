@@ -1,8 +1,12 @@
-namespace Kurmann.InfuseMediaIntegrator;
+using Kurmann.InfuseMediaIntegrator.Module;
+using Kurmann.InfuseMediaIntegrator.Module.Services;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace Kurmann.InfuseMediaIntegrator.Module;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddInfuseMediaIntegrator(this IServiceCollection services, Action<AppSettings> configure)
+    public static IServiceCollection AddInfuseMediaIntegrator(this IServiceCollection services, Action<ModuleSettings> configure)
     {
         // Konfigurationseinstellungen anwenden
         if (configure != null)

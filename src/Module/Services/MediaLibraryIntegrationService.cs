@@ -1,4 +1,4 @@
-using Kurmann.InfuseMediaIntegrator.Commands;
+using Kurmann.InfuseMediaIntegrator.Module.Commands;
 using Kurmann.InfuseMediaIntegrator.Entities.Elementary;
 using Kurmann.InfuseMediaIntegrator.Entities.MediaFileTypes;
 using Kurmann.InfuseMediaIntegrator.Entities.MediaLibrary;
@@ -6,7 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Kurmann.InfuseMediaIntegrator.Services;
+namespace Kurmann.InfuseMediaIntegrator.Module.Services;
 
 public class MediaLibraryIntegrationService : IHostedService, IDisposable
 {

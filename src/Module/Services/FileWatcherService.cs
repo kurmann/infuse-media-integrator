@@ -3,7 +3,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Kurmann.InfuseMediaIntegrator.Services;
+namespace Kurmann.InfuseMediaIntegrator.Module.Services;
 
 public class FileWatcherService : IHostedService, IDisposable
 {

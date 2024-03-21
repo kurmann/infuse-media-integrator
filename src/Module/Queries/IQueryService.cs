@@ -1,6 +1,6 @@
 using CSharpFunctionalExtensions;
 
-namespace Kurmann.InfuseMediaIntegrator.Queries;
+namespace Kurmann.InfuseMediaIntegrator.Module.Queries;
 
 public interface IQueryService<T>
 {

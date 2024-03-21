@@ -1,6 +1,6 @@
-using Kurmann.InfuseMediaIntegrator.Commands;
+using Kurmann.InfuseMediaIntegrator.Module.Queries;
 
-namespace Kurmann.InfuseMediaIntegrator.Tests.Queries;
+namespace Kurmann.InfuseMediaIntegrator.Tests.Module.Queries;
 
 [TestClass]
 public class MetadataFromFileQueryTests

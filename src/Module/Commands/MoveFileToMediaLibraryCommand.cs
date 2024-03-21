@@ -2,10 +2,10 @@ using CSharpFunctionalExtensions;
 using Kurmann.InfuseMediaIntegrator.Entities.Elementary;
 using Kurmann.InfuseMediaIntegrator.Entities.MediaFileTypes;
 using Kurmann.InfuseMediaIntegrator.Entities.MediaLibrary;
-using Kurmann.InfuseMediaIntegrator.Queries;
+using Kurmann.InfuseMediaIntegrator.Module.Queries;
 using Microsoft.Extensions.Logging;
 
-namespace Kurmann.InfuseMediaIntegrator.Commands;
+namespace Kurmann.InfuseMediaIntegrator.Module.Commands;
 
 public class MoveFileToMediaLibraryCommand : ICommand<FileMovedToMediaLibraryResultArgs>
 {

@@ -1,6 +1,7 @@
 using CSharpFunctionalExtensions;
+using Kurmann.InfuseMediaIntegrator.Module.Queries;
 
-namespace Kurmann.InfuseMediaIntegrator.Commands;
+namespace Kurmann.InfuseMediaIntegrator.Module.Commands;
 
 /// <summary>
 /// Erstellt ein Fanart-Infuse-Image aus einem MP4-Video.

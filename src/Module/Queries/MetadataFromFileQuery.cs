@@ -1,9 +1,9 @@
 using CSharpFunctionalExtensions;
 using Kurmann.InfuseMediaIntegrator.Entities;
 using Kurmann.InfuseMediaIntegrator.Entities.MediaLibrary;
-using Kurmann.InfuseMediaIntegrator.Queries;
+using Kurmann.InfuseMediaIntegrator.Module.Queries;
 
-namespace Kurmann.InfuseMediaIntegrator.Commands;
+namespace Kurmann.InfuseMediaIntegrator.Module.Queries;
 
 public class MetadataFromFileQuery(string? filePath) : IQueryService<MediaFileMetadata>
 {

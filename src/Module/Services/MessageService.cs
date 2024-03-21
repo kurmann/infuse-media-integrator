@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 
-namespace Kurmann.InfuseMediaIntegrator.Services;
+namespace Kurmann.InfuseMediaIntegrator.Module.Services;
 
 public interface IEventMessage { }
 

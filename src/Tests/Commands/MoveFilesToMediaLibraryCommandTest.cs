@@ -1,7 +1,7 @@
-using Kurmann.InfuseMediaIntegrator.Commands;
+using Kurmann.InfuseMediaIntegrator.Module.Commands;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace Kurmann.InfuseMediaIntegrator.Tests.Commands;
+namespace Kurmann.InfuseMediaIntegrator.Tests.Module.Commands;
 
 [TestClass]
 public class MoveFilesToMediaLibraryCommandTest

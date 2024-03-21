@@ -1,4 +1,4 @@
-namespace Kurmann.InfuseMediaIntegrator;
+namespace Kurmann.InfuseMediaIntegrator.Module;
 
 public class ModuleSettings
 {

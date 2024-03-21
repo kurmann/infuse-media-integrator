@@ -1,6 +1,6 @@
-using Kurmann.InfuseMediaIntegrator.Commands;
+using Kurmann.InfuseMediaIntegrator.Module.Commands;
 
-namespace Kurmann.InfuseMediaIntegrator.Tests.Commands;
+namespace Kurmann.InfuseMediaIntegrator.Tests.Module.Commands;
 
 [TestClass]
 public class CreateFanartInfuseImageCommandTests

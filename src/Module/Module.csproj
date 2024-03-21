@@ -4,13 +4,14 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>Kurmann.InfuseMediaIntegrator</RootNamespace>
-    <AssemblyName>Kurmann.InfuseMediaIntegrator</AssemblyName>
+    <RootNamespace>Kurmann.InfuseMediaIntegrator.Module</RootNamespace>
+    <AssemblyName>Kurmann.InfuseMediaIntegrator.Module</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="CSharpFunctionalExtensions" Version="2.40.3" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
     <PackageReference Include="TagLibSharp" Version="2.3.0" />

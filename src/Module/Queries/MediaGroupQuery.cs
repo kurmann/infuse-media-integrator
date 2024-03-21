@@ -1,7 +1,7 @@
 using CSharpFunctionalExtensions;
 using Kurmann.InfuseMediaIntegrator.Entities.MediaLibrary;
 
-namespace Kurmann.InfuseMediaIntegrator.Queries;
+namespace Kurmann.InfuseMediaIntegrator.Module.Queries;
 
 /// <summary>
 /// Führt eine Abfrage auf die Mediathek durch und gibt ein Verzeichnis zurück, das eine Mediengruppe darstellt.
