@@ -20,10 +20,5 @@ internal class Program
                 builder.ClearProviders();
                 builder.AddConsole();
             });
-
-            services.AddHostedService<FileWatcherService>();
-            services.AddHostedService<MediaLibraryIntegrationService>();
-
-            services.AddSingleton<IMessageService, MessageService>();
         });
 }
