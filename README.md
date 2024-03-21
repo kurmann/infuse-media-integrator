@@ -115,7 +115,7 @@ Diese Struktur bietet eine klare und kohärente Methode, um Module dynamisch in 
 
 Das Hauptziel dieser Integrationsmethode ist es, eine konsistente, wartbare und erweiterbare Basis für die Entwicklung von Software zu bieten, die aus mehreren Modulen besteht. Durch die Verwendung der `IServiceCollection` zur Registrierung von Modulabhängigkeiten halten wir unsere Anwendung flexibel und offen für Erweiterungen, während wir gleichzeitig die Vorteile der Dependency Injection und der losen Kopplung voll ausschöpfen.
 
-## Weiteere Infos
+## Weitere Infos
 
 - [Testdateien](docs/Tests.md)
 - [Dateistruktur Infuse](/docs/Dateistruktur.md)
