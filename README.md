@@ -1,5 +1,13 @@
 # Infuse Media Integrator
 
+## Archivierung
+
+### Dieses Repository wurde in das Monorepo "kurmann/videoschnitt" migriert
+
+**Hinweis:** Dieses Repository wird nicht mehr aktiv weiterentwickelt und ist archiviert. Die Entwicklung wird nun im Monorepo [kurmann/videoschnitt](https://github.com/kurmann/videoschnitt) fortgeführt.
+
+---
+
 ## Anforderungen und Prozess für das Verschieben von Dateien in die Mediathek
 
 ### Eingangsverzeichnis und Kategorisierung
